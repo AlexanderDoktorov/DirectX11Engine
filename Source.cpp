@@ -82,7 +82,6 @@ int main(int argc, char* argv[])
 
 	sln.reverseList(&head);
 
-	
 	tmp = &head;
 
 	do 
@@ -90,9 +89,6 @@ int main(int argc, char* argv[])
 		cout << tmp->val;
 		tmp = tmp->next;
 	} while (tmp != nullptr);
-
-
-
 
 	return 0;
 }
