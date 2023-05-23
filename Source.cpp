@@ -22,12 +22,6 @@ cout << endl;*/
 
 using namespace std;
 
-int Factorial(const int& n)
-{
-	if (n == 0 || n == 1) return 1;
-	return(n * Factorial(n - 1));
-}
-
 struct ListNode {
 	int val;
 	ListNode* next;
