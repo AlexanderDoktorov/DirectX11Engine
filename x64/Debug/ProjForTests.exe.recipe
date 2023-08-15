@@ -5,7 +5,14 @@
       <FullPath>G:\Visual Studio Projects\ProjForTests\x64\Debug\ProjForTests.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
-  <ContentFiles />
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>G:\Visual Studio Projects\ProjForTests\SolidPS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>G:\Visual Studio Projects\ProjForTests\DefaultVS.cso</FullPath>
+    </ContentFile>
+  </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />
 </Project>
