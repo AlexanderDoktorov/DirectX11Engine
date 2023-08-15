@@ -6,7 +6,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 	try
 	{
 		Application app = Application();
-		return app.Go(nCmdShow);
+		return app.Start(nCmdShow);
 	}
 	catch (hrException& hr_ex)
 	{

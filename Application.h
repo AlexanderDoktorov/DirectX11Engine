@@ -1,11 +1,8 @@
 #pragma once
-#include <DirectXColors.h>
-
 #include "Window.h"
 #include "Graphics.h"
-#include "Histogramm.h"
-
-#include "imgui.h"
+#include "Box.h"
+#include "ImGuiManager.h"
 
 class Application
 {
@@ -13,21 +10,17 @@ public:
 
 	Application();
 
-	int Go(int nCmdShow);
+	int Start(int nCmdShow);
+
+	~Application();
 
 private:
 
-	bool IsSorting = false;
-	bool FrameUpdated = false;
-
 	void UpdateFrame();
-	void ShakerSort(Histogramm& hist);
-	void BubbleSort(Histogramm& hist);
 
+	ImGuiManager ImMan = ImGuiManager();
 	std::unique_ptr<Window> window;
 	std::unique_ptr<Graphics> gfx;
-
-	std::unique_ptr<Histogramm> hist;
-	std::unique_ptr<Histogramm> initial_hist;
-	std::unique_ptr<Column> clmn;
+	Box<1.f>* box;
+	Parallelogram<2.f,1.f,4.f>* large_box;
 };

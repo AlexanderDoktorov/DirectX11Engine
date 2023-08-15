@@ -1,11 +1,5 @@
 ﻿G:\Visual Studio Community 2022\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ProjForTests.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  compilation object save succeeded; see G:\Visual Studio Projects\ProjForTests\ParallelogramVertexShader.cso
   Application.cpp
-G:\Visual Studio Projects\ProjForTests\Application.cpp(35,33): warning C4244: аргумент: преобразование "int" в "const float", возможна потеря данных
-G:\Visual Studio Projects\ProjForTests\Application.cpp(67,12): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-G:\Visual Studio Projects\ProjForTests\Application.cpp(124,35): warning C4244: аргумент: преобразование "int" в "const float", возможна потеря данных
-  Column.cpp
-  Histogramm.cpp
   main.cpp
   Создание кода...
   ProjForTests.vcxproj -> G:\Visual Studio Projects\ProjForTests\x64\Debug\Sorting Visualizer.exe

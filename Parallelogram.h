@@ -3,19 +3,21 @@
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
 
-template <float width, float height, float length>
-class Parallelogram : DrawableBase< Parallelogram< width,height,length > >
+template <float width = 1.f, float height = 1.f, float length = 1.f>
+class Parallelogram : public DrawableBase< Parallelogram< width,height,length > >
 {
+	using DrawableBase<Parallelogram<width, height, length>>::Initilized;
+	using DrawableBase<Parallelogram<width, height, length>>::AddStaticElement;
+	using DrawableBase<Parallelogram<width, height, length>>::AddElement;
 public:
 	Parallelogram(Graphics& Gfx)
 	{
 		DOK_assert(Initilized(), L"Make sure you made template of Parallelogram with Parallelogram::Make(Graphics& gfx)");
 
-		AddElement(std::make_unique<ColorBuffer>(Gfx, *this));
 		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
 	}
 
-	static void Make(Graphics& gfx)
+	static void Make(Graphics& Gfx)
 	{
 		if (!Initilized())
 		{
@@ -84,10 +86,9 @@ public:
 	{
 		return;
 	}
+
 private:
 	float x = 0.f;
 	float y = 0.f;
 	float z = 0.f;
 };
-
-Parallelogram<1.f,1.f,1.f> plg;
