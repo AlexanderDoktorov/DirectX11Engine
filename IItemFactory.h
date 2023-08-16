@@ -4,17 +4,17 @@
 class IItemFactory
 {
 public:
-	 template <float width, float height, float length>
-	 static void CreateParallelogramm(Graphics& gfx, Parallelogram<width, height, length>** ppParallelogramm)
-	 {
-		 Parallelogram<width, height, length>::Make(gfx);
-		 *ppParallelogramm = new Parallelogram<width, height, length>(gfx);
-	 }
+	virtual ~IItemFactory() = default;
 
-	 template <float size>
-	 static void CreateBox(Graphics& gfx, Box<size>** ppBox)
-	 {
-		 Box<size>::Make(gfx);
-		 *ppBox = new Box<size>(gfx);
-	 }
+	virtual void CreateParallelogramm(Graphics& gfx, Parallelogram** ppParallelogramm)
+	{
+		Parallelogram::Make(gfx);
+		*ppParallelogramm = new Parallelogram(gfx);
+	}
+
+	virtual void CreateBox(Graphics& gfx, Box** ppBox)
+	{
+		Box::Make(gfx);
+		*ppBox = new Box(gfx);
+	}
 };

@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Column.cpp" />
     <ClCompile Include="DOK_assert.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -203,6 +204,7 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Shift.cpp" />
@@ -216,10 +218,14 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Box.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="IItemFactory.h" />
     <ClInclude Include="ImGuiManager.h" />
+    <ClInclude Include="ItemFactory.h" />
     <ClInclude Include="Items.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="Parallelogram.h" />
+    <ClInclude Include="RawInputDevices.h" />
     <ClInclude Include="Sorts.h" />
     <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="Column.h" />

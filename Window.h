@@ -1,5 +1,9 @@
 #pragma once
 #include "ResizingBaseWindow.h"
+#include "Camera.h"
+#include "Mouse.h"
+#include "DOK_assert.h"
+#include "RawInputDevices.h"
 #include <memory>
 
 #include "ImGui\backend\imgui_impl_win32.h"
@@ -10,6 +14,8 @@ public:
     Window(const wchar_t* Tag, DWORD dw_style)
     {
         Create(Tag, dw_style);
+        devices.AddDevice(hWnd, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_MOUSE);
+        devices.Register();
         ImGui_ImplWin32_Init(hWnd);
     }
 
@@ -20,18 +26,17 @@ public:
 
     LPCWSTR ClassName() const noexcept override { return L"DirectX11 Example"; }
     LRESULT CALLBACK HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    Mouse& GetMouse() { return mouse; }
 
 private:
-    class Mouse
-    {
-    public:
-        Mouse() : pos_x(0U), pos_y(0U) {}
-        UINT pos_x;
-        UINT pos_y;
-    } Mouse;
+    bool captured = false;
+    void CaptureCursor();
+    void ReleaseCursor();
+private:
+    Camera* camera = nullptr;
 public:
-    UINT  MousePosX() { return Mouse.pos_x; }
-    UINT  MousePosY() { return Mouse.pos_y; }
-    float NormalMousePosX() { return  2.f * (Mouse.pos_x / (float)GetHeight()) - 1.f; }
-    float NormalMousePosY() { return -2.f * (Mouse.pos_y / (float)GetWidth()) + 1.f; }
+    void AddCamera(Camera* _camera) { DOK_assert(_camera != nullptr, L"Empty camera!"); camera = _camera; }
+private:
+    RawInputDevices devices;
+    Mouse mouse;
 };

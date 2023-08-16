@@ -104,6 +104,12 @@
     <ClCompile Include="WICTextureLoader.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h">
@@ -226,23 +232,35 @@
     <ClInclude Include="WICTextureLoader.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="IItemFactory.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Items.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Parallelogram.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
     <ClInclude Include="Column.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="Histogramm.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
+    <ClInclude Include="Parallelogram.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
     <ClInclude Include="Box.h">
       <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Items.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="IItemFactory.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemFactory.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="RawInputDevices.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

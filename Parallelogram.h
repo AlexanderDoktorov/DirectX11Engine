@@ -3,14 +3,10 @@
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
 
-template <float width = 1.f, float height = 1.f, float length = 1.f>
-class Parallelogram : public DrawableBase< Parallelogram< width,height,length > >
+class Parallelogram : public DrawableBase<Parallelogram>
 {
-	using DrawableBase<Parallelogram<width, height, length>>::Initilized;
-	using DrawableBase<Parallelogram<width, height, length>>::AddStaticElement;
-	using DrawableBase<Parallelogram<width, height, length>>::AddElement;
 public:
-	Parallelogram(Graphics& Gfx)
+	Parallelogram(Graphics& Gfx, float length = 1.f, float height = 1.f, float width = 1.f) : scale_x(length), scale_y(height), scale_z(width)
 	{
 		DOK_assert(Initilized(), L"Make sure you made template of Parallelogram with Parallelogram::Make(Graphics& gfx)");
 
@@ -21,9 +17,9 @@ public:
 	{
 		if (!Initilized())
 		{
-			auto half_x = length / 2.f;
-			auto half_y = height / 2.f;
-			auto half_z = width / 2.f;
+			float half_x = 0.5f;
+			float half_y = 0.5f ;
+			float half_z = 0.5f;
 
 			struct Vertex
 			{
@@ -78,9 +74,14 @@ public:
 	{
 		x = _x; y = _y; z = _z;
 	}
+
+	virtual void				Scale(float scale_x_new = 1.f, float scale_y_new = 1.f, float scale_z_new = 1.f)
+	{
+		scale_x = scale_x_new; scale_y = scale_y_new; scale_z = scale_z_new;
+	}
 	virtual DirectX::XMMATRIX	GetTransform()				const noexcept override
 	{
-		return DirectX::XMMatrixTranslation(x, y, z);
+		return DirectX::XMMatrixScaling(scale_x, scale_y, scale_z) * DirectX::XMMatrixTranslation(x, y, z);
 	}
 	virtual void				Update(float dt)			noexcept override
 	{
@@ -91,4 +92,8 @@ private:
 	float x = 0.f;
 	float y = 0.f;
 	float z = 0.f;
+
+	float scale_x = 1.f;
+	float scale_y = 1.f;
+	float scale_z = 1.f;
 };

@@ -1,10 +1,15 @@
 #pragma once
 #include "Parallelogram.h"
 
-template <float size>
-class Box : public Parallelogram<size, size, size>
+class Box : public Parallelogram
 {
+	using Parallelogram::Parallelogram;
 public:
-	using Parallelogram<size, size, size>::Parallelogram;
-	using Parallelogram<size, size, size>::Make;
+
+	Box(Graphics& gfx, float size = 1.f) : Parallelogram(gfx, size, size, size) {}
+
+	void Scale(float k)
+	{
+		Parallelogram::Scale(k, k, k);
+	}
 };
