@@ -91,15 +91,14 @@ void Game::UpdateFrame()
 	ball_1->Draw(*gfx);
 	sheet->Draw(*gfx);
 
-	light->ShowControlWindow();
-	ImGui::ShowDemoWindow();
+	//light->ShowControlWindow();
+	//ImGui::ShowDemoWindow();
 
-	gfx->SetShaderResourses();
-	gfx->ShowRenderWindow();
+	//gfx->SetShaderResourses();
+	//gfx->ShowRenderWindow();
 	
 	//cam.ShowControlWindow();
 	//window->GetMouse().ShowMenu();
-	//window->PutIntoImGuiWnd(*gfx);
 
 	gfx->EndFrame();
 }

@@ -54,14 +54,13 @@ public:
 private:
 
 	bool			ImGuiEnabled    = true;
-	bool			RenderToImGui	= false;
 	dx::XMMATRIX	projection		= dx::XMMatrixIdentity();
 	Camera			cam				= Camera();
 	D3D11_VIEWPORT  vp;
 
 	void ResizeBackBuffer(const UINT& width, const UINT& height);
-	void ReCreateDepthStencilView();
-	void ReCreateRenderTargetView();
+	void CreateDepthStencilView();
+	void CreateRenderTargetView();
 
 	template<class T>
 	void ResizeViews(const ResizingBaseWindow<T>* pWnd)
