@@ -1,14 +1,14 @@
 #pragma once
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
-class PixelShader : public IPipelineElement
+class PixelShader : public IBindable
 {
 public:
 	PixelShader(Graphics& Gfx, const wchar_t* fileName);
 
 	ID3DBlob* GetBlob() noexcept;
 
-	void Attach(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> p_PS;

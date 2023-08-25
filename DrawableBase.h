@@ -1,16 +1,16 @@
 #pragma once
 #include "DOK_assert.h"
-#include "PipelineObject.h"
+#include "Drawable.h"
 
 template <class T>
-class DrawableBase : public PipelineObject
+class DrawableBase : public Drawable
 {
 protected:
 	DrawableBase() = default;
 
 	static bool Initilized() noexcept { return initilized; }
 
-	static void AddStaticElement(std::unique_ptr<IPipelineElement> _elem) noexcept
+	static void AddStaticElement(std::unique_ptr<IBindable> _elem) noexcept
 	{
 		initilized = true;
 		if (auto p = dynamic_cast<IndexBuffer*>(_elem.get()))
@@ -23,16 +23,16 @@ protected:
 public:
 	void Draw(Graphics& Gfx) override
 	{
-		DOK_assert(staticIndexBuffer != nullptr || pIndexBuffer != nullptr, L"Non of the index buffer is set for drawing, add one with AddStaticElement() or AddElement()");
-		DOK_assert(staticIndexBuffer == nullptr || pIndexBuffer == nullptr, L"Both of the index buffers [static] and [non-static] is set for drawing, which one to use?");
+		//DOK_assert_noexit(staticIndexBuffer != nullptr || pIndexBuffer != nullptr, L"Non of the index buffer is set for drawing, add one with AddStaticElement() or AddElement()");
+		DOK_assert_noexit(staticIndexBuffer == nullptr || pIndexBuffer == nullptr, L"Both of the index buffers [static] and [non-static] is set for drawing, which one to use?");
 
 		for (auto& non_static_el : PipelineElements)
 		{
-			non_static_el->Attach(Gfx);
+			non_static_el->Bind(Gfx);
 		}
 		for (auto& static_el : StaticPipelineElements)
 		{
-			static_el->Attach(Gfx);
+			static_el->Bind(Gfx);
 		}
 		if(staticIndexBuffer)
 			Gfx.DrawIndexed(staticIndexBuffer->GetCount());
@@ -42,7 +42,7 @@ public:
 
 	virtual ~DrawableBase() = default;
 private:
-	static std::vector<std::unique_ptr<IPipelineElement>> StaticPipelineElements;
+	static std::vector<std::unique_ptr<IBindable>> StaticPipelineElements;
 	static IndexBuffer* staticIndexBuffer;
 	static bool initilized;
 };
@@ -54,4 +54,4 @@ template<class T>
 IndexBuffer* DrawableBase<T>::staticIndexBuffer = nullptr;
 
 template<class T>
-std::vector<std::unique_ptr<IPipelineElement>> DrawableBase<T>::StaticPipelineElements {};
+std::vector<std::unique_ptr<IBindable>> DrawableBase<T>::StaticPipelineElements {};

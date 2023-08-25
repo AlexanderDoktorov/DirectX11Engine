@@ -12,7 +12,7 @@ ID3DBlob* PixelShader::GetBlob() noexcept
 	return p_Blob.Get();
 }
 
-void PixelShader::Attach(Graphics& Gfx) noexcept
+void PixelShader::Bind(Graphics& Gfx) noexcept
 {
 	GetContext(Gfx)->PSSetShader(p_PS.Get(), nullptr, 0U);
 }

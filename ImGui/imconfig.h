@@ -120,3 +120,8 @@ namespace ImGui
     void MyFunction(const char* name, const MyMatrix44& v);
 }
 */
+#include "d3d11.h"
+
+#define IM_VEC2_CLASS_EXTRA \
+ImVec2 operator+(const ImVec2& rhs) { return ImVec2(rhs.x + x, rhs.y + y); }\
+ImVec2 operator-(const ImVec2& rhs) { return ImVec2(x - rhs.x, y - rhs.y); }

@@ -1,12 +1,12 @@
 #pragma once
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
-class HullShader : public IPipelineElement
+class HullShader : public IBindable
 {
 public:
 	HullShader(Graphics& Gfx, const wchar_t* FileName);
 
-	virtual void Attach(Graphics& Gfx) noexcept override;
+	virtual void Bind(Graphics& Gfx) noexcept override;
 
 private:
 	wrl::ComPtr<ID3D11HullShader> p_HullShader;

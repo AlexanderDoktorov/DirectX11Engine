@@ -5,12 +5,12 @@
 template <class T = DirectX::XMFLOAT4>
 class PixelConstantBuffer : public ConstantBuffer<T>
 {
-	using IPipelineElement::GetContext;
+	using IBindable::GetContext;
 	using ConstantBuffer<T>::p_ConstantBuffer;
 public:
-	using ConstantBuffer<T>::ConstantBuffer;
+	using  ConstantBuffer<T>::ConstantBuffer;
 
-	virtual void Attach(Graphics& Gfx) noexcept override
+	virtual void Bind(Graphics& Gfx) noexcept override
 	{
 		GetContext(Gfx)->PSSetConstantBuffers(0U, 1U, p_ConstantBuffer.GetAddressOf()); // : register(b0)
 	}

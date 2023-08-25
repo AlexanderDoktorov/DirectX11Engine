@@ -2,9 +2,9 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <vector>
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
-class IndexBuffer : public IPipelineElement
+class IndexBuffer : public IBindable
 {
 public:
 	IndexBuffer(Graphics& Gfx, const std::vector<unsigned short>& indicies)
@@ -23,7 +23,7 @@ public:
 		CHECK_HR ( GetDevice(Gfx)->CreateBuffer(&IBD, &ISD, &p_IndexBuffer) );
 	}
 
-	void Attach(Graphics& Gfx) noexcept
+	void Bind(Graphics& Gfx) noexcept
 	{
 		GetContext(Gfx)->IASetIndexBuffer(p_IndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0U);
 	}

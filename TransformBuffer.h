@@ -1,16 +1,28 @@
 #pragma once
-#include "PipelineObject.h"
+#include "Drawable.h"
 #include "VertexConstantBuffer.h"
 
-class TransformBuffer : public IPipelineElement
+class TransformBuffer : public IBindable
 {
 public:
 
-	TransformBuffer(Graphics& Gfx, PipelineObject& parent);
+	TransformBuffer(Graphics& Gfx, Drawable& parent);
 
-	virtual void Attach(Graphics& Gfx) noexcept override;
+	virtual void Bind(Graphics& Gfx) noexcept override;
 
 private:
-	const PipelineObject& parent;
-	static	std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> Cbuff;
+
+	struct Transformations
+	{
+		dx::XMMATRIX ModelToProjection;
+		dx::XMMATRIX ModelToView;
+
+		Transformations(const dx::XMMATRIX& ModelToProjection, const dx::XMMATRIX& ModelToView)
+			: ModelToProjection(ModelToProjection), ModelToView(ModelToView)
+		{
+		}
+	};
+
+	const Drawable& parent;
+	static	std::unique_ptr<VertexConstantBuffer<Transformations>> Cbuff;
 };

@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
-class VertexBuffer : public IPipelineElement
+class VertexBuffer : public IBindable
 {
 public:
     template <class T>
@@ -20,7 +20,7 @@ public:
         CHECK_HR ( GetDevice(Gfx)->CreateBuffer(&vbd, &vsd, &p_VertexBuffer) );
     }
 
-    void Attach(Graphics& Gfx) noexcept override
+    void Bind(Graphics& Gfx) noexcept override
     {
         UINT offset = 0U;
         GetContext(Gfx)->IASetVertexBuffers(0U, 1U, p_VertexBuffer.GetAddressOf(), &VertexStrides, &offset);

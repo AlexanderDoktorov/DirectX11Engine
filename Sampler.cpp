@@ -11,7 +11,7 @@ Sampler::Sampler(Graphics& Gfx)
 	CHECK_HR ( GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState) );
 }
 
-void Sampler::Attach(Graphics& Gfx) noexcept
+void Sampler::Bind(Graphics& Gfx) noexcept
 {
 	GetContext(Gfx)->PSSetSamplers(0U, 1U, p_SamplerState.GetAddressOf());
 }

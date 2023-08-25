@@ -22,6 +22,12 @@
     <Filter Include="Файлы заголовков\Items">
       <UniqueIdentifier>{a2d7a4fd-2584-4511-a357-e73868b44bb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Devices">
+      <UniqueIdentifier>{9a43bf03-4e8b-4221-8d3b-2061ec703b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Items\Geometries">
+      <UniqueIdentifier>{6d3a19ce-f289-42c7-a097-30130961ca4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SolidPS.hlsl">
@@ -30,10 +36,19 @@
     <FxCompile Include="DefaultVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="ParallelogramVertexShader.hlsl">
+    <FxCompile Include="BarTexturedVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="ParallelogramPixelShader.hlsl">
+    <FxCompile Include="BarTexturedPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidLitPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="SolidLitVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>
@@ -53,7 +68,7 @@
     <ClCompile Include="DOK_assert.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Column.cpp">
@@ -98,9 +113,6 @@
     <ClCompile Include="TransformBuffer.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="VertexShader.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="WICTextureLoader.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
@@ -108,7 +120,7 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Mouse.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Файлы заголовков\Devices</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,19 +148,13 @@
     <ClInclude Include="Window.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="WindowClass.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="DOK_assert.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorBuffer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="GenerateShuffledVector.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
+    <ClInclude Include="Game.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -196,10 +202,10 @@
     <ClInclude Include="InputLayout.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="IPipelineElement.h">
+    <ClInclude Include="IBindable.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineObject.h">
+    <ClInclude Include="Drawable.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="PixelConstantBuffer.h">
@@ -238,19 +244,10 @@
     <ClInclude Include="Histogramm.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
-    <ClInclude Include="Parallelogram.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
     <ClInclude Include="Box.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="Items.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="IItemFactory.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="ItemFactory.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
@@ -259,8 +256,56 @@
     <ClInclude Include="RawInputDevices.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
     <ClInclude Include="Mouse.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexedTriangleList.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Bar.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="DOK_math.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidLightenedBall.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Файлы заголовков\Items\Geometries</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Файлы заголовков\Items\Geometries</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowClass.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="LightConstantBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidBall.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon.h">
+      <Filter>Файлы заголовков\Items\Geometries</Filter>
+    </ClInclude>
+    <ClInclude Include="Sheet.h">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

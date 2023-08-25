@@ -1,14 +1,25 @@
 #pragma once
-#include "IPipelineElement.h"
+#include "IBindable.h"
+#include <d3dcompiler.h>
 
-class VertexShader : public IPipelineElement
+class VertexShader : public IBindable
 {
 public:
-	VertexShader(Graphics& Gfx, const wchar_t* fileName);
+	VertexShader(Graphics& Gfx, const wchar_t* fileName)
+	{
+		CHECK_HR(D3DReadFileToBlob(fileName, &p_Blob));
+		CHECK_HR(GetDevice(Gfx)->CreateVertexShader(p_Blob->GetBufferPointer(), p_Blob->GetBufferSize(), nullptr, &p_VS));
+	}
 
-	ID3DBlob* GetBlob() noexcept;
+	ID3DBlob* GetBlob() noexcept
+	{
+		return p_Blob.Get();
+	}
 
-	void Attach(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		GetContext(Gfx)->VSSetShader(p_VS.Get(), nullptr, 0U);
+	}
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> p_VS;

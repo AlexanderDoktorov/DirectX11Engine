@@ -68,6 +68,7 @@ Graphics::Graphics(HWND hwnd) :
     p_Context->OMSetDepthStencilState(p_DSState.Get(), 1U);
     CreateRenderTargetView();
     CreateDepthStencilView();
+    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 
     RECT rc;
     GetClientRect(hwnd, &rc);
@@ -99,6 +100,65 @@ void Graphics::SetProjection(dx::XMMATRIX projection) noexcept
 dx::XMMATRIX Graphics::GetProjection() const noexcept
 {
     return projection;
+}
+
+void Graphics::SetCamera(const Camera& new_cam)
+{
+    this->cam = new_cam;
+}
+
+Camera Graphics::GetCamera() const
+{
+    return this->cam;
+}
+
+void Graphics::ShowRenderWindow(bool* p_open)
+{
+    static ID3D11Texture2D* pBackBufferCopy = nullptr;
+    static ID3D11ShaderResourceView* pBackBufferResource = nullptr;
+
+    ID3D11Texture2D* pBackBuffer = nullptr;
+    g_mainRenderTargetView->GetResource(reinterpret_cast<ID3D11Resource**>(&pBackBuffer));
+
+    D3D11_TEXTURE2D_DESC descBack = { };
+    pBackBuffer->GetDesc(&descBack);
+
+    if (pBackBufferCopy == nullptr)
+    {
+        D3D11_TEXTURE2D_DESC descBackCopy = descBack;
+        descBackCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        descBackCopy.MipLevels = 0U;
+        descBackCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        p_Device->CreateTexture2D(&descBackCopy, nullptr, &pBackBufferCopy);
+    }
+
+    // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
+    p_Context->CopySubresourceRegion(pBackBufferCopy, 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
+
+    pBackBuffer->Release();
+
+    if (pBackBufferResource == nullptr)
+    {
+        D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer = { };
+        resourceViewDescBuffer.Format = descBack.Format;
+        resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
+        resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
+        p_Device->CreateShaderResourceView(pBackBufferCopy, &resourceViewDescBuffer, &pBackBufferResource);
+    }
+
+    // regenerate mipmap based on updated most detailed mip-level
+    p_Context->GenerateMips(pBackBufferResource);
+
+    ImVec2 vecMin = { 10.f, 10.f };
+    ImVec2 vecMax = { vecMin.x + floorf((float)descBack.Width / 4.0f), vecMin.y + floorf((float)descBack.Height / 4.0f) };
+
+    if (ImGui::Begin("Viewport", p_open))
+    {
+        ImVec2 client_region_size_with_indent = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
+        ImGui::GetWindowDrawList()->AddImage(pBackBufferResource, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
+    } 
+    ImGui::End();
 }
 
 void Graphics::EndFrame()
@@ -144,7 +204,7 @@ void Graphics::ResizeBackBuffer(const UINT& width, const UINT& height)
 {
     g_mainRenderTargetView.Reset();
     g_mainDepthStencilView.Reset();
-    p_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
+    p_SwapChain->ResizeBuffers(2U, width, height, DXGI_FORMAT_UNKNOWN, 0);
     CreateDepthStencilView();
     CreateRenderTargetView();
 }

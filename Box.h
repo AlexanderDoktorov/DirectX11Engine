@@ -1,15 +1,15 @@
 #pragma once
-#include "Parallelogram.h"
+#include "Bar.h"
 
-class Box : public Parallelogram
+class Box : public Bar
 {
-	using Parallelogram::Parallelogram;
+	using Bar::Bar;
 public:
 
-	Box(Graphics& gfx, float size = 1.f) : Parallelogram(gfx, size, size, size) {}
+	Box(Graphics& gfx, float size = 1.f) : Bar(gfx, size, size, size) {}
 
 	void Scale(float k)
 	{
-		Parallelogram::Scale(k, k, k);
+		Bar::Scale(k, k, k);
 	}
 };

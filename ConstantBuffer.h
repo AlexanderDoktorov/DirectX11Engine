@@ -1,8 +1,8 @@
 #pragma once
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
 template <class T>
-class ConstantBuffer : public IPipelineElement
+class ConstantBuffer : public IBindable
 {
 public:
     ConstantBuffer(Graphics& Gfx, const T& CBData)

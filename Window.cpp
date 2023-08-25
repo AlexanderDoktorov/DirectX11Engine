@@ -13,49 +13,21 @@ LRESULT Window::HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_KEYDOWN:
-        if(wParam == 0x43) // C - Camera
+        if(wParam == Button::BUTTON_C)
         {
             if (!captured)
                 CaptureCursor();
             else
                 ReleaseCursor();
-
             break;
         }
         break;
-    case WM_MOUSEMOVE:
-
-        break;
     case WM_INPUT: // manage raw input
     {
-        // сначала получаем в байткод rawinput data
-        UINT required_size = 0U;
-        GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &required_size, sizeof(RAWINPUTHEADER));
-        BYTE* pByteCode = new BYTE[required_size]; 
-        UINT bytes = GetRawInputData((HRAWINPUT)lParam, RID_INPUT, pByteCode, &required_size, sizeof(RAWINPUTHEADER));
-        DOK_assert(bytes == required_size, L"требуемые размеры буффера для rawinput и полученные не совпадают");
-
-        // интерпретируем как указатель на структуру RAWINPUT
-        PRAWINPUT pRawInput = (PRAWINPUT)pByteCode;
-
-        if (pRawInput->header.dwType == RIM_TYPEMOUSE)
-        {
-            // LOG
-            TCHAR pszDest[100];
-            size_t size = 100;
-
-            StringCchPrintf(pszDest, size,
-                TEXT("Mouse: lLastX=%i lLastY=%i \r\n"),
-
-                pRawInput->data.mouse.lLastX,
-                pRawInput->data.mouse.lLastY);
-            OutputDebugString(pszDest);
-
-            mouse.OnDeltaRaw(pRawInput->data.mouse.lLastX, pRawInput->data.mouse.lLastY)
-        }
-
-        if(pByteCode) delete[] pByteCode;
-
+        RawData previouspos = mouse.GetRawData();
+        UpdateRawInputData(lParam);
+        RawData currentpos = mouse.GetRawData();
+        rawDeltaQueue.push(currentpos - previouspos);
 
         break;
     }
@@ -84,6 +56,17 @@ LRESULT Window::HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
+std::optional<RawData> Window::ReadRawDelta()
+{
+    if (!rawDeltaQueue.empty())
+    {
+        RawData delta = rawDeltaQueue.front();
+        rawDeltaQueue.pop();
+        return delta;
+    }
+    return {};
+}
+
 // USE RAW INPUT TO GET DELTA OF MOUSE
 
 void Window::CaptureCursor()
@@ -102,6 +85,27 @@ void Window::ReleaseCursor()
     ShowCursor(TRUE);
     ReleaseCapture();
     captured = false;
+}
+
+void Window::UpdateRawInputData(const LPARAM& lParam)
+{
+    // сначала получаем в байткод rawinput data
+    UINT required_size = 0U;
+    GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &required_size, sizeof(RAWINPUTHEADER));
+    BYTE* pByteCode = new BYTE[required_size];
+    UINT bytes = GetRawInputData((HRAWINPUT)lParam, RID_INPUT, pByteCode, &required_size, sizeof(RAWINPUTHEADER));
+    DOK_assert(bytes == required_size, L"требуемые размеры буффера для rawinput и полученные не совпадают");
+
+    // интерпретируем как указатель на структуру RAWINPUT
+    PRAWINPUT pRawInput = (PRAWINPUT)pByteCode;
+
+    if (pRawInput->header.dwType == RIM_TYPEMOUSE)
+    {
+        if (pRawInput->data.mouse.lLastX != 0 || pRawInput->data.mouse.lLastY != 0)
+            mouse.OnDeltaRaw(pRawInput->data.mouse.lLastX, pRawInput->data.mouse.lLastY);
+    }
+
+    if (pByteCode) delete[] pByteCode;
 }
 
 

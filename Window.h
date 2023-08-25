@@ -1,10 +1,13 @@
 #pragma once
 #include "ResizingBaseWindow.h"
-#include "Camera.h"
 #include "Mouse.h"
+#include "Keyboard.h"
+#include "Camera.h"
 #include "DOK_assert.h"
 #include "RawInputDevices.h"
 #include <memory>
+#include <queue>
+#include <optional>
 
 #include "ImGui\backend\imgui_impl_win32.h"
 
@@ -14,7 +17,7 @@ public:
     Window(const wchar_t* Tag, DWORD dw_style)
     {
         Create(Tag, dw_style);
-        devices.AddDevice(hWnd, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_MOUSE);
+        devices.AddDevice(hWnd, mouse);
         devices.Register();
         ImGui_ImplWin32_Init(hWnd);
     }
@@ -26,17 +29,21 @@ public:
 
     LPCWSTR ClassName() const noexcept override { return L"DirectX11 Example"; }
     LRESULT CALLBACK HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-    Mouse& GetMouse() { return mouse; }
+
+    const Mouse&            GetMouse() const { return mouse; }
+    const Keyboard&         GetKeyboard() const { return keyboard; }
+    const bool              MouseCaptured() const { return captured; }
+    std::optional<RawData>  ReadRawDelta();
 
 private:
-    bool captured = false;
+
     void CaptureCursor();
     void ReleaseCursor();
-private:
-    Camera* camera = nullptr;
-public:
-    void AddCamera(Camera* _camera) { DOK_assert(_camera != nullptr, L"Empty camera!"); camera = _camera; }
-private:
-    RawInputDevices devices;
-    Mouse mouse;
+    void UpdateRawInputData(const LPARAM& lParam);
+
+    RawInputDevices     devices;
+    Mouse               mouse;
+    Keyboard            keyboard;
+    std::queue<RawData> rawDeltaQueue;
+    bool                captured    = false;
 };

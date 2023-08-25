@@ -153,13 +153,25 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <FxCompile Include="ParallelogramPixelShader.hlsl">
+    <FxCompile Include="BarTexturedPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ps_main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ps_main</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="SolidLitPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="SolidLitVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="SolidPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -179,7 +191,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="ParallelogramVertexShader.hlsl">
+    <FxCompile Include="BarTexturedVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -187,9 +199,15 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs_main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs_main</EntryPointName>
     </FxCompile>
+    <FxCompile Include="SolidVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Column.cpp" />
     <ClCompile Include="DOK_assert.cpp" />
@@ -210,21 +228,29 @@
     <ClCompile Include="Shift.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TransformBuffer.cpp" />
-    <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="LightConstantBuffer.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="Sheet.h" />
+    <ClInclude Include="SolidBall.h" />
+    <ClInclude Include="SolidLightenedBall.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="IItemFactory.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="DOK_math.h" />
+    <ClInclude Include="IndexedTriangleList.h" />
     <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="ItemFactory.h" />
     <ClInclude Include="Items.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="LightSource.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Parallelogram.h" />
+    <ClInclude Include="Bar.h" />
     <ClInclude Include="RawInputDevices.h" />
     <ClInclude Include="Sorts.h" />
     <ClInclude Include="ColorBuffer.h" />
@@ -248,15 +274,17 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayout.h" />
-    <ClInclude Include="IPipelineElement.h" />
-    <ClInclude Include="PipelineObject.h" />
+    <ClInclude Include="IBindable.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="PixelConstantBuffer.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="ResizingBaseWindow.h" />
     <ClInclude Include="Sampler.h" />
     <ClInclude Include="Shift.h" />
     <ClInclude Include="GenerateShuffledVector.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Topology.h" />
     <ClInclude Include="TransformBuffer.h" />
     <ClInclude Include="VertexBuffer.h" />

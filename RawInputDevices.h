@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include <hidusage.h>
+#include "Device.h"
 #include <vector>
 #include "DOK_assert.h"
 
@@ -9,17 +9,17 @@ class RawInputDevices
 public:
 	RawInputDevices() {}
 
-	RawInputDevices(HWND hwnd, USAGE UsagePage, USAGE UsageID)
+	RawInputDevices(HWND hwnd, const Device& device)
 	{
-		AddDevice(hwnd, UsagePage, UsageID);
+		AddDevice(hwnd, device);
 	}
 
-	void AddDevice(HWND hwnd, USAGE UsagePage, USAGE UsageID)
+	void AddDevice(HWND hwnd, const Device& dev)
 	{
 		RAWINPUTDEVICE device{};
 		device.hwndTarget = hwnd;
-		device.usUsagePage = UsagePage;// the class of the device ( e.g. mouse)
-		device.usUsage = UsageID; // the device within the class ( e.g. first mouse)
+		device.usUsagePage = dev.GetUsagePage();// the class of the device ( e.g. mouse)
+		device.usUsage = dev.GetUsageID(); // the device within the class ( e.g. first mouse)
 		device.dwFlags = 0; // default
 		devices.push_back(device);
 	}

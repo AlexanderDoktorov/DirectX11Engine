@@ -1,15 +1,20 @@
 #pragma once
 #include <d3d11.h>
-#include "IPipelineElement.h"
+#include "IBindable.h"
 
-class Topology : public IPipelineElement
+class Topology : public IBindable
 {
 public:
 	Topology(const D3D11_PRIMITIVE_TOPOLOGY& topology) : Pt(topology) {}
 
-	void Attach(Graphics& Gfx) noexcept
+	void Bind(Graphics& Gfx) noexcept
 	{
 		GetContext(Gfx)->IASetPrimitiveTopology(Pt);
+	}
+
+	void SetTopology(const D3D11_PRIMITIVE_TOPOLOGY& topology)
+	{
+		Pt = topology;
 	}
 
 private:

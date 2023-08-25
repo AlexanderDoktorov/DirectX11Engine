@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include "ResizingBaseWindow.h"
+#include "Camera.h"
 
 #include "ImGui\backend\imgui_impl_dx11.h"
 #include "ImGui\backend\imgui_impl_win32.h"
@@ -14,7 +15,7 @@ namespace dx = DirectX;
 
 class Graphics
 {
-	friend class IPipelineElement;
+	friend class IBindable;
 public:
 	Graphics(HWND hwnd);
 
@@ -30,15 +31,18 @@ public:
 			ImGui::NewFrame();
 		}
 
-		p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 		p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 		p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
 		p_Context->RSSetViewports(1U, &vp);
 		p_Context->RSSetState(p_RSState.Get());
+		p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 	}
 
 	void SetProjection(dx::XMMATRIX projection) noexcept;
 	dx::XMMATRIX GetProjection() const noexcept;
+	void SetCamera(const Camera& cam);
+	Camera GetCamera() const;
+	void ShowRenderWindow(bool* p_open = (bool*)0);
 
 	void EndFrame();
 
@@ -48,9 +52,11 @@ public:
 
 private:
 
-	bool ImGuiEnabled;
-	dx::XMMATRIX projection;
-	D3D11_VIEWPORT vp;
+	bool			ImGuiEnabled    = true;
+	bool			RenderToImGui	= false;
+	dx::XMMATRIX	projection		= dx::XMMatrixIdentity();
+	Camera			cam				= Camera();
+	D3D11_VIEWPORT  vp;
 
 	void ResizeBackBuffer(const UINT& width, const UINT& height);
 	void CreateDepthStencilView();
@@ -75,7 +81,6 @@ private:
 			};
 		}
 	}
-
 	wrl::ComPtr<ID3D11Device>			p_Device;
 	wrl::ComPtr<ID3D11DeviceContext>	p_Context;
 	wrl::ComPtr<IDXGISwapChain>			p_SwapChain;

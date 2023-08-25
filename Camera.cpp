@@ -1,54 +1,72 @@
 #include "Camera.h"
 #include "imgui.h"
+#include "DOK_math.h"
+#include <algorithm>
 
 DirectX::XMMATRIX Camera::GetCameraMatrix() const noexcept
 {
-    using namespace DirectX;
-    const auto EyePosition = DirectX::XMVector3Transform ( DirectX::XMLoadFloat3(&CameraPosition), DirectX::XMMatrixRotationRollPitchYaw(updown_angle, leftright_angle, 0.f) );
-    const auto TransformedEyeDirection = XMVector4Transform( EyeDirection, XMMatrixRotationRollPitchYaw(direction_pitch, direction_yaw, 0.f));
+    namespace dx = DirectX;
+    using namespace dx;
 
-    return DirectX::XMMatrixLookToLH(EyePosition, TransformedEyeDirection, XMVectorSet(0.0f, 1.0f, 0.0f, 0.f));
+    const dx::XMVECTOR forwardBaseVector = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+    // apply the camera rotations to a base vector
+    const auto lookVector = XMVector3Transform(forwardBaseVector,
+        XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f)
+    );
+    // generate camera transform (applied to all objects to arrange them relative
+    // to camera position/orientation in world) from cam position and direction
+    // camera "top" always faces towards +Y (cannot do a barrel roll)
+    const auto camPosition = XMLoadFloat3(&pos);
+    const auto camTarget = camPosition + lookVector;
+
+    return XMMatrixLookAtLH(camPosition, camTarget, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 }
 
-void Camera::RotateYaw(float dyaw)
+void Camera::Translate(DirectX::XMFLOAT3 translation) noexcept
 {
-    direction_yaw += speed_factor * dyaw;
+    namespace dx = DirectX;
+    dx::XMStoreFloat3(&translation, dx::XMVector3Transform(
+        dx::XMLoadFloat3(&translation),
+        dx::XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f) *
+        dx::XMMatrixScaling(travelSpeed, travelSpeed, travelSpeed)
+    ));
+    pos = {
+        pos.x + translation.x,
+        pos.y + translation.y,
+        pos.z + translation.z
+    };
+}
+
+void Camera::Rotate(float dyaw, float dpitch) noexcept
+{
+    yaw = wrap_angle(yaw + dyaw * rotationSpeed);
+    pitch = std::clamp(pitch + dpitch * rotationSpeed, 0.995f * -PI / 2.0f, 0.995f * PI / 2.0f);
 }
 
 void Camera::ShowControlWindow(bool *p_open) noexcept
 {
-    using namespace DirectX;
-    const auto EyePosition = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&CameraPosition), DirectX::XMMatrixRotationRollPitchYaw(updown_angle, leftright_angle, 0.f));
-    const auto TransformedEyeDirection = XMVector4Transform(EyeDirection, XMMatrixRotationRollPitchYaw(direction_pitch, direction_yaw, 0.f));
-
-    if(ImGui::Begin("Camera", p_open))
+    if (ImGui::Begin("Camera"), p_open)
     {
-        ImGui::Text("Position of the camera");
-        ImGui::SliderFloat3("Position {X, Y, Z} ",      &CameraPosition.x, -30.f, 30.f, "%.1f");
-        ImGui::SliderAngle("Pitch (around x) angle",    &updown_angle);
-        ImGui::SliderAngle("Yaw (around y) angle",      &leftright_angle);
-        ImGui::Text("Camera direction");
-        ImGui::SliderAngle("Direction pitch",           &direction_pitch);
-        ImGui::SliderAngle("Direction yaw ",            &direction_yaw);
-        ImGui::SliderFloat("Speed Factor",              &speed_factor, 0.f, 30.f);
-        if (ImGui::Button("Reset")) Reset();
-
-        ImGui::BeginChild("Camera status", ImVec2(440, 130), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-        ImGui::Text("Eye Position (%f, %f, %f) ", XMVectorGetX(EyePosition), XMVectorGetY(EyePosition), XMVectorGetZ(EyePosition));
-        ImGui::Text("Transformed Eye Direction (%f, %f, %f) ", XMVectorGetX(TransformedEyeDirection), XMVectorGetY(TransformedEyeDirection), XMVectorGetZ(TransformedEyeDirection));
-        ImGui::EndChild();
+        ImGui::Text("Position");
+        ImGui::SliderFloat("X", &pos.x, -80.0f, 80.0f, "%.1f");
+        ImGui::SliderFloat("Y", &pos.y, -80.0f, 80.0f, "%.1f");
+        ImGui::SliderFloat("Z", &pos.z, -80.0f, 80.0f, "%.1f");
+        ImGui::Text("Orientation");
+        ImGui::SliderAngle("Pitch", &pitch, 0.995f * -90.0f, 0.995f * 90.0f);
+        ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
+        if (ImGui::Button("Reset"))
+        {
+            Reset();
+        }
     }
     ImGui::End();
 }
 
 void Camera::Reset()
 {
-    CameraPosition  = { 0.f, 0.f, -10.f };
-    updown_angle    = 0.f;
-    leftright_angle = 0.f;
-    direction_pitch = 0.f;
-    direction_yaw   = 0.f;
-    speed_factor    = 1.f;
+    pos = { 0.f, 0.f, -10.f };
+    pitch = 0.f;
+    yaw = 0.f;
 }
 
 

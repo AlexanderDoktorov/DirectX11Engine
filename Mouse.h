@@ -1,10 +1,18 @@
 #pragma once
 #include <Windows.h>
+#include "Device.h"
 #include "imgui.h"
 
 struct RawData
 {
 	RawData() = default;
+	RawData(const LONG& rawX, const LONG& rawY)
+		: rawX(rawX), rawY(rawY)
+	{
+	}
+
+	bool operator!=(const RawData& other) { return rawX != other.rawX && rawY != other.rawY; }
+	RawData operator-(const RawData& other) { return RawData(rawX - other.rawX, rawY - other.rawY); }
 
 	LONG rawX = 0;
 	LONG rawY = 0;
@@ -18,25 +26,18 @@ struct Position
 	int Y = 0;
 };
 
-class Mouse
+class Mouse : public Device
 {
 public:
-	Mouse() {}
+	Mouse() : Device(HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_MOUSE) {}
 
-	//float   NormalMousePosX() { return  2.f * (Mouse.pos_x / (float)GetHeight()) - 1.f; }
-	//float   NormalMousePosY() { return -2.f * (Mouse.pos_y / (float)GetWidth()) + 1.f; }
+	void	ShowMenu(bool* p_open = (bool*)0) const;
 
-	void ShowMenu(bool* p_open = (bool*)0)
-	{
-		if(ImGui::Begin("Mouse data", p_open))
-		{
-			ImGui::Text("RawData X(%d), Y(%d)", rawData.rawX, rawData.rawY);
-		}
-		ImGui::End();
-	}
+	bool	IsLMBPressed() const;
+	bool	IsRMBPressed() const;
 
-	void OnDeltaRaw(const LONG& lLastX, const LONG& lLastY);
-	RawData GetRawData() const { return rawData; }
+	void	OnDeltaRaw(const LONG& lLastX, const LONG& lLastY);
+	RawData GetRawData() const;
 
 private:
 	Position position;

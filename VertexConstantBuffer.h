@@ -5,12 +5,12 @@
 template <class T = DirectX::XMMATRIX>
 class VertexConstantBuffer : public ConstantBuffer<T>
 {
-	using IPipelineElement::GetContext;
+	using IBindable::GetContext;
 	using ConstantBuffer<T>::p_ConstantBuffer;
 public:
 	using ConstantBuffer<T>::ConstantBuffer;
 
-	virtual void Attach(Graphics& Gfx) noexcept override
+	virtual void Bind(Graphics& Gfx) noexcept override
 	{								
 		GetContext(Gfx)->VSSetConstantBuffers(0U, 1U, p_ConstantBuffer.GetAddressOf()); // : register(b0)
 	}

@@ -13,7 +13,7 @@ Texture::~Texture()
 	CoUninitialize();
 }
 
-void Texture::Attach(Graphics& Gfx) noexcept
+void Texture::Bind(Graphics& Gfx) noexcept
 {
 	GetContext(Gfx)->PSSetShaderResources(0U, 1U, p_ShaderResourseView.GetAddressOf());
 	GetContext(Gfx)->VSSetShaderResources(0U, 1U, p_ShaderResourseView.GetAddressOf());

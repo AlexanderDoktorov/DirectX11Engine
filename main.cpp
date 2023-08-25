@@ -1,12 +1,12 @@
 // Programm that visualizes sorting
-#include "Application.h"
+#include "Game.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
 {
 	try
 	{
-		Application app = Application();
-		return app.Start(nCmdShow);
+		Game game = Game();
+		return game.Start(nCmdShow);
 	}
 	catch (hrException& hr_ex)
 	{

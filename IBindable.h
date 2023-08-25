@@ -3,12 +3,12 @@
 #include "Exceptions.h"
 #include <memory>
 
-class IPipelineElement
+class IBindable
 {
 public:
-	virtual ~IPipelineElement() = default;
+	virtual ~IBindable() = default;
 
-	virtual void Attach(Graphics& Gfx) noexcept = 0;
+	virtual void Bind(Graphics& Gfx) noexcept = 0;
 
 protected:
 	ID3D11Device* GetDevice(Graphics& Gfx) { return Gfx.p_Device.Get(); }
