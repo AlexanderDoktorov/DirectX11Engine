@@ -66,8 +66,8 @@ Graphics::Graphics(HWND hwnd) :
 
     // Bind depth stencil state
     p_Context->OMSetDepthStencilState(p_DSState.Get(), 1U);
-    CreateRenderTargetView();
-    CreateDepthStencilView();
+    ReCreateRenderTargetView();
+    ReCreateDepthStencilView();
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 
     RECT rc;
@@ -114,31 +114,13 @@ Camera Graphics::GetCamera() const
 
 void Graphics::ShowRenderWindow(bool* p_open)
 {
-    ID3D11Texture2D*        pBackBuffer;
-    CHECK_HR( p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)) );
-    D3D11_TEXTURE2D_DESC    desc{};
-    pBackBuffer->GetDesc(&desc);
-    desc.Usage = D3D11_USAGE_STAGING;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-    desc.BindFlags = 0U;
-    
-    ID3D11Texture2D* temp_texture;
-    CHECK_HR( p_Device->CreateTexture2D(&desc, nullptr, &temp_texture) );
-    p_Context->CopyResource(temp_texture, pBackBuffer);
-
-    D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-    p_Context->Map(temp_texture, 0U, D3D11_MAP_READ, 0U, &mappedSubresource);
-
+    //ReCreateShadersResourseView();
     if (ImGui::Begin("Viewport", p_open))
     {
         ImVec2 client_region_size_with_indent = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
-        ImGui::GetWindowDrawList()->AddImage(mappedSubresource.pData, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
+        ImGui::GetWindowDrawList()->AddImage(g_mainShaderResourseView.Get(), ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
     } 
     ImGui::End();
-
-    p_Context->Unmap(temp_texture, 0U);
-    pBackBuffer->Release();
-    temp_texture->Release();
 }
 
 void Graphics::EndFrame()
@@ -182,14 +164,12 @@ Graphics::~Graphics()
 
 void Graphics::ResizeBackBuffer(const UINT& width, const UINT& height)
 {
-    g_mainRenderTargetView.Reset();
-    g_mainDepthStencilView.Reset();
-    p_SwapChain->ResizeBuffers(2U, width, height, DXGI_FORMAT_UNKNOWN, 0);
-    CreateDepthStencilView();
-    CreateRenderTargetView();
+    p_SwapChain->ResizeBuffers(0U, width, height, DXGI_FORMAT_UNKNOWN, 0);
+    ReCreateDepthStencilView();
+    ReCreateRenderTargetView();
 }
 
-void Graphics::CreateDepthStencilView()
+void Graphics::ReCreateDepthStencilView()
 {
     ID3D11Texture2D* pBackBuffer;
     CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
@@ -221,7 +201,7 @@ void Graphics::CreateDepthStencilView()
     pBackBuffer->Release();
 }
 
-void Graphics::CreateRenderTargetView()
+void Graphics::ReCreateRenderTargetView()
 {
     ID3D11Texture2D* pBackBuffer;
     CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
@@ -229,4 +209,82 @@ void Graphics::CreateRenderTargetView()
     pBackBuffer->Release();
 }
 
+void Graphics::SetShaderResourses()
+{
+    ID3D11Texture2D* pBackBuffer = nullptr;
+    g_mainRenderTargetView->GetResource(reinterpret_cast<ID3D11Resource**>(&pBackBuffer));
+
+    D3D11_TEXTURE2D_DESC descBack = { };
+    pBackBuffer->GetDesc(&descBack);
+
+    D3D11_TEXTURE2D_DESC descBackCopy = descBack;
+    descBackCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    descBackCopy.MipLevels = 0U;
+    descBackCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    p_Device->CreateTexture2D(&descBackCopy, nullptr, &pBackBufferCopy);
+
+    // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
+    p_Context->CopySubresourceRegion(pBackBufferCopy.Get(), 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
+
+    pBackBuffer->Release();
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer = { };
+    resourceViewDescBuffer.Format = descBack.Format;
+    resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
+    resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
+    p_Device->CreateShaderResourceView(pBackBufferCopy.Get(), &resourceViewDescBuffer, &g_mainShaderResourseView);
+
+    // regenerate mipmap based on updated most detailed mip-level
+    p_Context->GenerateMips(g_mainShaderResourseView.Get());
+}
+
+//void func()
+//{
+//    static ID3D11Texture2D* pBackBufferCopy = nullptr;
+//    static ID3D11ShaderResourceView* pBackBufferResource = nullptr;
+//
+//    ID3D11Texture2D* pBackBuffer = nullptr;
+//    g_mainRenderTargetView->GetResource(reinterpret_cast<ID3D11Resource**>(&pBackBuffer));
+//
+//    D3D11_TEXTURE2D_DESC descBack = { };
+//    pBackBuffer->GetDesc(&descBack);
+//
+//    if (pBackBufferCopy == nullptr)
+//    {
+//        D3D11_TEXTURE2D_DESC descBackCopy = descBack;
+//        descBackCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+//        descBackCopy.MipLevels = 0U;
+//        descBackCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+//        p_Device->CreateTexture2D(&descBackCopy, nullptr, &pBackBufferCopy);
+//    }
+//
+//    // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
+//    p_Context->CopySubresourceRegion(pBackBufferCopy, 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
+//
+//    pBackBuffer->Release();
+//
+//    if (pBackBufferResource == nullptr)
+//    {
+//        D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer = { };
+//        resourceViewDescBuffer.Format = descBack.Format;
+//        resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+//        resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
+//        resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
+//        p_Device->CreateShaderResourceView(pBackBufferCopy, &resourceViewDescBuffer, &pBackBufferResource);
+//    }
+//
+//    // regenerate mipmap based on updated most detailed mip-level
+//    p_Context->GenerateMips(pBackBufferResource);
+//
+//    ImVec2 vecMin = { 10.f, 10.f };
+//    ImVec2 vecMax = { vecMin.x + floorf((float)descBack.Width / 4.0f), vecMin.y + floorf((float)descBack.Height / 4.0f) };
+//
+//    if (ImGui::Begin("Viewport", p_open))
+//    {
+//        ImVec2 client_region_size_with_indent = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
+//        ImGui::GetWindowDrawList()->AddImage(pBackBufferResource, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
+//    }
+//    ImGui::End();
+//}
 

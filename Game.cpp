@@ -93,6 +93,8 @@ void Game::UpdateFrame()
 
 	light->ShowControlWindow();
 	ImGui::ShowDemoWindow();
+
+	gfx->SetShaderResourses();
 	gfx->ShowRenderWindow();
 	
 	//cam.ShowControlWindow();

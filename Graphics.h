@@ -43,6 +43,7 @@ public:
 	void SetCamera(const Camera& cam);
 	Camera GetCamera() const;
 	void ShowRenderWindow(bool* p_open = (bool*)0);
+	void SetShaderResourses();
 
 	void EndFrame();
 
@@ -59,8 +60,8 @@ private:
 	D3D11_VIEWPORT  vp;
 
 	void ResizeBackBuffer(const UINT& width, const UINT& height);
-	void CreateDepthStencilView();
-	void CreateRenderTargetView();
+	void ReCreateDepthStencilView();
+	void ReCreateRenderTargetView();
 
 	template<class T>
 	void ResizeViews(const ResizingBaseWindow<T>* pWnd)
@@ -88,4 +89,7 @@ private:
 
 	wrl::ComPtr<ID3D11RenderTargetView> g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView> g_mainDepthStencilView;
+
+	wrl::ComPtr<ID3D11ShaderResourceView>	g_mainShaderResourseView;
+	wrl::ComPtr<ID3D11Texture2D>			pBackBufferCopy;
 };
