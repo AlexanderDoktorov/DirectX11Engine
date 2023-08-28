@@ -8,12 +8,12 @@
 #include "LightSource.h"
 #include "IPlacableItem.h"
 
-
 class Game
 {
 public:
 
 	Game();
+	~Game();
 
 	int Start(int nCmdShow);
 
@@ -23,6 +23,8 @@ private:
 	void ShowControlWindow();
 	void ShowItemsSubMenu();
 	void CreateBall();
+	bool LoadConfigurationFile(const char* path);
+	void UpdateConfigurationFile(const char* path);
 
 	ImGuiManager ImMan = ImGuiManager();
 

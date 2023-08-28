@@ -14,4 +14,3 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		return -1;
 	}
 }
-

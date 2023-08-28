@@ -223,13 +223,14 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="LightSource.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="wWinMain.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Shift.cpp" />
     <ClCompile Include="SolidBall.cpp" />
     <ClCompile Include="SolidLightenedBall.cpp" />
+    <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TransformBuffer.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
@@ -290,6 +291,7 @@
     <ClInclude Include="Shift.h" />
     <ClInclude Include="GenerateShuffledVector.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="StringHelper.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Topology.h" />
@@ -300,6 +302,9 @@
     <ClInclude Include="WICTextureLoader.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowClass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="game.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

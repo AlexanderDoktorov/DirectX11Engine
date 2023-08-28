@@ -15,6 +15,19 @@ public:
 	void Rotate(float dx, float dy) noexcept;
 	void Translate(DirectX::XMFLOAT3 translation) noexcept;
 	void Reset();
+
+	void SetPitch(float pitch);
+	void SetYaw(float yaw);
+	void SetPosition(DirectX::XMFLOAT3 pos);
+	void SetPosX(float x);
+	void SetPosY(float y);
+	void SetPosZ(float z);
+	void SetRotation(float pitch, float yaw);
+
+	DirectX::XMFLOAT3	GetPos()				const noexcept;
+	float				GetPitch()				const noexcept;
+	float				GetYaw()				const noexcept;
+
 	
 private:
 	DirectX::XMFLOAT3 pos;

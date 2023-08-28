@@ -69,4 +69,55 @@ void Camera::Reset()
     yaw = 0.f;
 }
 
+// Setters
+void Camera::SetPosition(DirectX::XMFLOAT3 pos)
+{
+    this->pos = pos;
+}
+
+void Camera::SetPosX(float x)
+{
+    pos.x = x;
+}
+
+void Camera::SetPosY(float y)
+{
+    pos.y = y;
+}
+
+void Camera::SetPosZ(float z)
+{
+    pos.z = z;
+}
+
+void Camera::SetRotation(float pitch, float yaw)
+{
+    this->pitch = pitch;
+    this->yaw = yaw;
+}
+
+DirectX::XMFLOAT3 Camera::GetPos() const noexcept
+{
+    return pos;
+}
+
+float Camera::GetPitch() const noexcept
+{
+    return pitch;
+}
+
+float Camera::GetYaw() const noexcept
+{
+    return yaw;
+}
+
+void Camera::SetPitch(float pitch)
+{
+    this->pitch = pitch;
+}
+
+void Camera::SetYaw(float yaw)
+{
+    this->yaw = yaw;
+}
 

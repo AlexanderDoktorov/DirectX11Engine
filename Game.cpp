@@ -1,8 +1,8 @@
 #include "Game.h"
 #include "Sorts.h"
+#include "StringHelper.h"
 
-#include <chrono>
-#include <thread>
+#include <fstream>
 
 Game::Game()
 {
@@ -27,6 +27,13 @@ Game::Game()
 	placable_items.push_back(balls[0].get());
 	placable_items.push_back(balls[1].get());
 	placable_items.push_back(light.get());
+
+	LoadConfigurationFile("./game.config");
+}
+
+Game::~Game()
+{
+	UpdateConfigurationFile("./game.config");
 }
 
 int Game::Start(int nCmdShow)
@@ -98,6 +105,7 @@ void Game::UpdateFrame()
 	sheet->Draw(*gfx);
 
 	ShowControlWindow();
+	cam.ShowControlWindow();
 
 	gfx->EndFrame();
 }
@@ -151,6 +159,58 @@ void Game::CreateBall()
 {
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx));
 	placable_items.push_back(balls.back().get());
+}
+
+bool Game::LoadConfigurationFile(const char* path)
+{
+	std::ifstream in_file_stream(path);
+
+	if (!in_file_stream.is_open())
+	{
+		OutputDebugString(L"Unable to open configuration file");
+		return false;
+	}
+
+	for (std::string line; std::getline(in_file_stream, line); )
+	{
+		if (line == "[CAMERA]")
+		{
+			std::getline(in_file_stream, line);
+
+			std::stringstream  ss(line.substr(line.find("=") + 1));
+			std::string buff;
+
+			// Position
+			std::getline(ss, buff, ',');
+			cam.SetPosX(std::stof(buff));
+
+			std::getline(ss, buff, ',');
+			cam.SetPosY(std::stof(buff));
+
+			std::getline(ss, buff, ',');
+			cam.SetPosZ(std::stof(buff));
+
+			// Rotation
+			std::getline(in_file_stream, line);
+			cam.SetPitch(std::stof(line.substr(line.find("=") + 1)));
+			std::getline(in_file_stream, line);
+			cam.SetYaw(std::stof(line.substr(line.find("=") + 1)));
+		}
+	}
+
+	return true;
+}
+
+void Game::UpdateConfigurationFile(const char* path)
+{
+	std::ofstream fout("game.config");
+
+	fout << "[CAMERA]" << std::endl;
+	fout << "POS=" << std::to_string(cam.GetPos().x) << ',' << std::to_string(cam.GetPos().y) << ',' << std::to_string(cam.GetPos().z) << std::endl;
+	fout << "Pitch=" << std::to_string(cam.GetPitch()) << std::endl;
+	fout << "Yaw=" << std::to_string(cam.GetYaw()) << std::endl;
+
+	fout.close();
 }
 
 
