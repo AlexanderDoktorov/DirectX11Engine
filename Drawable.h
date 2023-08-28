@@ -2,6 +2,7 @@
 #include "IBindable.h"
 #include "DOK_assert.h"
 #include "IndexBuffer.h"
+#include "Topology.h"
 #include <memory>
 
 class Drawable
@@ -46,6 +47,14 @@ protected:
 			}
 		}
 		return nullptr;
+	}
+
+	void SetTopology(const D3D11_PRIMITIVE_TOPOLOGY& tp)
+	{
+		if (Topology* topology = QueryBindable<Topology>())
+		{
+			topology->SetTopology(tp);
+		}
 	}
 
 	std::vector<std::unique_ptr<IBindable>> PipelineElements;

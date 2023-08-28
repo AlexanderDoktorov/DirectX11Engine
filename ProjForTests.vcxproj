@@ -207,6 +207,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DOK_DX11.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Column.cpp" />
@@ -221,18 +222,24 @@
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Shift.cpp" />
+    <ClCompile Include="SolidBall.cpp" />
+    <ClCompile Include="SolidLightenedBall.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TransformBuffer.cpp" />
     <ClCompile Include="WICTextureLoader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="IPlacableItem.h" />
+    <ClInclude Include="IToString.h" />
     <ClInclude Include="LightConstantBuffer.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Sheet.h" />

@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "SolidBall.h"
 
-class LightSource
+class LightSource : public IPlacableItem, public IToString
 {
 	struct LightData
 	{
@@ -28,7 +28,7 @@ public:
 
 	void Draw(Graphics& Gfx) noexcept
 	{
-		mesh.SetPosition(lightData.pos);
+		mesh.SetWorldPosition(lightData.pos);
 		mesh.Draw(Gfx);
 	}
 
@@ -45,7 +45,8 @@ public:
 
 	void Reset()
 	{
-		lightData = {
+		lightData = 
+		{
 			{ 0.0f,7.0f,0.0f },
 			{ 0.05f,0.05f,0.05f },
 			{ 1.0f,1.0f,1.0f },
@@ -56,9 +57,9 @@ public:
 		};
 	}
 
-	void ShowControlWindow()
+	void ShowControlChildWindow()
 	{
-		if(ImGui::Begin("Light control"))
+		ImGui::BeginChild("Light control", ImVec2(600, 200), true);
 		{
 			ImGui::SliderFloat3("XYZ", &lightData.pos.x, -200.f, 200.f);
 			ImGui::SliderFloat3("Ambiend RGB", &lightData.ambient.x, 0.f, 1.f);
@@ -67,11 +68,24 @@ public:
 			ImGui::SliderFloat("Latt", &lightData.Latt, 0.f, 1.f);
 			ImGui::SliderFloat("Qatt", &lightData.Qatt, 0.f, 1.f);
 			ImGui::SliderFloat("Diffuse intensity", &lightData.diffuseIntensity, 0.f, 10.f);
-			if(ImGui::Button("Reset"))
+
+			ImVec4 button_hovered_color = ImVec4(0.f, 0.f, 1.f, 1.f);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_hovered_color);
+			if (ImGui::Button("Reset"))
 				Reset();
+			ImGui::PopStyleColor(1U);
 		}
-		ImGui::End();
+		ImGui::EndChild();
 	}
+
+
+	// IPlacableItem
+	virtual void SetWorldPosition(const dx::XMFLOAT3& new_Wpos) override;
+	virtual dx::XMFLOAT3 GetWorldPosition() const noexcept override;
+
+	// IToString
+	const char* ToString() const noexcept override;
+
 private:
 	LightData lightData;
 	SolidBall mesh;

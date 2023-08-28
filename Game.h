@@ -6,6 +6,7 @@
 #include "Items.h"
 #include "Timer.h"
 #include "LightSource.h"
+#include "IPlacableItem.h"
 
 
 class Game
@@ -19,6 +20,9 @@ public:
 private:
 
 	void UpdateFrame();
+	void ShowControlWindow();
+	void ShowItemsSubMenu();
+	void CreateBall();
 
 	ImGuiManager ImMan = ImGuiManager();
 
@@ -27,12 +31,13 @@ private:
 
 	std::unique_ptr<Window> window;
 	std::unique_ptr<Graphics> gfx;
+
 	std::unique_ptr<Bar> bar;
-	std::unique_ptr<SolidLightenedBall> ball;
+	std::vector<IPlacableItem*> placable_items;
 	std::unique_ptr<Sheet> sheet;
-	std::unique_ptr<SolidLightenedBall> ball_1;
 	std::unique_ptr<Box> box;
 
+	std::vector<std::unique_ptr<SolidLightenedBall>> balls;
+
 	std::unique_ptr<LightSource> light;
-	std::unique_ptr<LightSource> light2;
 };

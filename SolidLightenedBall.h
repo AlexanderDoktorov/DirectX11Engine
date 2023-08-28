@@ -1,9 +1,11 @@
 ﻿#pragma once
+#include "IPlacableItem.h"
+#include "IToString.h"
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
 #include "Sphere.h"
 
-class SolidLightenedBall : public DrawableBase<SolidLightenedBall>, public IColored
+class SolidLightenedBall : public DrawableBase<SolidLightenedBall>, public IColored, public IPlacableItem, public IToString
 {
 public:
     SolidLightenedBall(Graphics& Gfx, dx::XMFLOAT4 color =  { 1.f, 1.f, 1.f, 1.f })
@@ -42,15 +44,12 @@ public:
 
     void MakeSkeleton()
     {
-        if (Topology* topology = QueryBindable<Topology>())
-        {
-            topology->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-        }
+        SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     }
 
-    virtual dx::XMMATRIX GetTransform() const noexcept override
+    DirectX::XMMATRIX GetTransform() const noexcept override
     {
-        return  dx::XMMatrixScaling(scale.x, scale.y, scale.z) * dx::XMMatrixTranslation(position.x, position.y, position.z);
+        return DOK_XMMatrixTranslation(world_position);
     }
 
     virtual void Update(float dt) noexcept override
@@ -58,12 +57,13 @@ public:
         return;
     }
 
-    void SetPosition(dx::XMFLOAT3 new_pos) noexcept
-    {
-        position = new_pos;
-    }
+    // IPlacableItem
+    virtual void SetWorldPosition(const dx::XMFLOAT3& new_Wpos) override;
+    virtual dx::XMFLOAT3 GetWorldPosition() const noexcept override;
+
+    // IToString
+    const char* ToString() const noexcept override;
 
 private:
-    dx::XMFLOAT3 position = { 0.f, 0.f, 0.f };
-    dx::XMFLOAT3 scale = { 1.f,1.f,1.f };
+    dx::XMFLOAT3 world_position = { 0.f, 0.f, 0.f };
 };

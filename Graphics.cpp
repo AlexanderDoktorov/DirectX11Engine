@@ -66,8 +66,8 @@ Graphics::Graphics(HWND hwnd) :
 
     // Bind depth stencil state
     p_Context->OMSetDepthStencilState(p_DSState.Get(), 1U);
-    ReCreateRenderTargetView();
-    ReCreateDepthStencilView();
+    CreateRenderTargetView();
+    CreateDepthStencilView();
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 
     RECT rc;
@@ -114,8 +114,7 @@ Camera Graphics::GetCamera() const
 
 void Graphics::ShowRenderWindow(bool* p_open)
 {
-    //ReCreateShadersResourseView();
-    if (ImGui::Begin("Viewport", p_open))
+    if ((ImGui::Begin("Viewport", p_open)))
     {
         ImVec2 client_region_size_with_indent = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
         ImGui::GetWindowDrawList()->AddImage(g_mainShaderResourseView.Get(), ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
@@ -125,6 +124,15 @@ void Graphics::ShowRenderWindow(bool* p_open)
 
 void Graphics::EndFrame()
 {
+    if (IsRenderingToImGui)
+    {
+        const float clear_color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
+        SetBackBufferAsShaderResourse();
+        ClearRenderTarget(clear_color);
+        static bool open = true;
+        ShowRenderWindow(&open);
+    }
+
     if (ImGuiEnabled)
     {
         ImGui::Render();
@@ -155,6 +163,11 @@ void Graphics::EndFrame()
 void Graphics::DrawIndexed(UINT Count)
 {
     p_Context->DrawIndexed(Count, 0U, 0U);
+}
+
+void Graphics::RenderToImGui(const bool& state)
+{
+    IsRenderingToImGui = state;
 }
 
 Graphics::~Graphics()
@@ -211,12 +224,13 @@ void Graphics::CreateRenderTargetView()
     pBackBuffer->Release();
 }
 
-void Graphics::SetShaderResourses()
+void Graphics::SetBackBufferAsShaderResourse()
 {
+    ID3D11Texture2D* pBackBufferCopy = nullptr;
     ID3D11Texture2D* pBackBuffer = nullptr;
     g_mainRenderTargetView->GetResource(reinterpret_cast<ID3D11Resource**>(&pBackBuffer));
 
-    D3D11_TEXTURE2D_DESC descBack = { };
+    D3D11_TEXTURE2D_DESC descBack{};
     pBackBuffer->GetDesc(&descBack);
 
     D3D11_TEXTURE2D_DESC descBackCopy = descBack;
@@ -226,17 +240,23 @@ void Graphics::SetShaderResourses()
     p_Device->CreateTexture2D(&descBackCopy, nullptr, &pBackBufferCopy);
 
     // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
-    p_Context->CopySubresourceRegion(pBackBufferCopy.Get(), 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
+    p_Context->CopySubresourceRegion(pBackBufferCopy, 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
 
-    pBackBuffer->Release();
-
-    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer = { };
+    D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer{};
     resourceViewDescBuffer.Format = descBack.Format;
     resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
     resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
-    p_Device->CreateShaderResourceView(pBackBufferCopy.Get(), &resourceViewDescBuffer, &g_mainShaderResourseView);
+    p_Device->CreateShaderResourceView(pBackBufferCopy, &resourceViewDescBuffer, &g_mainShaderResourseView);
 
     // regenerate mipmap based on updated most detailed mip-level
     p_Context->GenerateMips(g_mainShaderResourseView.Get());
+
+    pBackBufferCopy->Release();
+    pBackBuffer->Release();
+}
+
+void Graphics::ClearRenderTarget(const float clear_color[4])
+{
+    p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 }

@@ -28,6 +28,9 @@
     <Filter Include="Файлы заголовков\Items\Geometries">
       <UniqueIdentifier>{6d3a19ce-f289-42c7-a097-30130961ca4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Interfaces">
+      <UniqueIdentifier>{5a12d1a8-d329-462a-b1af-f2ef700bbb73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SolidPS.hlsl">
@@ -122,6 +125,18 @@
     <ClCompile Include="Mouse.cpp">
       <Filter>Файлы заголовков\Devices</Filter>
     </ClCompile>
+    <ClCompile Include="DOK_DX11.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidBall.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidLightenedBall.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSource.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h">
@@ -193,16 +208,10 @@
     <ClInclude Include="HPipelineElements.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="IColored.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="IndexBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="InputLayout.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="IBindable.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Drawable.h">
@@ -306,6 +315,21 @@
     </ClInclude>
     <ClInclude Include="Sheet.h">
       <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="DOK_DX11.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="IPlacableItem.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IColored.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IBindable.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IToString.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

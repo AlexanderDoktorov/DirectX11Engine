@@ -31,36 +31,44 @@ public:
 			ImGui::NewFrame();
 		}
 
-		p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
+		if (IsRenderingToImGui)
+		{
+			ImGui::DockSpaceOverViewport();
+		}
+
+		ClearRenderTarget(clear_color);
 		p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
 		p_Context->RSSetViewports(1U, &vp);
 		p_Context->RSSetState(p_RSState.Get());
 		p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 	}
 
-	void SetProjection(dx::XMMATRIX projection) noexcept;
-	dx::XMMATRIX GetProjection() const noexcept;
-	void SetCamera(const Camera& cam);
-	Camera GetCamera() const;
-	void ShowRenderWindow(bool* p_open = (bool*)0);
-	void SetShaderResourses();
+	void			SetProjection(dx::XMMATRIX projection) noexcept;
+	void			SetCamera(const Camera& cam);
+	void			ClearRenderTarget(const float clear_color[4]);
+	void			EndFrame();
+	void			DrawIndexed(UINT Count);
+	void			RenderToImGui(const bool& state);
 
-	void EndFrame();
-
-	void DrawIndexed(UINT Count);
+	Camera			GetCamera()		const;
+	dx::XMMATRIX	GetProjection() const noexcept;
 
 	~Graphics();
 
 private:
-
-	bool			ImGuiEnabled    = true;
 	dx::XMMATRIX	projection		= dx::XMMatrixIdentity();
 	Camera			cam				= Camera();
 	D3D11_VIEWPORT  vp;
 
-	void ResizeBackBuffer(const UINT& width, const UINT& height);
-	void CreateDepthStencilView();
-	void CreateRenderTargetView();
+	void			ResizeBackBuffer(const UINT& width, const UINT& height);
+	void			CreateDepthStencilView();
+	void			CreateRenderTargetView();
+
+	// ImGuiStuff
+	void			ShowRenderWindow(bool* p_open = (bool*)0);
+	void			SetBackBufferAsShaderResourse();
+	bool			IsRenderingToImGui = false;
+	bool			ImGuiEnabled = true;
 
 	template<class T>
 	void ResizeViews(const ResizingBaseWindow<T>* pWnd)
@@ -86,9 +94,7 @@ private:
 	wrl::ComPtr<IDXGISwapChain>			p_SwapChain;
 	wrl::ComPtr<ID3D11RasterizerState>  p_RSState;
 
-	wrl::ComPtr<ID3D11RenderTargetView> g_mainRenderTargetView;
-	wrl::ComPtr<ID3D11DepthStencilView> g_mainDepthStencilView;
-
+	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
+	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
 	wrl::ComPtr<ID3D11ShaderResourceView>	g_mainShaderResourseView;
-	wrl::ComPtr<ID3D11Texture2D>			pBackBufferCopy;
 };
