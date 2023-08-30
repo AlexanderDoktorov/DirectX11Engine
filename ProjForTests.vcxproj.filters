@@ -59,9 +59,6 @@
     <ClCompile Include="Graphics.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Shift.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -135,6 +132,15 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="LightSource.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="wWinMain.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -331,5 +337,11 @@
     <ClInclude Include="IToString.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="game.config" />
   </ItemGroup>
 </Project>

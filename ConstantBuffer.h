@@ -30,6 +30,10 @@ public:
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, nullptr, &p_ConstantBuffer); assert(SUCCEEDED(hr));
     }
 
+    ConstantBuffer() = default;
+
+    bool Initilized() { return p_ConstantBuffer != nullptr; }
+
     void Update(Graphics& Gfx, const T& NewData)
     {
         D3D11_MAPPED_SUBRESOURCE mappedSubresource = {};

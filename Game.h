@@ -42,4 +42,5 @@ private:
 	std::vector<std::unique_ptr<SolidLightenedBall>> balls;
 
 	std::unique_ptr<LightSource> light;
+	std::unique_ptr<LightSource> light2;
 };

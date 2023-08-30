@@ -207,6 +207,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="DOK_DX11.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Camera.cpp" />

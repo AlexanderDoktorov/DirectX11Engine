@@ -11,6 +11,7 @@ Game::Game()
 
 	box				= std::make_unique<Box>(*gfx);
 	light			= std::make_unique<LightSource>(*gfx);
+	light2			= std::make_unique<LightSource>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(1.f, 0.f, 1.f, 1.f)));
@@ -27,6 +28,7 @@ Game::Game()
 	placable_items.push_back(balls[0].get());
 	placable_items.push_back(balls[1].get());
 	placable_items.push_back(light.get());
+	placable_items.push_back(light2.get());
 
 	LoadConfigurationFile("./game.config");
 }
@@ -89,12 +91,13 @@ void Game::UpdateFrame()
 	}
 
 	if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
-	{
 		balls[0]->MakeSkeleton();
-	}
 
-	light->Bind(*gfx);
 	light->Draw(*gfx);
+	light2->Draw(*gfx);
+
+	std::vector<LightSource::LightDesc> descs = { light->GetDesc(), light2->GetDesc() };
+	LightSource::BindLights(*gfx, descs);
 
 	box->Draw(*gfx);
 	bar->Draw(*gfx);
