@@ -54,6 +54,9 @@
     <FxCompile Include="SolidLitVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
+    <FxCompile Include="LightComputeShader.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graphics.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="ColorBuffer.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeShader.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -339,6 +345,15 @@
     </ClInclude>
     <ClInclude Include="StringHelper.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeShader.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourseBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="LightResourseBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

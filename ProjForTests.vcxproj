@@ -161,6 +161,18 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ps_main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ps_main</EntryPointName>
     </FxCompile>
+    <FxCompile Include="LightComputeShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cs_main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cs_main</EntryPointName>
+    </FxCompile>
     <FxCompile Include="SolidLitPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -208,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ColorBuffer.cpp" />
+    <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="DOK_DX11.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -238,12 +251,15 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="IPlacableItem.h" />
     <ClInclude Include="IToString.h" />
     <ClInclude Include="LightConstantBuffer.h" />
+    <ClInclude Include="LightResourseBuffer.h" />
     <ClInclude Include="Polygon.h" />
+    <ClInclude Include="ResourseBuffer.h" />
     <ClInclude Include="Sheet.h" />
     <ClInclude Include="SolidBall.h" />
     <ClInclude Include="SolidLightenedBall.h" />

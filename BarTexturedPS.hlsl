@@ -15,12 +15,10 @@ struct LightDesc
 };
 
 static const float3 ambient = float3(0.1f, 0.1f, 0.1f);
-static const uint MAX_NUM_LIGHTS = 5;
 
 cbuffer lightbuffer : register(b1)
 {
-    uint NUM_LIGHTS;
-    LightDesc lightDescs[MAX_NUM_LIGHTS];
+    LightDesc lightDescs[1U];
 };
 
 cbuffer colorbuffer : register(b0)
@@ -33,7 +31,7 @@ float4 ps_main(float2 UVs : TEXCOORD0, float3 normal : NORMAL0, float3 world_pos
     float4 texture_color = CubeTexture.Sample(CubeSamplerState, UVs);
     float3 total_diffuse = float3(0, 0, 0);
 
-    for (uint i = 0; i < NUM_LIGHTS; ++i)
+    for (uint i = 0; i < 1U; ++i)
     {
         const float3 vToL = lightDescs[i].light_position - world_pos;
         const float3 distToL = length(vToL);

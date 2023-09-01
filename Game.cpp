@@ -96,8 +96,8 @@ void Game::UpdateFrame()
 	light->Draw(*gfx);
 	light2->Draw(*gfx);
 
-	std::vector<LightSource::LightDesc> descs = { light->GetDesc(), light2->GetDesc() };
-	LightSource::BindLights(*gfx, descs);
+	light2->Bind(*gfx);
+	//light->Bind(*gfx);
 
 	box->Draw(*gfx);
 	bar->Draw(*gfx);

@@ -1,4 +1,10 @@
 ﻿G:\Visual Studio Community 2022\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ProjForTests.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  Game.cpp
-G:\Visual Studio Projects\ProjForTests\LightSource.h(28,14): warning C4267: инициализация: преобразование из "size_t" в "unsigned int"; возможна потеря данных
+G:\Visual Studio Projects\ProjForTests\BarTexturedPS.hlsl(39,21-127): warning X3206: implicit truncation of vector type
+G:\Visual Studio Projects\ProjForTests\BarTexturedPS.hlsl(34,5-33): warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
+  
+  compilation object save succeeded; see G:\Visual Studio Projects\ProjForTests\BarTexturedPS.cso
+G:\Visual Studio Projects\ProjForTests\SolidLitPS.hlsl(32,22-128): warning X3206: implicit truncation of vector type
+G:\Visual Studio Projects\ProjForTests\SolidLitPS.hlsl(27,5-33): warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
+  
+  compilation object save succeeded; see G:\Visual Studio Projects\ProjForTests\SolidLitPS.cso
   ProjForTests.vcxproj -> G:\Visual Studio Projects\ProjForTests\x64\Debug\Sorting Visualizer.exe

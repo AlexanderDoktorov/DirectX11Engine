@@ -16,6 +16,7 @@ namespace dx = DirectX;
 class Graphics
 {
 	friend class IBindable;
+	friend class ShaderResourseView;
 public:
 	Graphics(HWND hwnd);
 

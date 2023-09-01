@@ -10,8 +10,13 @@ class LightConstantBuffer : public ConstantBuffer<T>
 public:
 	using  ConstantBuffer<T>::ConstantBuffer;
 
+	UINT nStartSlot() const noexcept
+	{
+		return 1U;
+	}
+
 	virtual void Bind(Graphics& Gfx) noexcept override
 	{
-		GetContext(Gfx)->PSSetConstantBuffers(1U, 1U, p_ConstantBuffer.GetAddressOf()); // : register(b1)
+		GetContext(Gfx)->PSSetConstantBuffers(nStartSlot(), 1U, p_ConstantBuffer.GetAddressOf()); // : register(b1)
 	}
 };
