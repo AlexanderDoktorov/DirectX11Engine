@@ -26,11 +26,11 @@ public:
 			auto model = Polygon::Make<Vertex>(4U, 100.f);
 			model.SetNormalsIndependentFlat();
 
-			std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"SolidLitVS.cso");
+			std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"GeometryVS.cso");
 			auto ShBC = VS->GetBlob();
 
 			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"SolidLitPS.cso"));
+			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
 			AddStaticElement(std::move(VS));
 			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, ShBC));
 			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.h"
+#include "DirectXWindow.h"
 #include "Graphics.h"
 #include "ImGuiManager.h"
 #include "Camera.h"
@@ -31,7 +31,7 @@ private:
 	Camera cam;
 	Timer timer;
 
-	std::unique_ptr<Window> window;
+	std::unique_ptr<DirectXWindow> window;
 	std::unique_ptr<Graphics> gfx;
 
 	std::unique_ptr<Bar> bar;
@@ -43,4 +43,5 @@ private:
 
 	std::unique_ptr<LightSource> light;
 	std::unique_ptr<LightSource> light2;
+	std::vector<std::unique_ptr<LightSource>> lights;
 };

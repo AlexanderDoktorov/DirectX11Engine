@@ -3,7 +3,8 @@
 #include <dxgi.h>
 #include <wrl.h>
 #include <d3d11.h>
-#include "ResizingBaseWindow.h"
+#include <memory>
+#include "DirectXWindow.h"
 #include "Camera.h"
 
 #include "ImGui\backend\imgui_impl_dx11.h"
@@ -13,43 +14,38 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+class Texture;
+class LightPassPixelShader;
+class ScreenSpaceVertexShader;
+
 class Graphics
 {
-	friend class IBindable;
-	friend class ShaderResourseView;
+	friend class GraphicsChild;
 public:
 	Graphics(HWND hwnd);
 
-	template<class T>
-	void BeginFrame(const ResizingBaseWindow<T>* pWnd, const float clear_color[4])
-	{
-		ResizeViews(pWnd);
+	void BeginFrame(const DirectXWindow* pWnd, const float clear_color[4]);
 
-		if (ImGuiEnabled)
-		{
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-		}
-
-		if (IsRenderingToImGui)
-		{
-			ImGui::DockSpaceOverViewport();
-		}
-
-		ClearRenderTarget(clear_color);
-		p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
-		p_Context->RSSetViewports(1U, &vp);
-		p_Context->RSSetState(p_RSState.Get());
-		p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
-	}
+	// Deffered Rendering
+	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
+	void			BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4]);
+	void			BeginLightningPass();
+	void			BeginCombinePass();
 
 	void			SetProjection(dx::XMMATRIX projection) noexcept;
 	void			SetCamera(const Camera& cam);
-	void			ClearRenderTarget(const float clear_color[4]);
+	void			ClearMainRenderTarget(const float clear_color[4]);
 	void			EndFrame();
 	void			DrawIndexed(UINT Count);
+	void			Draw(UINT vertex_count);
 	void			RenderToImGui(const bool& state);
+
+	// Render targets
+	void			BindLightBufferAsRenderTarget();
+	void			BindGBufferRenderTargets();
+	void			BindBackBufferAsRenderTarget();
+	void			MakeBackBufferTexture();
+
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -61,35 +57,19 @@ private:
 	Camera			cam				= Camera();
 	D3D11_VIEWPORT  vp;
 
-	void			ResizeBackBuffer(const UINT& width, const UINT& height);
+	void			RecreateMainViews(const UINT& width, const UINT& height);
+	void			RecreateGBufferViews(const UINT& width, const UINT& height);
 	void			CreateDepthStencilView();
-	void			CreateRenderTargetView();
+	void			CreateBackBufferView();
+	void			CreateRTVForTexture(const Texture& texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
+	void			UnbindRenderTargets();
 
 	// ImGuiStuff
 	void			ShowRenderWindow(bool* p_open = (bool*)0);
-	void			SetBackBufferAsShaderResourse();
 	bool			IsRenderingToImGui = false;
 	bool			ImGuiEnabled = true;
 
-	template<class T>
-	void ResizeViews(const ResizingBaseWindow<T>* pWnd)
-	{
-		if (pWnd->GetResizeInfo().g_ResizeWidth != 0 && pWnd->GetResizeInfo().g_ResizeHeight != 0)
-		{
-			ResizeBackBuffer(pWnd->GetResizeInfo().g_ResizeWidth, pWnd->GetResizeInfo().g_ResizeHeight);
-			pWnd->ZeroResizeInfo();
-			RECT rc;
-			GetClientRect(pWnd->GetWnd(), &rc);
-			vp = D3D11_VIEWPORT{
-				(FLOAT)rc.left,
-				(FLOAT)rc.top,
-				(FLOAT)(rc.right - rc.left),
-				(FLOAT)(rc.bottom - rc.top),
-				0.f,
-				1.f
-			};
-		}
-	}
+
 	wrl::ComPtr<ID3D11Device>			p_Device;
 	wrl::ComPtr<ID3D11DeviceContext>	p_Context;
 	wrl::ComPtr<IDXGISwapChain>			p_SwapChain;
@@ -97,5 +77,23 @@ private:
 
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
-	wrl::ComPtr<ID3D11ShaderResourceView>	g_mainShaderResourseView;
+	wrl::ComPtr<ID3D11ShaderResourceView>	g_backBufferTextureView;
+
+	// G-buffer
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvPosition;
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvNormal;
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
+
+	std::unique_ptr<Texture>			PositionTexture;
+	std::unique_ptr<Texture>			NormalTexture;
+	std::unique_ptr<Texture>			AlbedoTexture;
+	std::unique_ptr<Texture>			LightTexture;
+
+	std::unique_ptr<LightPassPixelShader>        pLightPassPixelShader;
+	std::unique_ptr<ScreenSpaceVertexShader>     pScreenSpaceVS;
+	class DefferedRendering
+	{
+		// Maybe put all the deffered rendering stuff here
+	};
 };

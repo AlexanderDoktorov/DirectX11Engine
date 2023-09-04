@@ -5,7 +5,6 @@
 class Sampler : public IBindable
 {
 public:
-
 	Sampler(Graphics& Gfx);
 
 	virtual void Bind(Graphics& Gfx) noexcept override;

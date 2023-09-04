@@ -23,7 +23,7 @@ public:
 		}
 		if (pIndexBuffer)
 			Gfx.DrawIndexed(pIndexBuffer->GetCount());
-	}	
+	}
 
 protected:
 

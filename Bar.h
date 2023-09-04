@@ -27,11 +27,11 @@ public:
 			auto model = Cube::MakeIndependentTextured<Vertex>();
 			model.SetNormalsIndependentFlat();
 
-			std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"BarTexturedVS.cso");
+			std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"GeometryTexturedVS.cso");
 			auto ShBC = VS->GetBlob();
 
 			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"BarTexturedPS.cso"));
+			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryTexturedPS.cso"));
 			AddStaticElement(std::move(VS));
 			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, ShBC));
 			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

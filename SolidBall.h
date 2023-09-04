@@ -23,14 +23,15 @@ public:
 
             std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
             {
-                { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+                { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
             };
 
-            std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"SolidVS.cso");
+            std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"GeometryVS.cso");
             auto ShBC = VS->GetBlob();
 
             AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-            AddStaticElement(std::make_unique<PixelShader>(Gfx, L"SolidPS.cso"));
+            AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
             AddStaticElement(std::move(VS));
             AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, ShBC));
             AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

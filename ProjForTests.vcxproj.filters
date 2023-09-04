@@ -31,6 +31,12 @@
     <Filter Include="Файлы заголовков\Interfaces">
       <UniqueIdentifier>{5a12d1a8-d329-462a-b1af-f2ef700bbb73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Deffered Rendering">
+      <UniqueIdentifier>{914b862a-4446-4d69-a239-ca2e2d11e080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Windows">
+      <UniqueIdentifier>{5a331809-642d-460a-b61b-dfd542eb760d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SolidPS.hlsl">
@@ -39,22 +45,31 @@
     <FxCompile Include="DefaultVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="BarTexturedVS.hlsl">
+    <FxCompile Include="GeometryTexturedVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="BarTexturedPS.hlsl">
+    <FxCompile Include="GeometryTexturedPS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="SolidVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="SolidLitPS.hlsl">
+    <FxCompile Include="GeometryPS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="SolidLitVS.hlsl">
+    <FxCompile Include="GeometryVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="LightComputeShader.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="ScreenSpaceVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="LightPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="CombinePS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>
@@ -65,7 +80,7 @@
     <ClCompile Include="Shift.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
+    <ClCompile Include="DirectXWindow.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="DOK_assert.cpp">
@@ -149,11 +164,14 @@
     <ClCompile Include="ComputeShader.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsChild.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShaderCommon.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseWindow.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Sorts.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -166,13 +184,7 @@
     <ClInclude Include="HullShader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="ResizingBaseWindow.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Shift.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="DOK_assert.h">
@@ -310,9 +322,6 @@
     <ClInclude Include="Sphere.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
     </ClInclude>
-    <ClInclude Include="WindowClass.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="LightConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -355,8 +364,37 @@
     <ClInclude Include="LightResourseBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsChild.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenSpaceVertexShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPassPixelShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="IResisingWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowClass.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShaderCommon.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="game.config" />
+    <None Include="game.config">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>

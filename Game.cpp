@@ -6,16 +6,20 @@
 
 Game::Game()
 {
-	window			= std::make_unique<Window>(L"Game", WS_OVERLAPPEDWINDOW);
+	// Graphics and window
+	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);
 	gfx				= std::make_unique<Graphics>(window->GetWnd());
 
+	// Geometries
 	box				= std::make_unique<Box>(*gfx);
-	light			= std::make_unique<LightSource>(*gfx);
-	light2			= std::make_unique<LightSource>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(1.f, 0.f, 1.f, 1.f)));
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(.5f, 0.1f, 1.f, 1.f)));
+
+	// Lights
+	lights.push_back(std::make_unique<LightSource>(*gfx));
+	lights.push_back(std::make_unique<LightSource>(*gfx));
 
 	box->SetPosition(0.f, 4.f, 5.f);
 	box->Scale(0.5f);
@@ -25,10 +29,11 @@ Game::Game()
 	balls[0]->SetWorldPosition(dx::XMFLOAT3(1.f, 5.f, 1.f));
 	balls[1]->SetWorldPosition(dx::XMFLOAT3(1.f, 5.f, 10.f));
 
-	placable_items.push_back(balls[0].get());
-	placable_items.push_back(balls[1].get());
-	placable_items.push_back(light.get());
-	placable_items.push_back(light2.get());
+	for (auto& ball : balls)
+		placable_items.push_back(ball.get());
+
+	for (auto& light : lights)
+		placable_items.push_back(light.get());
 
 	LoadConfigurationFile("./game.config");
 }
@@ -66,8 +71,10 @@ void Game::UpdateFrame()
 	auto dt = timer.Check();
 
 	const float color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
-	gfx->BeginFrame(window.get(), color);
+	//gfx->BeginFrame(window.get(), color);
 
+	// Fill G-buffer
+	gfx->BeginGeometryPass(window.get(), color);	
 
 	if (window->MouseCaptured())
 	{
@@ -93,22 +100,32 @@ void Game::UpdateFrame()
 	if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
 		balls[0]->MakeSkeleton();
 
-	light->Draw(*gfx);
-	light2->Draw(*gfx);
+	for (auto& light_source : lights)
+	{
+		light_source->DrawIntoGBuffer(*gfx);
+	}
 
-	light2->Bind(*gfx);
-	//light->Bind(*gfx);
-
-	box->Draw(*gfx);
-	bar->Draw(*gfx);
+	box->DrawIntoGBuffer(*gfx);
+	bar->DrawIntoGBuffer(*gfx);
 	for (auto& ball : balls)
 	{
-		ball->Draw(*gfx);
+		ball->DrawIntoGBuffer(*gfx);
 	}
-	sheet->Draw(*gfx);
+	sheet->DrawIntoGBuffer(*gfx);
 
-	ShowControlWindow();
-	cam.ShowControlWindow();
+	// Apply light
+	gfx->BeginLightningPass();
+
+	for (auto& light_source : lights)
+	{
+		light_source->DrawIntoLightRenderTarget(*gfx);
+	}
+
+	// Combine textures
+	gfx->BeginCombinePass();
+
+	//ShowControlWindow();
+	//cam.ShowControlWindow();
 
 	gfx->EndFrame();
 }
