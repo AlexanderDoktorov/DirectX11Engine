@@ -57,18 +57,6 @@ void LightSource::Draw(Graphics& Gfx) noexcept
 	mesh.Draw(Gfx);
 }
 
-void LightSource::DrawIntoGBuffer(Graphics& Gfx) noexcept
-{
-	mesh.SetWorldPosition(lightDesc.pos);
-	mesh.DrawIntoGBuffer(Gfx);
-}
-
-void LightSource::DrawIntoLightRenderTarget(Graphics& Gfx) noexcept
-{
-	Gfx.BindLightBufferAsRenderTarget();
-	Gfx.Draw(3U);
-}
-
 void LightSource::SetWorldPosition(const dx::XMFLOAT3& new_Wpos)
 {
 	lightDesc.pos = new_Wpos;

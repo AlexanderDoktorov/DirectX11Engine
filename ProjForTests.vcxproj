@@ -287,6 +287,7 @@
     <ClCompile Include="DirectXWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CombinePixelShader.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />

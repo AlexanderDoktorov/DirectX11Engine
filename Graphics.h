@@ -17,6 +17,7 @@ namespace dx = DirectX;
 class Texture;
 class LightPassPixelShader;
 class ScreenSpaceVertexShader;
+class CombinePixelShader;
 
 class Graphics
 {
@@ -30,7 +31,7 @@ public:
 	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
 	void			BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4]);
 	void			BeginLightningPass();
-	void			BeginCombinePass();
+	void			PerformCombinePass();
 
 	void			SetProjection(dx::XMMATRIX projection) noexcept;
 	void			SetCamera(const Camera& cam);
@@ -41,9 +42,9 @@ public:
 	void			RenderToImGui(const bool& state);
 
 	// Render targets
-	void			BindLightBufferAsRenderTarget();
-	void			BindGBufferRenderTargets();
-	void			BindBackBufferAsRenderTarget();
+	void			BindLightBuffer();
+	void			BindGBuffer();
+	void			BindBackBuffer();
 	void			MakeBackBufferTexture();
 
 
@@ -62,12 +63,13 @@ private:
 	void			CreateDepthStencilView();
 	void			CreateBackBufferView();
 	void			CreateRTVForTexture(const Texture& texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
-	void			UnbindRenderTargets();
+	void			UnbindRenderTargets(UINT num_views);
+	void			UnbindPixelShaderResourses(UINT num_resourses);
 
 	// ImGuiStuff
 	void			ShowRenderWindow(bool* p_open = (bool*)0);
 	bool			IsRenderingToImGui = false;
-	bool			ImGuiEnabled = true;
+	bool			ImGuiEnabled = false;
 
 
 	wrl::ComPtr<ID3D11Device>			p_Device;
@@ -90,6 +92,7 @@ private:
 	std::unique_ptr<Texture>			AlbedoTexture;
 	std::unique_ptr<Texture>			LightTexture;
 
+	std::unique_ptr<CombinePixelShader>			 pCombinePS;
 	std::unique_ptr<LightPassPixelShader>        pLightPassPixelShader;
 	std::unique_ptr<ScreenSpaceVertexShader>     pScreenSpaceVS;
 	class DefferedRendering

@@ -47,13 +47,13 @@ int Game::Start(int nCmdShow)
 {
 	window->Show(nCmdShow);
 	bool open = true;
+	gfx->RenderToImGui(false);
 
 	while (open)
 	{
 		// Messages
 		gfx->SetProjection(dx::XMMatrixPerspectiveLH(1.f, (float)window->GetWidth() / window->GetHeight(), 1.f, 500.f));
 		gfx->SetCamera(cam);
-		gfx->RenderToImGui(true);
 		if (const auto r = window->ProcessMessage())
 		{
 			open = false;
@@ -102,27 +102,29 @@ void Game::UpdateFrame()
 
 	for (auto& light_source : lights)
 	{
-		light_source->DrawIntoGBuffer(*gfx);
+		light_source->Draw(*gfx);
 	}
 
-	box->DrawIntoGBuffer(*gfx);
-	bar->DrawIntoGBuffer(*gfx);
+	box->Draw(*gfx);
+	bar->Draw(*gfx);
 	for (auto& ball : balls)
 	{
-		ball->DrawIntoGBuffer(*gfx);
+		ball->Draw(*gfx);
 	}
-	sheet->DrawIntoGBuffer(*gfx);
+	sheet->Draw(*gfx);
 
 	// Apply light
 	gfx->BeginLightningPass();
 
 	for (auto& light_source : lights)
 	{
-		light_source->DrawIntoLightRenderTarget(*gfx);
+		light_source->Bind(*gfx);
+		gfx->BindLightBuffer();
+		gfx->Draw(3U);
 	}
 
 	// Combine textures
-	gfx->BeginCombinePass();
+	gfx->PerformCombinePass();
 
 	//ShowControlWindow();
 	//cam.ShowControlWindow();

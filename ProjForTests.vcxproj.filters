@@ -391,6 +391,9 @@
     <ClInclude Include="VertexShaderCommon.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="CombinePixelShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">

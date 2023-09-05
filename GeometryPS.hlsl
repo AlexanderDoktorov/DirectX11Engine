@@ -6,7 +6,7 @@ cbuffer solid_color_buffer : register(b0)
 struct VSOutput
 {
     float4 Position : SV_POSITION;
-    float4 Normal : NORMAL0;
+    float3 Normal : NORMAL0;
 };
 
 struct PSOutput
@@ -21,7 +21,7 @@ PSOutput ps_main(VSOutput ps_input)
     PSOutput output = (PSOutput) 0;
     
     output.Color = solid_color;
-    output.Normal = ps_input.Normal;
+    output.Normal = float4(ps_input.Normal, 1.0f);
     output.Position = ps_input.Position;
     
     return output;

@@ -7,19 +7,19 @@ SamplerState linearSampler : register(s0);
 
 struct PS_INPUT
 {
-    float4 position : SV_POSITION;
-    float2 texCoord : TEXCOORD0;
+    float2 TexCoord : TEXCOORD0;
+    float4 Position : SV_Position;
 };
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
     // Sample G-buffer data
-    float4 position = gBufferPosition.Sample(linearSampler, input.texCoord);
-    float4 normal = gBufferNormal.Sample(linearSampler, input.texCoord);
-    float4 albedo = gBufferAlbedo.Sample(linearSampler, input.texCoord);
+    float4 position = gBufferPosition.Sample(linearSampler, input.TexCoord);
+    float4 normal = gBufferNormal.Sample(linearSampler, input.TexCoord);
+    float4 albedo = gBufferAlbedo.Sample(linearSampler, input.TexCoord);
 
     // Sample accumulated lighting
-    float4 lighting = lightAccumulation.Sample(linearSampler, input.texCoord);
+    float4 lighting = lightAccumulation.Sample(linearSampler, input.TexCoord);
 
     // Combine G-buffer data and lighting to produce the final color
     float3 finalColor = albedo.rgb * lighting.rgb;

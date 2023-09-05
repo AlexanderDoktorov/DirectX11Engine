@@ -20,8 +20,6 @@ public:
 	LightSource(Graphics& Gfx);
 
 	void		Draw(Graphics& Gfx) noexcept;
-	void		DrawIntoGBuffer(Graphics& Gfx) noexcept;
-	void		DrawIntoLightRenderTarget(Graphics& Gfx) noexcept;
 	void		Reset();
 	void		Bind(Graphics& Gfx);
 

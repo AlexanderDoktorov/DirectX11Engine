@@ -40,18 +40,6 @@ public:
 			Gfx.DrawIndexed(pIndexBuffer->GetCount());
 	}
 
-	void DrawIntoBackBuffer(Graphics& Gfx)
-	{
-		Gfx.BindBackBufferAsRenderTarget();
-		Draw(Gfx);
-	}
-
-	void DrawIntoGBuffer(Graphics& Gfx)
-	{
-		Gfx.BindGBufferRenderTargets();
-		Draw(Gfx);
-	}
-
 	virtual ~DrawableBase() = default;
 private:
 	static std::vector<std::unique_ptr<IBindable>> StaticPipelineElements;

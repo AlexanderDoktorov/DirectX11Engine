@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "LightPassPixelShader.h"
 #include "ScreenSpaceVertexShader.h"
+#include "CombinePixelShader.h"
 
 #pragma comment(lib, "d3d11")
 
@@ -106,31 +107,27 @@ Graphics::Graphics(HWND hwnd) :
 
     pLightPassPixelShader   = std::make_unique<LightPassPixelShader>(*this);
     pScreenSpaceVS = std::make_unique<ScreenSpaceVertexShader>(*this);
+    pCombinePS = std::make_unique<CombinePixelShader>(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
 
-
-void Graphics::BindGBufferRenderTargets()
+void Graphics::BindBackBuffer()
 {
-    UnbindRenderTargets();
-    ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
-    p_Context->OMSetRenderTargets(3U, rtvs, g_mainDepthStencilView.Get());
+    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
 }
 
-void Graphics::BindBackBufferAsRenderTarget()
+void Graphics::BindLightBuffer()
 {
-    UnbindRenderTargets();
-    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
-}
-
-void Graphics::BindLightBufferAsRenderTarget()
-{
-    UnbindRenderTargets();
-    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), g_mainDepthStencilView.Get());
+    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     pScreenSpaceVS->Bind(*this);
     pLightPassPixelShader->Bind(*this);
-    pLightPassPixelShader->BindPixelShaderResourses(*this, { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() });
+}
+
+void Graphics::BindGBuffer()
+{
+    ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
+    p_Context->OMSetRenderTargets(3U, rtvs, nullptr);
 }
 
 void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4])
@@ -158,16 +155,26 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
 
 void Graphics::BeginLightningPass()
 {
+    UnbindRenderTargets(3U);
+
     const float light_clear[4] = { 0.f,0.f,0.f,0.f };
     p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
+    pLightPassPixelShader->BindPixelShaderResourses(*this, { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() });
 }
 
-void Graphics::BeginCombinePass()
+void Graphics::PerformCombinePass()
 {
-    // End Deffered rendering frame
-    p_Context->PSSetShaderResources(0U, 0U, nullptr);
-    UnbindRenderTargets();
-    BindBackBufferAsRenderTarget();
+    UnbindRenderTargets(1U);
+    UnbindPixelShaderResourses(3U);
+
+    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
+    p_Context->PSSetShaderResources(0U, 4U, srvs);
+    pCombinePS->Bind(*this);
+    pScreenSpaceVS->Bind(*this);
+    BindBackBuffer();
+    Draw(3U);
+
+    UnbindPixelShaderResourses(4U);
 }
 
 void Graphics::ShowRenderWindow(bool* p_open)
@@ -205,6 +212,7 @@ void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
 
 void Graphics::EndFrame()
 {
+
     if (IsRenderingToImGui)
     {
         const float clear_color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
@@ -243,6 +251,7 @@ void Graphics::EndFrame()
 
 void Graphics::DrawIndexed(UINT Count)
 {
+    BindGBuffer();
     p_Context->DrawIndexed(Count, 0U, 0U);
 }
 
@@ -409,7 +418,14 @@ Camera Graphics::GetCamera() const
     return this->cam;
 }
 
-void Graphics::UnbindRenderTargets()
+void Graphics::UnbindRenderTargets(UINT num_views)
 {
-    p_Context->OMSetRenderTargets(0U, nullptr, nullptr);
+    std::vector<ID3D11RenderTargetView*> null(num_views, nullptr);
+    p_Context->OMSetRenderTargets(num_views, null.data(), nullptr);
+}
+
+void Graphics::UnbindPixelShaderResourses(UINT num_resourses)
+{
+    std::vector<ID3D11ShaderResourceView*> null(num_resourses, nullptr);
+    p_Context->PSSetShaderResources(0U, num_resourses, null.data());
 }
