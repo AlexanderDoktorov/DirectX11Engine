@@ -1,34 +1,31 @@
 // simple function
 // Input - 2d coords -> output -> 4d coords
 
-Texture2D CubeTexture : register(t3);
+Texture2D Texture : register(t3);
 SamplerState CubeSamplerState : register(s0);
 
-struct VSOutput
+struct VS_OUT
 {
-    float2 textcoord : TEXCOORD0;
-    float3 normal : NORMAL0;
-    float4 sv_pos : SV_POSITION;
+    float4 Position : SV_POSITION; // Position in homogeneous clip space
+    float3 WorldPosition : TEXCOORD0; // Vertex position in world space (for G-buffer)
+    float3 WorldNormal : TEXCOORD1; // Vertex normal in world space (for G-buffer)
+    float2 TexCoord : TEXCOORD2; // Texture coordinates
 };
 
 struct PSOutput
 {
     float4 Position : SV_TARGET0;
     float4 Normal : SV_TARGET1;
-    float4 Color : SV_TARGET2;
+    float4 Albedo : SV_TARGET2;
 };
 
-Texture2D<float4> gBufferPos : register(t0);
-Texture2D<float4> gBufferNorm : register(t1);
-Texture2D<float4> gBufferAlbedo : register(t2);
-
-PSOutput ps_main(VSOutput ps_input) : SV_TARGET
+PSOutput ps_main(VS_OUT ps_input) : SV_TARGET
 {
     PSOutput output = (PSOutput) 0;
     
-    output.Color = CubeTexture.Sample(CubeSamplerState, ps_input.textcoord);
-    output.Normal = float4(ps_input.normal, 1.f);
-    output.Position = ps_input.sv_pos;
-    
+    output.Albedo = Texture.Sample(CubeSamplerState, ps_input.TexCoord);
+    output.Normal = float4(ps_input.WorldNormal, 0.f);
+    output.Position = float4(ps_input.WorldPosition, 0.f);
+
     return output;
 }

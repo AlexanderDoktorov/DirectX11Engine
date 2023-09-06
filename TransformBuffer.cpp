@@ -10,8 +10,10 @@ TransformBuffer::TransformBuffer(Graphics& Gfx, Drawable& parent) : parent(paren
 void TransformBuffer::Bind(Graphics& Gfx) noexcept
 {
 	//												Model to World			World to View (rotates world)		View to Projection (flattens objects to fit the camera)
-	auto ModelToView = parent.GetTransform() * Gfx.GetCamera().GetCameraMatrix();
+	auto World		= parent.GetTransform();
+	auto View		= Gfx.GetCamera().GetCameraMatrix();
+	auto Projection = Gfx.GetProjection();
 
-	Cbuff->Update(Gfx, Transformations(dx::XMMatrixTranspose(ModelToView * Gfx.GetProjection()), dx::XMMatrixTranspose(ModelToView)));
+	Cbuff->Update(Gfx, Transformations(dx::XMMatrixTranspose(World), dx::XMMatrixTranspose(View), dx::XMMatrixTranspose(Projection)));
 	Cbuff->Bind(Gfx);
 }

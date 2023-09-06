@@ -76,7 +76,7 @@ Graphics::Graphics(HWND hwnd) :
 
     RECT rc;
     GetClientRect(hwnd, &rc);
-    vp = D3D11_VIEWPORT{
+    D3D11_VIEWPORT initial_viewport = D3D11_VIEWPORT{
         0.f,
         0.f,
         (FLOAT)(rc.right - rc.left),
@@ -84,7 +84,7 @@ Graphics::Graphics(HWND hwnd) :
         0.f,
         1.f
     };
-    p_Context->RSSetViewports(1U, &vp);
+    p_Context->RSSetViewports(1U, &initial_viewport);
 
     // Set RSState
     D3D11_RASTERIZER_DESC RSDesc{};
@@ -114,20 +114,7 @@ Graphics::Graphics(HWND hwnd) :
 
 void Graphics::BindBackBuffer()
 {
-    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
-}
-
-void Graphics::BindLightBuffer()
-{
-    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
-    pScreenSpaceVS->Bind(*this);
-    pLightPassPixelShader->Bind(*this);
-}
-
-void Graphics::BindGBuffer()
-{
-    ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
-    p_Context->OMSetRenderTargets(3U, rtvs, nullptr);
+    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 }
 
 void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4])
@@ -136,7 +123,6 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
 
     if (ImGuiEnabled)
     {
-
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
@@ -149,32 +135,60 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
 
     ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
     for (int i = 0; i < 3; ++i) {
-        p_Context->ClearRenderTargetView(rtvs[i], clear_color);
+       ClearRTV(rtvs[i], clear_color);
     }
+    p_Context->OMSetRenderTargets(3U, rtvs, nullptr);
+}
+
+void Graphics::EndGeometryPass()
+{
+    ID3D11RenderTargetView* nullRTVs[3] = { nullptr, nullptr, nullptr };
+    p_Context->OMSetRenderTargets(3U, nullRTVs, nullptr);
 }
 
 void Graphics::BeginLightningPass()
 {
-    UnbindRenderTargets(3U);
-
     const float light_clear[4] = { 0.f,0.f,0.f,0.f };
-    p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
-    pLightPassPixelShader->BindPixelShaderResourses(*this, { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() });
+    ClearRTV(rtvLight.Get(), light_clear);
+    SetAdditiveBlendingState();
+
+    ID3D11ShaderResourceView* srvs[3] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() };
+    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
+    p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
+    pScreenSpaceVS->Bind(*this);
+    pLightPassPixelShader->Bind(*this);
+}
+
+void Graphics::EndLightningPass()
+{
+    ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+    p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
+
+    ID3D11RenderTargetView* nullRTV = nullptr;
+    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
+
+    ResetBlendingState();
 }
 
 void Graphics::PerformCombinePass()
 {
-    UnbindRenderTargets(1U);
-    UnbindPixelShaderResourses(3U);
+    // What's wrong with combina pass??
+    const float light_clear[4] = { 0.1f,0.1f,0.1f,0.3f };
+    ClearRTV(g_mainRenderTargetView.Get(), light_clear);
+    SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
+
+    BindBackBuffer();
     p_Context->PSSetShaderResources(0U, 4U, srvs);
     pCombinePS->Bind(*this);
     pScreenSpaceVS->Bind(*this);
-    BindBackBuffer();
     Draw(3U);
 
-    UnbindPixelShaderResourses(4U);
+    // Unbind
+    ID3D11ShaderResourceView* nullSRV[4] = { nullptr, nullptr, nullptr, nullptr };
+    p_Context->PSSetShaderResources(0U, 4U, nullSRV);
+    ResetBlendingState();
 }
 
 void Graphics::ShowRenderWindow(bool* p_open)
@@ -204,20 +218,18 @@ void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
     }
 
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
-    p_Context->RSSetViewports(1U, &vp);
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
-    ClearMainRenderTarget(clear_color);
+    ClearRTV(g_mainRenderTargetView.Get(), clear_color);
 }
 
 
 void Graphics::EndFrame()
 {
-
     if (IsRenderingToImGui)
     {
         const float clear_color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
         MakeBackBufferTexture();
-        ClearMainRenderTarget(clear_color);
+        ClearRTV(g_mainRenderTargetView.Get(), clear_color);
         static bool open = true;
         ShowRenderWindow(&open);
     }
@@ -251,7 +263,6 @@ void Graphics::EndFrame()
 
 void Graphics::DrawIndexed(UINT Count)
 {
-    BindGBuffer();
     p_Context->DrawIndexed(Count, 0U, 0U);
 }
 
@@ -382,7 +393,7 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
         pWnd->ZeroResizeInfo();
         RECT rc;
         GetClientRect(pWnd->GetWnd(), &rc);
-        vp = D3D11_VIEWPORT{
+        D3D11_VIEWPORT viewport = D3D11_VIEWPORT{
             (FLOAT)rc.left,
             (FLOAT)rc.top,
             (FLOAT)(rc.right - rc.left),
@@ -390,12 +401,8 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
             0.f,
             1.f
         };
+        p_Context->RSSetViewports(1U, &viewport);
     }
-}
-
-void Graphics::ClearMainRenderTarget(const float clear_color[4])
-{
-    p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 }
 
 void Graphics::SetProjection(dx::XMMATRIX projection) noexcept
@@ -413,6 +420,31 @@ void Graphics::SetCamera(const Camera& new_cam)
     this->cam = new_cam;
 }
 
+void Graphics::SetAdditiveBlendingState()
+{
+    ID3D11BlendState* pBlendState = nullptr;
+
+    D3D11_BLEND_DESC blendDesc{};
+    blendDesc.RenderTarget[0].BlendEnable = TRUE;
+    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+    CHECK_HR ( p_Device->CreateBlendState(&blendDesc, &pBlendState) );
+    p_Context->OMSetBlendState(pBlendState, nullptr, 0xFFFFFFFF);
+
+    pBlendState->Release();
+}
+
+void Graphics::ResetBlendingState()
+{
+    p_Context->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
+}
+
 Camera Graphics::GetCamera() const
 {
     return this->cam;
@@ -428,4 +460,10 @@ void Graphics::UnbindPixelShaderResourses(UINT num_resourses)
 {
     std::vector<ID3D11ShaderResourceView*> null(num_resourses, nullptr);
     p_Context->PSSetShaderResources(0U, num_resourses, null.data());
+}
+
+void Graphics::ClearRTV(ID3D11RenderTargetView* rtv, const float clear_color[4])
+{
+    assert(p_Context != nullptr);
+    p_Context->ClearRenderTargetView(rtv, clear_color);
 }

@@ -74,60 +74,66 @@ void Game::UpdateFrame()
 	//gfx->BeginFrame(window.get(), color);
 
 	// Fill G-buffer
-	gfx->BeginGeometryPass(window.get(), color);	
-
-	if (window->MouseCaptured())
+	gfx->BeginGeometryPass(window.get(), color);
 	{
-		while (const auto deltaraw = window->ReadRawDelta())
+		if (window->MouseCaptured())
 		{
-			cam.Rotate((float)deltaraw->rawX, (float)deltaraw->rawY);
+			while (const auto deltaraw = window->ReadRawDelta())
+			{
+				cam.Rotate((float)deltaraw->rawX, (float)deltaraw->rawY);
+			}
+
+			if (window->GetKeyboard().IsKeyDown(BUTTON_W)) // forward
+				cam.Translate({ 0.0f,0.0f,dt });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_S))
+				cam.Translate({ 0.0f,0.0f,-dt });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_A))
+				cam.Translate({ -dt,0.0f,0.0f });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_D))
+				cam.Translate({ dt,0.0f,0.0f });
+			if (window->GetKeyboard().IsKeyDown(VK_SPACE))
+				cam.Translate({ 0.0f,dt,0.0f });
+			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
+				cam.Translate({ 0.0f,-dt,0.0f });
 		}
 
-		if (window->GetKeyboard().IsKeyDown(BUTTON_W)) // forward
-			cam.Translate({ 0.0f,0.0f,dt });
-		if (window->GetKeyboard().IsKeyDown(BUTTON_S))
-			cam.Translate({ 0.0f,0.0f,-dt });
-		if (window->GetKeyboard().IsKeyDown(BUTTON_A))
-			cam.Translate({ -dt,0.0f,0.0f });
-		if (window->GetKeyboard().IsKeyDown(BUTTON_D))
-			cam.Translate({ dt,0.0f,0.0f });
-		if (window->GetKeyboard().IsKeyDown(VK_SPACE))
-			cam.Translate({ 0.0f,dt,0.0f });
-		if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
-			cam.Translate({ 0.0f,-dt,0.0f });
-	}
+		if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
+			balls[0]->MakeSkeleton();
 
-	if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
-		balls[0]->MakeSkeleton();
+		for (auto& light_source : lights)
+		{
+			light_source->Draw(*gfx);
+		}
 
-	for (auto& light_source : lights)
-	{
-		light_source->Draw(*gfx);
+		box->Draw(*gfx);
+		bar->Draw(*gfx);
+		for (auto& ball : balls)
+		{
+			ball->Draw(*gfx);
+		}
+		sheet->Draw(*gfx);
 	}
-
-	box->Draw(*gfx);
-	bar->Draw(*gfx);
-	for (auto& ball : balls)
-	{
-		ball->Draw(*gfx);
-	}
-	sheet->Draw(*gfx);
+	gfx->EndGeometryPass();
 
 	// Apply light
 	gfx->BeginLightningPass();
-
-	for (auto& light_source : lights)
 	{
-		light_source->Bind(*gfx);
-		gfx->BindLightBuffer();
-		gfx->Draw(3U);
+		for (auto& light_source : lights)
+		{
+			light_source->Bind(*gfx);
+			gfx->Draw(3U);
+		}
 	}
+	gfx->EndLightningPass();
 
 	// Combine textures
 	gfx->PerformCombinePass();
 
-	//ShowControlWindow();
-	//cam.ShowControlWindow();
+#ifndef _NOIMGUI
+	ShowControlWindow();
+	cam.ShowControlWindow();
+#endif
+
 
 	gfx->EndFrame();
 }
@@ -136,7 +142,7 @@ void Game::ShowControlWindow()
 {
 	ImGui::Begin("Controls");
 	{
-		light->ShowControlChildWindow();
+		//light->ShowControlChildWindow();
 		ImGui::Separator();
 		ShowItemsSubMenu();
 	}

@@ -29,24 +29,27 @@ public:
 
 	// Deffered Rendering
 	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
+
 	void			BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4]);
+	void			EndGeometryPass();
+
 	void			BeginLightningPass();
+	void			EndLightningPass();
+
 	void			PerformCombinePass();
 
 	void			SetProjection(dx::XMMATRIX projection) noexcept;
 	void			SetCamera(const Camera& cam);
-	void			ClearMainRenderTarget(const float clear_color[4]);
+	void			SetAdditiveBlendingState();
+	void			ResetBlendingState();
 	void			EndFrame();
 	void			DrawIndexed(UINT Count);
 	void			Draw(UINT vertex_count);
 	void			RenderToImGui(const bool& state);
 
 	// Render targets
-	void			BindLightBuffer();
-	void			BindGBuffer();
 	void			BindBackBuffer();
 	void			MakeBackBufferTexture();
-
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -56,7 +59,6 @@ public:
 private:
 	dx::XMMATRIX	projection		= dx::XMMatrixIdentity();
 	Camera			cam				= Camera();
-	D3D11_VIEWPORT  vp;
 
 	void			RecreateMainViews(const UINT& width, const UINT& height);
 	void			RecreateGBufferViews(const UINT& width, const UINT& height);
@@ -65,6 +67,8 @@ private:
 	void			CreateRTVForTexture(const Texture& texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
 	void			UnbindRenderTargets(UINT num_views);
 	void			UnbindPixelShaderResourses(UINT num_resourses);
+	void			ClearRTV(ID3D11RenderTargetView* rtv, const float clear_color[4]);
+
 
 	// ImGuiStuff
 	void			ShowRenderWindow(bool* p_open = (bool*)0);

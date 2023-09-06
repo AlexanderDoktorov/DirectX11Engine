@@ -19,6 +19,7 @@ class LightSource : public IPlacableItem, public IToString
 public:
 	LightSource(Graphics& Gfx);
 
+
 	void		Draw(Graphics& Gfx) noexcept;
 	void		Reset();
 	void		Bind(Graphics& Gfx);

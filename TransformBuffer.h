@@ -14,11 +14,12 @@ private:
 
 	struct Transformations
 	{
-		dx::XMMATRIX ModelToProjection;
-		dx::XMMATRIX ModelToView;
+		dx::XMMATRIX World;
+		dx::XMMATRIX View;
+		dx::XMMATRIX Projection;
 
-		Transformations(const dx::XMMATRIX& ModelToProjection, const dx::XMMATRIX& ModelToView)
-			: ModelToProjection(ModelToProjection), ModelToView(ModelToView)
+		Transformations(const dx::XMMATRIX& World, const dx::XMMATRIX& View, const dx::XMMATRIX& Projection)
+			: World(World), View(View), Projection(Projection)
 		{
 		}
 	};

@@ -10,12 +10,25 @@ struct VS_INPUT
     float2 UV : TEXTCOORD0;
 };
 
-PS_INPUT main(VS_INPUT input)
+PS_INPUT main(in uint VertexIdx : SV_VertexID)
 {
     PS_INPUT output;
 
-    output.Position = float4(input.position, 0.f, 1.f);
-    output.TexCoord = input.UV;
+    if (VertexIdx == 0)
+    {
+        output.Position = float4(-1.0f, 1.0f, 1.0f, 1.0f);
+        output.TexCoord = float2(0.0f, 0.0f);
+    }
+    else if (VertexIdx == 1)
+    {
+        output.Position = float4(3.0f, 1.0f, 1.0f, 1.0f);
+        output.TexCoord = float2(2.0f, 0.0f);
+    }
+    else
+    {
+        output.Position = float4(-1.0f, -3.0f, 1.0f, 1.0f);
+        output.TexCoord = float2(0.0f, 2.0f);
+    }
 
     return output;
 }

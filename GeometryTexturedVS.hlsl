@@ -1,34 +1,40 @@
 // Transforms coordinates
-
-// PVW if transposed (W*V*P)^T = P^T * V^T * W^T (DX - row major / HLSL - column major)
 cbuffer transform : register(b0)
 {
-    matrix WorldToViewToProjection;
-    matrix ModelToView;
+    matrix World;
+    matrix View;
+    matrix Projection;
 };
 
 struct VS_INPUT
 {
-    float3 position : POSITION;
-    float2 textcoord : TEXCOORD0;
-    float3 normal : NORMAL0;
+    float3 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
+    float3 Normal : NORMAL0;
 };
 
 struct VS_OUT
 {
-    float2 textcoord : TEXCOORD0;
-    float3 normal : NORMAL0;
-    float4 sv_pos : SV_POSITION;
+    float4 Position : SV_POSITION; // Position in homogeneous clip space
+    float3 WorldPosition : TEXCOORD0; // Vertex position in world space (for G-buffer)
+    float3 WorldNormal : TEXCOORD1; // Vertex normal in world space (for G-buffer)
+    float2 TexCoord : TEXCOORD2; // Texture coordinates
 };
 
+// Vertex Shader function
 VS_OUT vs_main(VS_INPUT input)
 {
-    VS_OUT vs_output = (VS_OUT) 0;
-    
-    vs_output.textcoord = input.textcoord;
-    vs_output.normal = mul(input.normal, (float3x3) ModelToView);
-    vs_output.sv_pos = mul(float4(input.position, 1.f), WorldToViewToProjection);
-    //vs_output.world_pos = (float3) mul(float4(input.position, 1.0f), ModelToView);
-    
-    return vs_output;
+    VS_OUT output;
+
+    // Transform the vertex position to homogeneous clip space
+    output.Position = mul(float4(input.Position, 1.0f), World);
+    output.Position = mul(output.Position, View);
+    output.Position = mul(output.Position, Projection);
+
+    // Pass other data to the pixel shader
+    output.WorldPosition = mul(float4(input.Position, 1.0f), World).xyz;
+    output.WorldNormal = normalize(mul(float4(input.Normal, 1.0f), World).xyz);
+    output.TexCoord = input.TexCoord;
+
+    return output;
 }

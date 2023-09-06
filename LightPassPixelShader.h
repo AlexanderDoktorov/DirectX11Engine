@@ -18,11 +18,6 @@ public:
 		pSampler->Bind(Gfx);
 	}
 
-	void BindPixelShaderResourses(Graphics& Gfx, std::vector<ID3D11ShaderResourceView*> resourses)
-	{
-		GetContext(Gfx)->PSSetShaderResources(0U, (UINT)resourses.size(), resourses.data());
-	}
-
 private:
 	std::unique_ptr<PixelShader> pPixelShader;
 	std::unique_ptr<Sampler> pSampler;
