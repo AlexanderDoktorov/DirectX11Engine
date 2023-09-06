@@ -4,12 +4,6 @@ struct PS_INPUT
     float4 Position : SV_Position;
 };
 
-struct VS_INPUT
-{
-    float2 position : POSITION0;
-    float2 UV : TEXTCOORD0;
-};
-
 PS_INPUT main(in uint VertexIdx : SV_VertexID)
 {
     PS_INPUT output;

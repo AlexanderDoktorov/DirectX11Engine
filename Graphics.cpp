@@ -172,14 +172,14 @@ void Graphics::EndLightningPass()
 
 void Graphics::PerformCombinePass()
 {
-    // What's wrong with combina pass??
+    p_Context->IASetInputLayout(nullptr);
     const float light_clear[4] = { 0.1f,0.1f,0.1f,0.3f };
     ClearRTV(g_mainRenderTargetView.Get(), light_clear);
     SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
 
-    BindBackBuffer();
+    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U, 4U, srvs);
     pCombinePS->Bind(*this);
     pScreenSpaceVS->Bind(*this);
