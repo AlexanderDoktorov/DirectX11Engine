@@ -11,7 +11,8 @@
 
 Graphics::Graphics(HWND hwnd) : 
     projection(dx::XMMATRIX()),
-    ImGuiEnabled(true)
+    ImGuiEnabled(true),
+    IsRenderingToImGui(true)
 {
     // Set flags
     UINT device_flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
@@ -137,7 +138,8 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
     for (int i = 0; i < 3; ++i) {
        ClearRTV(rtvs[i], clear_color);
     }
-    p_Context->OMSetRenderTargets(3U, rtvs, nullptr);
+    p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
+    p_Context->OMSetRenderTargets(3U, rtvs, g_mainDepthStencilView.Get());
 }
 
 void Graphics::EndGeometryPass()

@@ -47,7 +47,7 @@ int Game::Start(int nCmdShow)
 {
 	window->Show(nCmdShow);
 	bool open = true;
-	gfx->RenderToImGui(false);
+	gfx->RenderToImGui(true);
 
 	while (open)
 	{
