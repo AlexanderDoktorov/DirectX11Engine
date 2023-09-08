@@ -14,10 +14,11 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+class Sampler;
 class VertexShaderCommon;
 class PixelShaderCommon;
-class Texture;
-class Sampler;
+class RenderTexture;
+interface ITexture;
 
 class Graphics
 {
@@ -48,7 +49,6 @@ public:
 	void			RenderToImGui(const bool& state);
 
 	// Render targets
-	void			BindBackBuffer();
 	void			MakeBackBufferTexture();
 
 	Camera			GetCamera()		const;
@@ -57,14 +57,14 @@ public:
 	~Graphics();
 
 private:
-	dx::XMMATRIX	projection		= dx::XMMatrixIdentity();
-	Camera			cam				= Camera();
+	dx::XMMATRIX	projection = dx::XMMatrixIdentity();
+	Camera			cam = Camera();
 
 	void			RecreateMainViews(const UINT& width, const UINT& height);
 	void			RecreateGBufferViews(const UINT& width, const UINT& height);
 	void			CreateDepthStencilView();
 	void			CreateBackBufferView();
-	void			CreateRTVForTexture(const Texture& texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
+	void			CreateRTVForTexture(const ITexture* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
 	void			UnbindRenderTargets(UINT num_views);
 	void			UnbindPixelShaderResourses(UINT num_resourses);
 	void			ClearRTV(ID3D11RenderTargetView* rtv, const float clear_color[4]);
@@ -91,15 +91,15 @@ private:
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
 
-	std::unique_ptr<Texture>			PositionTexture;
-	std::unique_ptr<Texture>			NormalTexture;
-	std::unique_ptr<Texture>			AlbedoTexture;
-	std::unique_ptr<Texture>			LightTexture;
+	std::unique_ptr<RenderTexture>			PositionTexture;
+	std::unique_ptr<RenderTexture>			NormalTexture;
+	std::unique_ptr<RenderTexture>			AlbedoTexture;
+	std::unique_ptr<RenderTexture>			LightTexture;
 
 	std::unique_ptr<PixelShaderCommon>			 pCombinePS;
 	std::unique_ptr<PixelShaderCommon>			 pLightPassPixelShader;
 	std::unique_ptr<VertexShaderCommon>			 pScreenSpaceVS;
-	std::unique_ptr<Sampler>					 pLinearSampler;
+	std::unique_ptr<Sampler>				 pLinearSampler;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

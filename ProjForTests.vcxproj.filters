@@ -119,10 +119,7 @@
     <ClCompile Include="Histogramm.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
+    <ClCompile Include="PictureTexture.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="TransformBuffer.cpp">
@@ -180,6 +177,15 @@
       <Filter>Файлы заголовков\Items</Filter>
     </ClCompile>
     <ClCompile Include="Sheet.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShaderTexture.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -256,7 +262,7 @@
     <ClInclude Include="Sampler.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
+    <ClInclude Include="PictureTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Topology.h">
@@ -411,6 +417,15 @@
     </ClInclude>
     <ClInclude Include="PixelShaderTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="ITexture.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="ISlot.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

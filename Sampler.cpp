@@ -8,10 +8,20 @@ Sampler::Sampler(Graphics& Gfx)
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 
-	CHECK_HR ( GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState) );
+	CHECK_HR(GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState));
 }
 
-void Sampler::Bind(Graphics& Gfx) noexcept
+UINT Sampler::GetBindSlot() const noexcept
 {
-	GetContext(Gfx)->PSSetSamplers(0U, 1U, p_SamplerState.GetAddressOf());
+	return bindSlot;
+}
+
+void Sampler::SetBindSlot(UINT slot) noexcept
+{
+	bindSlot = slot;
+}
+
+void Sampler::Bind(Graphics & Gfx) noexcept
+{
+	GetContext(Gfx)->PSSetSamplers(bindSlot, 1U, p_SamplerState.GetAddressOf());
 }

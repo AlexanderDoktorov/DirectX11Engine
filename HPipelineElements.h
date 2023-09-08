@@ -18,13 +18,14 @@
 
 #pragma endregion Shaders
 
-	#include "InputLayout.h"
-	#include "Topology.h"
-
 #pragma region Textures
 
 	#include "Sampler.h"
-	#include "Texture.h"
+	#include "PictureTexture.h"
+	#include "RenderTexture.h"
 	#include "PixelShaderTexture.h"
 
 #pragma endregion Textures
+
+#include "InputLayout.h"
+#include "Topology.h"

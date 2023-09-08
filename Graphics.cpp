@@ -2,7 +2,7 @@
 #include "Exceptions.h"
 #include <assert.h>
 
-#include "Texture.h"
+#include "RenderTexture.h"
 #include "Sampler.h"
 #include "PixelShaderCommon.h"
 #include "VertexShaderCommon.h"
@@ -96,16 +96,16 @@ Graphics::Graphics(HWND hwnd) :
     p_Context->RSSetState(p_RSState.Get());
 
     // Create G-Buffer
-    PositionTexture         = std::make_unique<Texture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    NormalTexture           = std::make_unique<Texture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    AlbedoTexture           = std::make_unique<Texture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
-    LightTexture            = std::make_unique<Texture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     
-    CreateRTVForTexture(*PositionTexture,   rtvPosition);
-    CreateRTVForTexture(*NormalTexture,     rtvNormal);
-    CreateRTVForTexture(*AlbedoTexture,     rtvAlbedo);
-    CreateRTVForTexture(*LightTexture,      rtvLight);
+    CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
+    CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
+    CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
+    CreateRTVForTexture(LightTexture.get(),      rtvLight);
 
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this, L"LightPS.cso");
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,  L"ScreenSpaceVS.cso");
@@ -114,11 +114,6 @@ Graphics::Graphics(HWND hwnd) :
     pLinearSampler->Bind(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
-}
-
-void Graphics::BindBackBuffer()
-{
-    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 }
 
 void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4])
@@ -133,9 +128,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
     }
 
     if (IsRenderingToImGui)
-    {
         ImGui::DockSpaceOverViewport();
-    }
 
     ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
     for (int i = 0; i < 3; ++i) {
@@ -304,10 +297,10 @@ void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
     AlbedoTexture->Resize(*this, height, width);
     LightTexture->Resize(*this, height, width);
 
-    CreateRTVForTexture(*PositionTexture, rtvPosition);
-    CreateRTVForTexture(*NormalTexture, rtvNormal);
-    CreateRTVForTexture(*AlbedoTexture, rtvAlbedo);
-    CreateRTVForTexture(*LightTexture, rtvLight);
+    CreateRTVForTexture(PositionTexture.get(), rtvPosition);
+    CreateRTVForTexture(NormalTexture.get(), rtvNormal);
+    CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
+    CreateRTVForTexture(LightTexture.get(), rtvLight);
 }
 
 void Graphics::CreateDepthStencilView()
@@ -350,13 +343,15 @@ void Graphics::CreateBackBufferView()
     pBackBuffer->Release();
 }
 
-void Graphics::CreateRTVForTexture(const Texture& texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv)
+void Graphics::CreateRTVForTexture(const ITexture* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv)
 {
+    assert(texture->GetDesc().BindFlags | D3D11_BIND_RENDER_TARGET);
+
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
-    rtvDesc.Format = texture.GetDesc().Format;
+    rtvDesc.Format = texture->GetDesc().Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0U;
-    CHECK_HR(p_Device->CreateRenderTargetView(texture.GetTexture(), &rtvDesc, &rtv));
+    CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
 }
 
 void Graphics::MakeBackBufferTexture()

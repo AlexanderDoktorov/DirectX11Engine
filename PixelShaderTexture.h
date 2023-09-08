@@ -1,21 +1,46 @@
 #pragma once
+#include "ISlot.h"
 #include "IBindable.h"
-#include "Texture.h"
+#include "RenderTexture.h"
+#include "PictureTexture.h"
 
-template<UINT startSlot>
-class PixelShaderTexture : public Texture, public IBindable
+class PixelShaderRenderTexture : public RenderTexture, public IBindable, public ISlot
 {
 public:
-	using Texture::Texture;
-	
-	virtual void Bind(Graphics& Gfx) noexcept override
+	PixelShaderRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth, UINT bindSlot)
+		:
+		RenderTexture(Gfx, textureFormat, TextureHeight, TextureWidth),
+		bindSlot(bindSlot)
 	{
-		ID3D11ShaderResourceView* srvs[1] = { GetSRV() };
-		GetContext(Gfx)->PSSetShaderResources(startSlot, 1U, srvs);
+
 	}
+	
+	// ISlot
+	void SetBindSlot(UINT slot) noexcept override;
+	UINT GetBindSlot() const noexcept override;
+	
+	virtual void Bind(Graphics& Gfx) noexcept override;
+private:
+	UINT bindSlot = 0U;
 };
 
-typedef PixelShaderTexture<0U> TextureSlot0;
-typedef PixelShaderTexture<1U> TextureSlot1;
-typedef PixelShaderTexture<2U> TextureSlot2;
-typedef PixelShaderTexture<3U> TextureSlot3;
+class PixelShaderPictureTexture : public PictureTexture, public IBindable, public ISlot
+{
+public:
+	PixelShaderPictureTexture(Graphics& Gfx, const wchar_t* FileName, UINT bindSlot)
+		:
+		PictureTexture(Gfx, FileName),
+		bindSlot(bindSlot)
+	{
+
+	}
+
+	// ISlot
+	void SetBindSlot(UINT slot) noexcept override;
+	UINT GetBindSlot() const noexcept override;
+
+	virtual void Bind(Graphics& Gfx) noexcept override;
+
+private:
+	UINT bindSlot = 0U;
+};
