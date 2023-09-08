@@ -174,7 +174,6 @@ void Graphics::PerformCombinePass()
     
     p_Context->IASetInputLayout(nullptr);
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), light_clear);
-    SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
 
@@ -188,15 +187,14 @@ void Graphics::PerformCombinePass()
     // Unbind
     ID3D11ShaderResourceView* nullSRV[4] = { nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, 4U, nullSRV);
-    ResetBlendingState();
 }
 
-void Graphics::ShowRenderWindow(bool* p_open)
+void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
 {
     if ((ImGui::Begin("Viewport", p_open)))
     {
         ImVec2 client_region_size_with_indent = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
-        ImGui::GetWindowDrawList()->AddImage(g_backBufferTextureView.Get(), ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
+        ImGui::GetWindowDrawList()->AddImage(srv, ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + client_region_size_with_indent);
     } 
     ImGui::End();
 }
@@ -219,19 +217,24 @@ void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
 
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
-    ClearRTV(g_mainRenderTargetView.Get(), clear_color);
+    p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 }
 
 
 void Graphics::EndFrame()
 {
+    wrl::ComPtr<ID3D11ShaderResourceView> backBuffer;
+
     if (IsRenderingToImGui)
     {
+        // First make SRV then clear RTV !!!
+        backBuffer = MakeSRVFromRTV(g_mainRenderTargetView);
         const float clear_color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
-        MakeBackBufferTexture();
-        ClearRTV(g_mainRenderTargetView.Get(), clear_color);
+        p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
+
         static bool open = true;
-        ShowRenderWindow(&open);
+        if (backBuffer)
+            ShowRenderWindow(backBuffer.Get(), &open);
     }
 
     if (ImGuiEnabled)
@@ -354,36 +357,39 @@ void Graphics::CreateRTVForTexture(const ITexture* texture, wrl::ComPtr<ID3D11Re
     CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
 }
 
-void Graphics::MakeBackBufferTexture()
+wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
 {
-    ID3D11Texture2D* pBackBufferCopy = nullptr;
-    ID3D11Texture2D* pBackBuffer = nullptr;
-    g_mainRenderTargetView->GetResource(reinterpret_cast<ID3D11Resource**>(&pBackBuffer));
+    wrl::ComPtr<ID3D11ShaderResourceView> result;
+    ID3D11Texture2D* pRenderTextureCopy = nullptr;
+    ID3D11Texture2D* pRenderTexture = nullptr;
+    rtv->GetResource(reinterpret_cast<ID3D11Resource**>(&pRenderTexture));
 
-    D3D11_TEXTURE2D_DESC descBack{};
-    pBackBuffer->GetDesc(&descBack);
+    D3D11_TEXTURE2D_DESC descText{};
+    pRenderTexture->GetDesc(&descText);
 
-    D3D11_TEXTURE2D_DESC descBackCopy = descBack;
-    descBackCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-    descBackCopy.MipLevels = 0U;
-    descBackCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-    p_Device->CreateTexture2D(&descBackCopy, nullptr, &pBackBufferCopy);
+    D3D11_TEXTURE2D_DESC descTextCopy = descText;
+    descTextCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    descTextCopy.MipLevels = 0U;
+    descTextCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    CHECK_HR( p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy) );
 
     // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
-    p_Context->CopySubresourceRegion(pBackBufferCopy, 0U, 0U, 0U, 0U, pBackBuffer, 0U, nullptr);
+    p_Context->CopySubresourceRegion(pRenderTextureCopy, 0U, 0U, 0U, 0U, pRenderTexture, 0U, nullptr);
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDescBuffer{};
-    resourceViewDescBuffer.Format = descBack.Format;
+    resourceViewDescBuffer.Format = descText.Format;
     resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
     resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
-    p_Device->CreateShaderResourceView(pBackBufferCopy, &resourceViewDescBuffer, &g_backBufferTextureView);
+    CHECK_HR( p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result) );
 
     // regenerate mipmap based on updated most detailed mip-level
-    p_Context->GenerateMips(g_backBufferTextureView.Get());
+    p_Context->GenerateMips(result.Get());
 
-    pBackBufferCopy->Release();
-    pBackBuffer->Release();
+    pRenderTextureCopy->Release();
+    pRenderTexture->Release();
+
+    return result;
 }
 
 void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
@@ -450,22 +456,4 @@ void Graphics::ResetBlendingState()
 Camera Graphics::GetCamera() const
 {
     return this->cam;
-}
-
-void Graphics::UnbindRenderTargets(UINT num_views)
-{
-    std::vector<ID3D11RenderTargetView*> null(num_views, nullptr);
-    p_Context->OMSetRenderTargets(num_views, null.data(), nullptr);
-}
-
-void Graphics::UnbindPixelShaderResourses(UINT num_resourses)
-{
-    std::vector<ID3D11ShaderResourceView*> null(num_resourses, nullptr);
-    p_Context->PSSetShaderResources(0U, num_resourses, null.data());
-}
-
-void Graphics::ClearRTV(ID3D11RenderTargetView* rtv, const float clear_color[4])
-{
-    assert(p_Context != nullptr);
-    p_Context->ClearRenderTargetView(rtv, clear_color);
 }

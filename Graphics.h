@@ -49,7 +49,7 @@ public:
 	void			RenderToImGui(const bool& state);
 
 	// Render targets
-	void			MakeBackBufferTexture();
+	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -65,13 +65,9 @@ private:
 	void			CreateDepthStencilView();
 	void			CreateBackBufferView();
 	void			CreateRTVForTexture(const ITexture* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
-	void			UnbindRenderTargets(UINT num_views);
-	void			UnbindPixelShaderResourses(UINT num_resourses);
-	void			ClearRTV(ID3D11RenderTargetView* rtv, const float clear_color[4]);
-
 
 	// ImGuiStuff
-	void			ShowRenderWindow(bool* p_open = (bool*)0);
+	void			ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open = (bool*)0);
 	bool			IsRenderingToImGui = false;
 	bool			ImGuiEnabled = false;
 
@@ -83,7 +79,6 @@ private:
 
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
-	wrl::ComPtr<ID3D11ShaderResourceView>	g_backBufferTextureView;
 
 	// G-buffer
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvPosition;
