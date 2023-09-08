@@ -375,6 +375,7 @@
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="Blob.cpp" />
     <ClCompile Include="PixelShaderCommon.cpp" />
+    <ClCompile Include="Sheet.cpp" />
     <ClCompile Include="VertexShaderCommon.cpp" />
     <ClCompile Include="wWinMain.cpp" />
     <ClCompile Include="Mouse.cpp" />
@@ -402,7 +403,6 @@
     <ClInclude Include="PixelShaderCommon.h" />
     <ClInclude Include="PixelShaderTexture.h" />
     <ClInclude Include="ScreenSpaceVertexShader.h" />
-    <ClInclude Include="LightResourseBuffer.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="ResourseBuffer.h" />
     <ClInclude Include="Blob.h" />

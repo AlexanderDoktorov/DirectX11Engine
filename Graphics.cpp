@@ -3,9 +3,9 @@
 #include <assert.h>
 
 #include "Texture.h"
-#include "LightPassPixelShader.h"
-#include "ScreenSpaceVertexShader.h"
-#include "CombinePixelShader.h"
+#include "Sampler.h"
+#include "PixelShaderCommon.h"
+#include "VertexShaderCommon.h"
 
 #pragma comment(lib, "d3d11")
 
@@ -100,15 +100,18 @@ Graphics::Graphics(HWND hwnd) :
     NormalTexture           = std::make_unique<Texture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     AlbedoTexture           = std::make_unique<Texture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
     LightTexture            = std::make_unique<Texture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    pLinearSampler          = std::make_unique<Sampler>(*this);
     
     CreateRTVForTexture(*PositionTexture,   rtvPosition);
     CreateRTVForTexture(*NormalTexture,     rtvNormal);
     CreateRTVForTexture(*AlbedoTexture,     rtvAlbedo);
     CreateRTVForTexture(*LightTexture,      rtvLight);
 
-    pLightPassPixelShader   = std::make_unique<LightPassPixelShader>(*this);
-    pScreenSpaceVS          = std::make_unique<ScreenSpaceVertexShader>(*this);
-    pCombinePS              = std::make_unique<CombinePixelShader>(*this);
+    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this, L"LightPS.cso");
+    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,  L"ScreenSpaceVS.cso");
+    pCombinePS              = std::make_unique<PixelShaderCommon>(*this, L"CombinePS.cso");
+
+    pLinearSampler->Bind(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
@@ -136,7 +139,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
 
     ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
     for (int i = 0; i < 3; ++i) {
-       ClearRTV(rtvs[i], clear_color);
+        p_Context->ClearRenderTargetView(rtvs[i], clear_color);
     }
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(3U, rtvs, g_mainDepthStencilView.Get());
@@ -151,7 +154,7 @@ void Graphics::EndGeometryPass()
 void Graphics::BeginLightningPass()
 {
     const float light_clear[4] = { 0.f,0.f,0.f,0.f };
-    ClearRTV(rtvLight.Get(), light_clear);
+    p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
     SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[3] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() };
@@ -174,14 +177,16 @@ void Graphics::EndLightningPass()
 
 void Graphics::PerformCombinePass()
 {
-    p_Context->IASetInputLayout(nullptr);
     const float light_clear[4] = { 0.1f,0.1f,0.1f,0.3f };
-    ClearRTV(g_mainRenderTargetView.Get(), light_clear);
+    
+    p_Context->IASetInputLayout(nullptr);
+    p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), light_clear);
     SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
-    p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
 
+    p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
+    p_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
     pCombinePS->Bind(*this);
     pScreenSpaceVS->Bind(*this);

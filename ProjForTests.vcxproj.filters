@@ -179,6 +179,9 @@
     <ClCompile Include="LightSource.cpp">
       <Filter>Файлы заголовков\Items</Filter>
     </ClCompile>
+    <ClCompile Include="Sheet.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sorts.h">
@@ -353,9 +356,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="ResourseBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="LightResourseBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsChild.h">

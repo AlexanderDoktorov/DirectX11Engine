@@ -64,6 +64,11 @@ public:
     // IToString
     const char* ToString() const noexcept override;
 
+    // IColored
+    DirectX::XMFLOAT4 GetColor() const noexcept override;
+    void SetColor(dx::XMFLOAT4 new_color) noexcept override;
+
 private:
     dx::XMFLOAT3 world_position = { 0.f, 0.f, 0.f };
+    dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f };
 };

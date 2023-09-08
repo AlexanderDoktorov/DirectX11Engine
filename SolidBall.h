@@ -62,13 +62,18 @@ public:
     }
 
     // IPlacableItem
-    virtual void SetWorldPosition(const dx::XMFLOAT3& new_Wpos) override;
-    virtual dx::XMFLOAT3 GetWorldPosition() const noexcept override;
+    void SetWorldPosition(const dx::XMFLOAT3& new_Wpos) override;
+    dx::XMFLOAT3 GetWorldPosition() const noexcept override;
 
     // IToString
     const char* ToString() const noexcept override;
 
+    // IColored
+    DirectX::XMFLOAT4 GetColor() const noexcept override;
+    void SetColor(dx::XMFLOAT4 new_color) noexcept override;
+
 private:
     dx::XMFLOAT3 scale = { 1.f,1.f,1.f };
     dx::XMFLOAT3 world_position = { 0.f,0.f,0.f };
+    dx::XMFLOAT4 color = { 1.f, 1.f, 1.f, 1.f };
 };

@@ -14,10 +14,10 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+class VertexShaderCommon;
+class PixelShaderCommon;
 class Texture;
-class LightPassPixelShader;
-class ScreenSpaceVertexShader;
-class CombinePixelShader;
+class Sampler;
 
 class Graphics
 {
@@ -96,9 +96,10 @@ private:
 	std::unique_ptr<Texture>			AlbedoTexture;
 	std::unique_ptr<Texture>			LightTexture;
 
-	std::unique_ptr<CombinePixelShader>			 pCombinePS;
-	std::unique_ptr<LightPassPixelShader>        pLightPassPixelShader;
-	std::unique_ptr<ScreenSpaceVertexShader>     pScreenSpaceVS;
+	std::unique_ptr<PixelShaderCommon>			 pCombinePS;
+	std::unique_ptr<PixelShaderCommon>			 pLightPassPixelShader;
+	std::unique_ptr<VertexShaderCommon>			 pScreenSpaceVS;
+	std::unique_ptr<Sampler>					 pLinearSampler;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

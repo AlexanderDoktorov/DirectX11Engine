@@ -58,7 +58,14 @@ public:
 		return;
 	}
 
+	// IColored
+	// IColored
+	DirectX::XMFLOAT4 GetColor() const noexcept override;
+	void SetColor(dx::XMFLOAT4 new_color) noexcept override;
+
 private:
+	dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f };
+
 	float x = 0.f;
 	float y = 0.f;
 	float z = 0.f;
