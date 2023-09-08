@@ -146,22 +146,13 @@
     <ClCompile Include="SolidLightenedBall.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="LightSource.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="wWinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="StringHelper.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ColorBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsChild.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Blob.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="PixelShader.cpp">
@@ -178,6 +169,15 @@
     </ClCompile>
     <ClCompile Include="PixelShaderCommon.cpp">
       <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Blob.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSource.cpp">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -407,6 +407,9 @@
       <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="Blob.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShaderTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>

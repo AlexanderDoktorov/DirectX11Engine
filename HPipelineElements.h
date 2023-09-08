@@ -25,5 +25,6 @@
 
 	#include "Sampler.h"
 	#include "Texture.h"
+	#include "PixelShaderTexture.h"
 
 #pragma endregion Textures

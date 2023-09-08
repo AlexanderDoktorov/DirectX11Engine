@@ -2,7 +2,7 @@
 #include "Exceptions.h"
 #include "GraphicsChild.h"
 
-class IBindable : public GraphicsChild
+class IBindable : virtual public GraphicsChild
 {
 public:
 	virtual ~IBindable() = default;

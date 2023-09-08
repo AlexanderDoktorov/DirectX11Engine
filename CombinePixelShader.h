@@ -1,30 +1,23 @@
 #pragma once
 
-#include "PixelShader.h"
+#include "PixelShaderCommon.h"
 #include "Sampler.h"
 #include <vector>
 
-class CombinePixelShader : public IBindable
+class CombinePixelShader : public PixelShaderCommon
 {
 public:
-	CombinePixelShader(Graphics& Gfx)
+	CombinePixelShader(Graphics& Gfx) : PixelShaderCommon(Gfx, L"CombinePS.cso")
 	{
-		pPixelShader = std::make_unique<PixelShader>(Gfx, L"CombinePS.cso");
 		pSampler = std::make_unique<Sampler>(Gfx);
 	}
 
 	virtual void Bind(Graphics& Gfx) noexcept override
 	{
-		pPixelShader->Bind(Gfx);
+		PixelShaderCommon::Bind(Gfx);
 		pSampler->Bind(Gfx);
 	}
 
-	void BindPixelShaderResourses(Graphics& Gfx, std::vector<ID3D11ShaderResourceView*> resourses)
-	{
-		GetContext(Gfx)->PSSetShaderResources(0U, (UINT)resourses.size(), resourses.data());
-	}
-
 private:
-	std::unique_ptr<PixelShader> pPixelShader;
 	std::unique_ptr<Sampler> pSampler;
 };

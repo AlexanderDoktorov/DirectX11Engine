@@ -1,8 +1,8 @@
 #pragma once
-#include "IBindable.h"
+#include "GraphicsChild.h"
 #include <wrl.h>
 
-class Texture
+class Texture : virtual public GraphicsChild
 {
 public:
 	Texture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth);

@@ -107,8 +107,8 @@ Graphics::Graphics(HWND hwnd) :
     CreateRTVForTexture(*LightTexture,      rtvLight);
 
     pLightPassPixelShader   = std::make_unique<LightPassPixelShader>(*this);
-    pScreenSpaceVS = std::make_unique<ScreenSpaceVertexShader>(*this);
-    pCombinePS = std::make_unique<CombinePixelShader>(*this);
+    pScreenSpaceVS          = std::make_unique<ScreenSpaceVertexShader>(*this);
+    pCombinePS              = std::make_unique<CombinePixelShader>(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
@@ -180,9 +180,9 @@ void Graphics::PerformCombinePass()
     SetAdditiveBlendingState();
 
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
+    p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
 
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
-    p_Context->PSSetShaderResources(0U, 4U, srvs);
     pCombinePS->Bind(*this);
     pScreenSpaceVS->Bind(*this);
     Draw(3U);

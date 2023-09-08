@@ -1,6 +1,7 @@
 #pragma once
 #include "IShader.h"
 #include "Blob.h"
+#include "Sampler.h"
 #include "DOK_assert.h"
 
 class PixelShaderCommon : public IShader

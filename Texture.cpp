@@ -1,6 +1,6 @@
 #include "WICTextureLoader.h"
-#include "DOK_assert.h"
 #include "Texture.h"
+#include "Exceptions.h"
 
 Texture::Texture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
@@ -71,9 +71,4 @@ D3D11_TEXTURE2D_DESC Texture::GetDesc() const noexcept
     D3D11_TEXTURE2D_DESC desc;
     p_Texture->GetDesc(&desc);
     return desc;
-}
-
-void Texture::Bind(Graphics& Gfx) noexcept
-{
-	GetContext(Gfx)->PSSetShaderResources(3U, 1U, p_ShaderResourseView.GetAddressOf());
 }

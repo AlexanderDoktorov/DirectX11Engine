@@ -1,24 +1,24 @@
 #pragma once
-#include "PixelShader.h"
+#include "PixelShaderCommon.h"
 #include "Sampler.h"
-#include <vector>
 
-class LightPassPixelShader : public IBindable
+class LightPassPixelShader : public PixelShaderCommon
 {
 public:
-	LightPassPixelShader(Graphics& Gfx)
+	LightPassPixelShader(Graphics& Gfx) : PixelShaderCommon(Gfx, L"LightPS.cso")
 	{
-		pPixelShader = std::make_unique<PixelShader>(Gfx, L"LightPS.cso");
 		pSampler = std::make_unique<Sampler>(Gfx);
 	}
 
 	virtual void Bind(Graphics& Gfx) noexcept override
 	{
-		pPixelShader->Bind(Gfx);
+		PixelShaderCommon::Bind(Gfx);
 		pSampler->Bind(Gfx);
 	}
 
 private:
-	std::unique_ptr<PixelShader> pPixelShader;
 	std::unique_ptr<Sampler> pSampler;
 };
+
+
+

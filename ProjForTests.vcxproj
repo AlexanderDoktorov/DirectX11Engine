@@ -400,6 +400,7 @@
     <ClInclude Include="LightConstantBuffer.h" />
     <ClInclude Include="LightPassPixelShader.h" />
     <ClInclude Include="PixelShaderCommon.h" />
+    <ClInclude Include="PixelShaderTexture.h" />
     <ClInclude Include="ScreenSpaceVertexShader.h" />
     <ClInclude Include="LightResourseBuffer.h" />
     <ClInclude Include="Polygon.h" />

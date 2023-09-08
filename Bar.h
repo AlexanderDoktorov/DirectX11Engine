@@ -37,7 +37,7 @@ public:
 			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticElement(std::make_unique<IndexBuffer>(Gfx, model.indices));
 			AddStaticElement(std::make_unique<Sampler>(Gfx));
-			AddStaticElement(std::make_unique<Texture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\Текстура_квадрата.png"));
+			AddStaticElement(std::make_unique<TextureSlot3>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\Текстура_квадрата.png"));
 		}
 		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
 	}
