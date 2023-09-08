@@ -37,6 +37,9 @@
     <Filter Include="Файлы заголовков\Windows">
       <UniqueIdentifier>{5a331809-642d-460a-b61b-dfd542eb760d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Pipeline\Shaders">
+      <UniqueIdentifier>{231594a7-4118-4ce0-934a-b3fecb65bacb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SolidPS.hlsl">
@@ -116,12 +119,6 @@
     <ClCompile Include="Histogramm.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="HullShader.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Sampler.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
@@ -161,14 +158,26 @@
     <ClCompile Include="ColorBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ComputeShader.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsChild.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="VertexShaderCommon.cpp">
+    <ClCompile Include="Blob.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="HullShader.cpp">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeShader.cpp">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShaderCommon.cpp">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShaderCommon.cpp">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,9 +188,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Graphics.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="HullShader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Shift.h">
@@ -244,9 +250,6 @@
     <ClInclude Include="PixelConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="PixelShader.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="Sampler.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -265,9 +268,6 @@
     <ClInclude Include="VertexConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="WICTextureLoader.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -282,9 +282,6 @@
     </ClInclude>
     <ClInclude Include="Items.h">
       <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="RawInputDevices.h">
       <Filter>Файлы заголовков</Filter>
@@ -355,9 +352,6 @@
     <ClInclude Include="StringHelper.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="ComputeShader.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="ResourseBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -385,14 +379,35 @@
     <ClInclude Include="WindowClass.h">
       <Filter>Файлы заголовков\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexShaderCommon.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="CombinePixelShader.h">
       <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShaderCommon.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="HullShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="IShader.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShaderCommon.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Blob.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

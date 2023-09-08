@@ -373,6 +373,8 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="LightSource.cpp" />
+    <ClCompile Include="Blob.cpp" />
+    <ClCompile Include="PixelShaderCommon.cpp" />
     <ClCompile Include="VertexShaderCommon.cpp" />
     <ClCompile Include="wWinMain.cpp" />
     <ClCompile Include="Mouse.cpp" />
@@ -397,11 +399,13 @@
     <ClInclude Include="IToString.h" />
     <ClInclude Include="LightConstantBuffer.h" />
     <ClInclude Include="LightPassPixelShader.h" />
+    <ClInclude Include="PixelShaderCommon.h" />
     <ClInclude Include="ScreenSpaceVertexShader.h" />
     <ClInclude Include="LightResourseBuffer.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="ResourseBuffer.h" />
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Blob.h" />
+    <ClInclude Include="IShader.h" />
     <ClInclude Include="Sheet.h" />
     <ClInclude Include="SolidBall.h" />
     <ClInclude Include="SolidLightenedBall.h" />
