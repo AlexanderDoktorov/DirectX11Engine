@@ -223,7 +223,7 @@ void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
 
 void Graphics::EndFrame()
 {
-    wrl::ComPtr<ID3D11ShaderResourceView> backBuffer;
+    wrl::ComPtr<ID3D11ShaderResourceView> backBuffer{};
 
     if (IsRenderingToImGui)
     {

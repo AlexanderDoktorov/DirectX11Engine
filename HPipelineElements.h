@@ -15,6 +15,8 @@
 
 	#include "PixelShader.h"
 	#include "VertexShader.h"
+	#include "VertexShaderCommon.h"
+	#include "PixelShaderCommon.h"
 
 #pragma endregion Shaders
 

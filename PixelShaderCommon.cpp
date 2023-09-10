@@ -30,3 +30,8 @@ ID3D11PixelShader* PixelShaderCommon::GetShader() const noexcept
 {
 	return p_PixelShader.Get();
 }
+
+ID3DBlob* PixelShaderCommon::GetBlob() noexcept
+{
+	return blob.GetBlob();
+}

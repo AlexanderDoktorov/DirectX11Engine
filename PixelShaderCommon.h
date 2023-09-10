@@ -4,7 +4,7 @@
 #include "Sampler.h"
 #include "DOK_assert.h"
 
-class PixelShaderCommon : public IShader
+class PixelShaderCommon : virtual public IShader
 {
 public:
 	PixelShaderCommon(Graphics& Gfx, const wchar_t* FileName);
@@ -15,6 +15,9 @@ public:
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
 	ID3D11PixelShader* GetShader() const noexcept;
+
+	ID3DBlob*			GetBlob() noexcept;
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>	p_PixelShader;
 	Blob blob = Blob();

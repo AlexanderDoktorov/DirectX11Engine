@@ -1,26 +1,6 @@
 ﻿G:\Visual Studio Community 2022\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ProjForTests.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  ColorBuffer.cpp
-  Column.cpp
-  ComputeShader.cpp
   Game.cpp
-  Graphics.cpp
-  GraphicsChild.cpp
-  Histogramm.cpp
-  HullShader.cpp
-  LightSource.cpp
-  PictureTexture.cpp
-  PixelShader.cpp
-  PixelShaderCommon.cpp
-  PixelShaderTexture.cpp
-  RenderTexture.cpp
-  Sampler.cpp
-  Sheet.cpp
-  SolidBall.cpp
   SolidLightenedBall.cpp
-  TransformBuffer.cpp
-  VertexShaderCommon.cpp
-  Создание кода...
-  Компиляция...
   wWinMain.cpp
   Создание кода...
   ProjForTests.vcxproj -> G:\Visual Studio Projects\ProjForTests\x64\Debug\Sorting Visualizer.exe

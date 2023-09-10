@@ -398,6 +398,8 @@
     <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsChild.h" />
+    <ClInclude Include="IBlob.h" />
+    <ClInclude Include="IndexedTriangleStrip.h" />
     <ClInclude Include="IPlacableItem.h" />
     <ClInclude Include="ISlot.h" />
     <ClInclude Include="ITexture.h" />

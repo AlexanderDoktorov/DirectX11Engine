@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "IndexedTriangleList.h"
+#include "IndexedTriangleStrip.h"
 #include "DOK_math.h"
 class Sphere
 {
@@ -89,6 +90,57 @@ public:
 
 		return { std::move(vertices),std::move(indices) };
 	}
+
+
+	template<class V>
+	static IndexedTriangleList<V> MakeTesselated(UINT Prec_φ, UINT Prec_θ, float r = 1.f)
+	{
+		namespace dx = DirectX;
+		assert(Prec_φ >= 3);
+		assert(Prec_θ >= 3);
+
+		std::vector<V> vertices;
+
+		// vertices[0] = North pole
+		//vertices.emplace_back();
+		//vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
+
+		// vertices[1] = South polse
+		//vertices.emplace_back();
+		//vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
+
+		for (float φ = -dx::XM_PIDIV2; φ <= dx::XM_PIDIV2 + dx::XM_PIDIV2 / Prec_φ; φ += dx::XM_PIDIV2 / Prec_φ) // 2 * Prec_φ + 1 = количество окружностей
+		{
+			for (float θ = 0.f; θ < 2.f * dx::XM_PI; θ += (2.f * dx::XM_PI) / Prec_θ) // Prec_θ = количество точек в окружностях
+			{
+				float x_ = r * cosf(φ) * cosf(θ);
+				float y_ = r * cosf(φ) * sinf(θ);
+				float z_ = r * sinf(φ);
+				vertices.emplace_back();
+				vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
+			}
+		}
+
+		std::vector<unsigned short>  indicies;
+
+		for (unsigned short i = 0; i < vertices.size() - 2*(Prec_θ + 1);  ++i)
+		{
+			indicies.push_back(i + 1);
+			indicies.push_back(i + Prec_θ);
+			indicies.push_back(i);
+
+			indicies.push_back(i + Prec_θ);
+			indicies.push_back(i + 1);
+			indicies.push_back(i + Prec_θ + 1);
+		}
+
+		return { std::move(vertices), std::move(indicies) };
+	}
+
+
+
+
+
 	template<class V>
 	static IndexedTriangleList<V> Make()
 	{

@@ -427,6 +427,12 @@
     <ClInclude Include="ISlot.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="IBlob.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexedTriangleStrip.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">

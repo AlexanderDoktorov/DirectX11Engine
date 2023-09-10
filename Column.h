@@ -51,13 +51,12 @@ public:
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
 			};
 
-			std::unique_ptr<VertexShader> VS = std::make_unique<VertexShader>(Gfx, L"DefaultVS.cso");
-			auto ShBC = VS->GetBlob();
+			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"DefaultVS.cso");
 
 			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, verts));
 			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"SolidPS.cso"));
+			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
 			AddStaticElement(std::move(VS));
-			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, ShBC));
 			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticElement(std::make_unique<IndexBuffer>(Gfx, indicies));
 		}

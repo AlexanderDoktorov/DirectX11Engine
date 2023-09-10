@@ -30,3 +30,8 @@ ID3D11VertexShader* VertexShaderCommon::GetShader() const noexcept
 {
 	return p_VertexShader.Get();
 }
+
+ID3DBlob* VertexShaderCommon::GetBlob() noexcept
+{
+	return blob.GetBlob();
+}

@@ -3,7 +3,7 @@
 #include "Blob.h"
 #include "DOK_assert.h"
 
-class VertexShaderCommon : public IShader
+class VertexShaderCommon : virtual public IShader
 {
 public:
 	VertexShaderCommon(Graphics& Gfx, const wchar_t* FileName);
@@ -14,6 +14,9 @@ public:
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
 	ID3D11VertexShader* GetShader() const noexcept;
+
+	ID3DBlob*			GetBlob() noexcept override;
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>	p_VertexShader;
 	Blob blob = Blob();
