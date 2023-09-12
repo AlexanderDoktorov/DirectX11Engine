@@ -20,6 +20,20 @@ protected:
 		}
 		StaticPipelineElements.push_back(std::move(_elem));
 	}
+
+	template <class T>
+	static T* QueryStaticBindable()
+	{
+		for (auto& bindable : StaticPipelineElements)
+		{
+			if (auto pt = dynamic_cast<T*>(bindable.get()))
+			{
+				return pt;
+			}
+		}
+		return nullptr;
+	}
+
 public:
 	void Draw(Graphics& Gfx) override
 	{
@@ -38,19 +52,6 @@ public:
 			Gfx.DrawIndexed(staticIndexBuffer->GetCount());
 		if(pIndexBuffer)
 			Gfx.DrawIndexed(pIndexBuffer->GetCount());
-	}
-
-	template <class T>
-	static T* QueryStaticBindable()
-	{
-		for (auto& bindable : StaticPipelineElements)
-		{
-			if (auto pt = dynamic_cast<T*>(bindable.get()))
-			{
-				return pt;
-			}
-		}
-		return nullptr;
 	}
 
 	virtual ~DrawableBase() = default;

@@ -2,8 +2,9 @@
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
 #include "Polygon.h"
+#include "Interfaces.h"
 
-class Sheet : public DrawableBase<Sheet>, public IColored
+class Sheet : public DrawableBase<Sheet>, public IColored, public IMovable, public IScalable, public IObject
 {
 public:
 	Sheet(Graphics& Gfx, dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f } ) 
@@ -39,11 +40,6 @@ public:
 		AddElement(std::make_unique<ColorBuffer>(Gfx, *this));
 	}
 
-	void						SetPosition(float _x, float _y, float _z)
-	{
-		x = _x; y = _y; z = _z;
-	}
-
 	virtual void				Scale(float scale_x_new = 1.f, float scale_y_new = 1.f, float scale_z_new = 1.f)
 	{
 		scale_x = scale_x_new; scale_y = scale_y_new; scale_z = scale_z_new;
@@ -52,15 +48,18 @@ public:
 	{
 		return DirectX::XMMatrixRotationRollPitchYaw(Pitch, Yaw,  Roll) * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z) * DirectX::XMMatrixTranslation(x, y, z);
 	}
-	virtual void				Update(float dt)			noexcept override
-	{
-		return;
-	}
 
-	// IColored
+	// IMovable
+	virtual void SetPosition(float _x, float _y, float _z) override;
+	virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
+
 	// IColored
 	DirectX::XMFLOAT4 GetColor() const noexcept override;
 	void SetColor(dx::XMFLOAT4 new_color) noexcept override;
+
+	// IScalable
+	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new) override;
+	virtual dx::XMFLOAT3 GetScale() const noexcept override;
 
 private:
 	dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f };

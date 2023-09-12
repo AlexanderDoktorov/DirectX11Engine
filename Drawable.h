@@ -11,7 +11,6 @@ public:
 	~Drawable() = default;
 
 	virtual DirectX::XMMATRIX GetTransform() const noexcept = 0;
-	virtual void Update(float dt) noexcept = 0;
 
 	virtual void Draw(Graphics& Gfx)
 	{

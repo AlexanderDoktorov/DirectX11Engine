@@ -1,10 +1,11 @@
 #pragma once
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
+#include "Interfaces.h"
 #include "Sampler.h"
 #include "Cube.h"
 
-class Bar : public DrawableBase<Bar>
+class Bar : public DrawableBase<Bar>, public IMovable, public IScalable, public IObject
 {
 public:
 	Bar(Graphics& Gfx, float length = 4.f, float height = 1.f, float width = 1.f) : scale_x(length), scale_y(height), scale_z(width)
@@ -42,23 +43,18 @@ public:
 		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
 	}
 
-	void						SetPosition(float _x, float _y, float _z)
-	{
-		x = _x; y = _y; z = _z;
-	}
-
-	virtual void				Scale(float scale_x_new = 1.f, float scale_y_new = 1.f, float scale_z_new = 1.f)
-	{
-		scale_x = scale_x_new; scale_y = scale_y_new; scale_z = scale_z_new;
-	}
 	virtual DirectX::XMMATRIX	GetTransform()				const noexcept override
 	{
 		return DirectX::XMMatrixScaling(scale_x, scale_y, scale_z) * DirectX::XMMatrixTranslation(x, y, z);
 	}
-	virtual void				Update(float dt)			noexcept override
-	{
-		return;
-	}
+
+	// IMovable
+	virtual void SetPosition(float _x, float _y, float _z) override;
+	virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
+
+	// IScalable
+	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new) override;
+	virtual dx::XMFLOAT3 GetScale() const noexcept override;
 
 private:
 	float x = 0.f;

@@ -1,11 +1,13 @@
 #include "SolidBall.h"
 
-void SolidBall::SetWorldPosition(const dx::XMFLOAT3& new_Wpos)
+void SolidBall::SetPosition(float _x, float _y, float _z)
 {
-    world_position = new_Wpos;
+    world_position.x = _x;
+    world_position.y = _y;
+    world_position.z = _z;
 }
 
-dx::XMFLOAT3 SolidBall::GetWorldPosition() const noexcept
+DirectX::XMFLOAT3 SolidBall::GetPosition() const noexcept
 {
     return world_position;
 }

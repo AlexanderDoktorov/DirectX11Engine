@@ -14,21 +14,21 @@ struct LightDesc
 	float Qatt = 1.f;
 };
 
-class LightSource : public IPlacableItem, public IToString
+class LightSource : public SolidBall, public IBindable
 {
 public:
 	LightSource(Graphics& Gfx);
 
 
-	void		Draw(Graphics& Gfx) noexcept;
+	void		Draw(Graphics& Gfx) override;
 	void		Reset();
-	void		Bind(Graphics& Gfx);
+	void		Bind(Graphics& Gfx) noexcept override;
 
 	void ShowControlChildWindow();
 
-	// IPlacableItem
-	virtual void SetWorldPosition(const dx::XMFLOAT3& new_Wpos) override;
-	virtual dx::XMFLOAT3 GetWorldPosition() const noexcept override;
+	// IMovable
+	virtual void SetPosition(float _x, float _y, float _z) override;
+	virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
 
 	// IToString
 	const char* ToString() const noexcept override;
@@ -36,5 +36,4 @@ public:
 private:
 	static std::unique_ptr<LightConstantBuffer<LightDesc>> pLightBuffer;
 	LightDesc lightDesc;
-	SolidBall mesh;
 };

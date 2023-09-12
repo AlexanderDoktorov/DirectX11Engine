@@ -354,6 +354,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bar.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="DOK_DX11.cpp" />
@@ -398,9 +399,13 @@
     <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsChild.h" />
+    <ClInclude Include="IAnimated.h" />
     <ClInclude Include="IBlob.h" />
+    <ClInclude Include="IMovable.h" />
     <ClInclude Include="IndexedTriangleStrip.h" />
-    <ClInclude Include="IPlacableItem.h" />
+    <ClInclude Include="Interfaces.h" />
+    <ClInclude Include="IObject.h" />
+    <ClInclude Include="IScalable.h" />
     <ClInclude Include="ISlot.h" />
     <ClInclude Include="ITexture.h" />
     <ClInclude Include="IToString.h" />

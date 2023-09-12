@@ -6,7 +6,7 @@
 #include "Items.h"
 #include "Timer.h"
 #include "LightSource.h"
-#include "IPlacableItem.h"
+#include "Interfaces.h"
 
 class Game
 {
@@ -35,7 +35,7 @@ private:
 	std::unique_ptr<Graphics> gfx;
 
 	std::unique_ptr<Bar> bar;
-	std::vector<IPlacableItem*> placable_items;
+	std::vector<IObject*> objects;
 	std::unique_ptr<Sheet> sheet;
 	std::unique_ptr<Box> box;
 

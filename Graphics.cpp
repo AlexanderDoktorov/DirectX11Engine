@@ -240,6 +240,8 @@ void Graphics::EndFrame()
     if (ImGuiEnabled)
     {
         ImGui::Render();
+        ImGui::EndFrame();
+
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
         ImGuiIO& io = ImGui::GetIO();

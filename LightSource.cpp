@@ -3,12 +3,12 @@
 std::unique_ptr<LightConstantBuffer<LightDesc>> LightSource::pLightBuffer{};
 
 LightSource::LightSource(Graphics& Gfx) :
-	mesh(Gfx)
+	SolidBall(Gfx)
 {
 	if (!pLightBuffer)
 		pLightBuffer = std::make_unique<LightConstantBuffer<LightDesc>>(Gfx);
 
-	mesh.SetScale(dx::XMFLOAT3(0.5, 0.5, 0.5));
+	SolidBall::SetScale(dx::XMFLOAT3(0.5, 0.5, 0.5));
 	Reset();
 }
 
@@ -32,6 +32,16 @@ void LightSource::ShowControlChildWindow()
 	ImGui::EndChild();
 }
 
+void LightSource::SetPosition(float _x, float _y, float _z)
+{
+	lightDesc.pos = dx::XMFLOAT3(_x,_y,_z);
+}
+
+DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
+{
+	return lightDesc.pos;
+}
+
 void LightSource::Reset()
 {
 	lightDesc =
@@ -45,26 +55,16 @@ void LightSource::Reset()
 	};
 }
 
-void LightSource::Bind(Graphics& Gfx)
+void LightSource::Bind(Graphics& Gfx) noexcept
 {
 	pLightBuffer->Update(Gfx, lightDesc);
 	pLightBuffer->Bind(Gfx);
 }
 
-void LightSource::Draw(Graphics& Gfx) noexcept
+void LightSource::Draw(Graphics& Gfx)
 {
-	mesh.SetWorldPosition(lightDesc.pos);
-	mesh.Draw(Gfx);
-}
-
-void LightSource::SetWorldPosition(const dx::XMFLOAT3& new_Wpos)
-{
-	lightDesc.pos = new_Wpos;
-}
-
-dx::XMFLOAT3  LightSource::GetWorldPosition() const noexcept
-{
-	return lightDesc.pos;
+	SolidBall::SetPosition(lightDesc.pos);
+	SolidBall::Draw(Gfx);
 }
 
 const char* LightSource::ToString() const noexcept

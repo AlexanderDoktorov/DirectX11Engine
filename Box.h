@@ -8,8 +8,8 @@ public:
 
 	Box(Graphics& gfx, float size = 1.f) : Bar(gfx, size, size, size) {}
 
-	void Scale(float k)
+	void SetScale(float k)
 	{
-		Bar::Scale(k, k, k);
+		Bar::SetScale(k, k, k);
 	}
 };

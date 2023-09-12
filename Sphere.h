@@ -91,55 +91,53 @@ public:
 		return { std::move(vertices),std::move(indices) };
 	}
 
-
-	template<class V>
-	static IndexedTriangleList<V> MakeTesselated(UINT Prec_φ, UINT Prec_θ, float r = 1.f)
+	template <class V>
+	static IndexedTriangleList<V> MakeTesselatedIndependentTexturedNormalized(int numSlices, int numStacks, float radius)
 	{
-		namespace dx = DirectX;
-		assert(Prec_φ >= 3);
-		assert(Prec_θ >= 3);
-
 		std::vector<V> vertices;
+		std::vector<unsigned short> indices;
 
-		// vertices[0] = North pole
-		//vertices.emplace_back();
-		//vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
-
-		// vertices[1] = South polse
-		//vertices.emplace_back();
-		//vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
-
-		for (float φ = -dx::XM_PIDIV2; φ <= dx::XM_PIDIV2 + dx::XM_PIDIV2 / Prec_φ; φ += dx::XM_PIDIV2 / Prec_φ) // 2 * Prec_φ + 1 = количество окружностей
+		for (int i = 0; i <= numStacks; ++i)
 		{
-			for (float θ = 0.f; θ < 2.f * dx::XM_PI; θ += (2.f * dx::XM_PI) / Prec_θ) // Prec_θ = количество точек в окружностях
+			float phi = DirectX::XM_PI * static_cast<float>(i) / static_cast<float>(numStacks);
+			for (int j = 0; j <= numSlices; ++j)
 			{
-				float x_ = r * cosf(φ) * cosf(θ);
-				float y_ = r * cosf(φ) * sinf(θ);
-				float z_ = r * sinf(φ);
-				vertices.emplace_back();
-				vertices.back().pos = dx::XMFLOAT3(x_, y_, z_);
+				float theta = DirectX::XM_2PI * static_cast<float>(j) / static_cast<float>(numSlices);
+
+				V vertex;
+				vertex.pos.x = radius * sinf(phi) * cosf(theta);
+				vertex.pos.y = radius * cosf(phi);
+				vertex.pos.z = radius * sinf(phi) * sinf(theta);
+				vertex.tc.x = static_cast<float>(j) / static_cast<float>(numSlices);
+				vertex.tc.y = static_cast<float>(i) / static_cast<float>(numStacks);
+
+				// Calculate normal as a normalized vertex position
+				DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&vertex.pos));
+				DirectX::XMStoreFloat3(&vertex.n, normal);
+
+				vertices.push_back(vertex);
 			}
 		}
 
-		std::vector<unsigned short>  indicies;
-
-		for (unsigned short i = 0; i < vertices.size() - 2*(Prec_θ + 1);  ++i)
+		// Generate indices
+		for (int i = 0; i < numStacks; ++i)
 		{
-			indicies.push_back(i + 1);
-			indicies.push_back(i + Prec_θ);
-			indicies.push_back(i);
+			for (int j = 0; j < numSlices; ++j)
+			{
+				int vertexIndex = i * (numSlices + 1) + j;
 
-			indicies.push_back(i + Prec_θ);
-			indicies.push_back(i + 1);
-			indicies.push_back(i + Prec_θ + 1);
+				indices.push_back(vertexIndex);
+				indices.push_back(vertexIndex + 1);
+				indices.push_back(vertexIndex + numSlices + 2);
+
+				indices.push_back(vertexIndex);
+				indices.push_back(vertexIndex + numSlices + 2);
+				indices.push_back(vertexIndex + numSlices + 1);
+			}
 		}
 
-		return { std::move(vertices), std::move(indicies) };
+		return { std::move(vertices),std::move(indices) };
 	}
-
-
-
-
 
 	template<class V>
 	static IndexedTriangleList<V> Make()
