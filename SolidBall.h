@@ -31,16 +31,16 @@ public:
 
             std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryTexturedVS.cso");
 
-            AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-            AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryTexturedPS.cso"));
-            AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
-            AddStaticElement(std::move(VS));
-            AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-            AddStaticElement(std::make_unique<IndexBuffer>(Gfx, model.indices));
-            AddStaticElement(std::make_unique<PixelShaderPictureTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\globus_texture.jpeg", 3U));
+            AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
+            AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"GeometryTexturedPS.cso"));
+            AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+            AddStaticBindable(std::move(VS));
+            AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+            AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
+            AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\globus_texture.jpeg", 3U));
         }
-        AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
-        AddElement(std::make_unique<ColorBuffer>(Gfx, *this));
+        AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
+        AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
     }
 
     void MakeSkeleton()
@@ -48,17 +48,31 @@ public:
         SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     }
 
-    void MakeTextured(Graphics& Gfx, const wchar_t* TextureFilePath)
+    void MakeSolid(Graphics& Gfx)
     {
-        if (VertexShaderCommon* VS = QueryStaticBindable<VertexShaderCommon>())
+        ClearStaticBindables();
+        struct Vertex
         {
-            VS->Load(Gfx, L"GeometryTexturedVS.cso");
-        }
+            dx::XMFLOAT3 pos;
+            dx::XMFLOAT3 n;
+        };
 
-        if (InputLayout* IL = QueryStaticBindable<InputLayout>())
+        std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
         {
-            //IL->SetLayoutForShader(Gfx, inputElementDesc, );
-        }
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        };
+
+        auto model = Sphere::MakeTesselated<Vertex>(40 , 40);
+
+        std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
+
+        AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
+        AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"GeometryPS.cso"));
+        AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+        AddStaticBindable(std::move(VS));
+        AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+        AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
     }
     
     DirectX::XMMATRIX GetTransform() const noexcept override

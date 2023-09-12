@@ -31,16 +31,16 @@ public:
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryTexturedVS.cso");
 
-			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryTexturedPS.cso"));
-			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
-			AddStaticElement(std::move(VS));
-			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticElement(std::make_unique<IndexBuffer>(Gfx, model.indices));
-			AddStaticElement(std::make_unique<Sampler>(Gfx));
-			AddStaticElement(std::make_unique<PixelShaderPictureTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\Текстура_квадрата.png", 3U));
+			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
+			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"GeometryTexturedPS.cso"));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+			AddStaticBindable(std::move(VS));
+			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
+			AddStaticBindable(std::make_unique<Sampler>(Gfx));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\Текстура_квадрата.png", 3U));
 		}
-		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
 	}
 
 	virtual DirectX::XMMATRIX	GetTransform()				const noexcept override

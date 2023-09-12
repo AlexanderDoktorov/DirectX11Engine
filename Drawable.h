@@ -26,13 +26,27 @@ public:
 
 protected:
 
-	void AddElement(std::unique_ptr<IBindable> element) noexcept {
+	void AddBindable(std::unique_ptr<IBindable> element) noexcept {
 		if (auto p = dynamic_cast<IndexBuffer*>(element.get()))
 		{
 			DOK_assert(pIndexBuffer == nullptr, L"Trying to add [NonStatic] IndexBuffer twice");
 			pIndexBuffer = p;
 		}
 		PipelineElements.push_back(std::move(element));
+	}
+
+	template <class T>
+	static void RemoveBindable()
+	{
+		for (auto it = PipelineElements.begin(); it != PipelineElements.end();) {
+			if(T* ptr = dynamic_cast<T*>(it->get())) {
+				it->reset();
+				it = PipelineElements.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
 	}
 
 	template <class T>

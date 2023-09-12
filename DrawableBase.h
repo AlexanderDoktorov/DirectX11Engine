@@ -10,7 +10,7 @@ protected:
 
 	static bool Initilized() noexcept { return initilized; }
 
-	static void AddStaticElement(std::unique_ptr<IBindable> _elem) noexcept
+	static void AddStaticBindable(std::unique_ptr<IBindable> _elem) noexcept
 	{
 		initilized = true;
 		if (auto p = dynamic_cast<IndexBuffer*>(_elem.get()))
@@ -19,6 +19,30 @@ protected:
 			staticIndexBuffer = p;
 		}
 		StaticPipelineElements.push_back(std::move(_elem));
+	}
+
+	static void ClearStaticBindables()
+	{
+		for (auto& bindable : StaticPipelineElements)
+		{
+			bindable.reset();
+		}
+		StaticPipelineElements.clear();
+		staticIndexBuffer = nullptr;
+	}
+
+	template <class T>
+	static void RemoveStaticBindable()
+	{
+		for (auto it = StaticPipelineElements.begin(); it != StaticPipelineElements.end();) {
+			if(T* ptr = dynamic_cast<T*>(it->get())) {
+				it->reset();
+				it = StaticPipelineElements.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
 	}
 
 	template <class T>

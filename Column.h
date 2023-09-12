@@ -53,12 +53,12 @@ public:
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"DefaultVS.cso");
 
-			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, verts));
-			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"SolidPS.cso"));
-			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
-			AddStaticElement(std::move(VS));
-			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticElement(std::make_unique<IndexBuffer>(Gfx, indicies));
+			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, verts));
+			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"SolidPS.cso"));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+			AddStaticBindable(std::move(VS));
+			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, indicies));
 		}
 	}
 
@@ -66,8 +66,8 @@ public:
 	{
 		DOK_assert(Initilized(), L"Make sure you made template of column with Column(Gfx, left_bottom_pos, height, width");
 
-		AddElement(std::make_unique<ColorBuffer>(Gfx, *this));
-		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
 	}
 
 	Column(const Column& other) = default;

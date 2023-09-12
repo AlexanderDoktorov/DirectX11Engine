@@ -29,15 +29,15 @@ public:
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 
-			AddStaticElement(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticElement(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
-			AddStaticElement(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
-			AddStaticElement(std::move(VS));
-			AddStaticElement(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticElement(std::make_unique<IndexBuffer>(Gfx, model.indices));
+			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
+			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+			AddStaticBindable(std::move(VS));
+			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
 		}
-		AddElement(std::make_unique<TransformBuffer>(Gfx, *this));
-		AddElement(std::make_unique<ColorBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
 	}
 
 	virtual void				Scale(float scale_x_new = 1.f, float scale_y_new = 1.f, float scale_z_new = 1.f)

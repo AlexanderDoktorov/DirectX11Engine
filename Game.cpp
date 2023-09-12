@@ -98,7 +98,7 @@ void Game::UpdateFrame()
 		}
 
 		if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
-			balls[0]->MakeSkeleton();
+			balls[0]->MakeSolid(*gfx);
 
 		for (auto& light_source : lights)
 		{
@@ -173,9 +173,7 @@ void Game::ShowItemsSubMenu()
 
 		ImGui::SameLine();
 		if (ImGui::Button("Create ball"))
-		{
 			CreateBall();
-		}
 
 		if(auto movable = dynamic_cast<IMovable*>(objects[current_item_selected]))
 		{
