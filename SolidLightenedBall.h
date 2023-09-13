@@ -5,7 +5,7 @@
 #include "HPipelineElements.h"
 #include "Sphere.h"
 
-class SolidLightenedBall : public DrawableBase<SolidLightenedBall>, public IColored, public IMovable, public IToString, public IObject
+class SolidLightenedBall : public DrawableBase<SolidLightenedBall>, public IColored, public IMovable, public IToString
 {
 public:
     SolidLightenedBall(Graphics& Gfx, dx::XMFLOAT4 color =  { 1.f, 1.f, 1.f, 1.f })
@@ -45,7 +45,10 @@ public:
 
     void MakeSkeleton()
     {
-        SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        if (auto tp = QueryBindable<Topology>())
+        {
+            tp->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        }
     }
 
     void MakeSolid(Graphics& Gfx)

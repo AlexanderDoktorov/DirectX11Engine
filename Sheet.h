@@ -4,7 +4,7 @@
 #include "Polygon.h"
 #include "Interfaces.h"
 
-class Sheet : public DrawableBase<Sheet>, public IColored, public IMovable, public IScalable, public IObject
+class Sheet : public DrawableBase<Sheet>, public IColored, public IMovable, public IScalable
 {
 public:
 	Sheet(Graphics& Gfx, dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f } ) 

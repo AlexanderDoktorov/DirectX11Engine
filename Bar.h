@@ -5,7 +5,7 @@
 #include "Sampler.h"
 #include "Cube.h"
 
-class Bar : public DrawableBase<Bar>, public IMovable, public IScalable, public IObject
+class Bar : public DrawableBase<Bar>, public IMovable, public IScalable
 {
 public:
 	Bar(Graphics& Gfx, float length = 4.f, float height = 1.f, float width = 1.f) : scale_x(length), scale_y(height), scale_z(width)

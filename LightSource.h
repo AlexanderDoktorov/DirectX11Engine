@@ -19,12 +19,11 @@ class LightSource : public SolidBall, public IBindable
 public:
 	LightSource(Graphics& Gfx);
 
-
 	void		Draw(Graphics& Gfx) override;
 	void		Reset();
 	void		Bind(Graphics& Gfx) noexcept override;
 
-	void ShowControlChildWindow();
+	void		ShowControlChildWindow();
 
 	// IMovable
 	virtual void SetPosition(float _x, float _y, float _z) override;

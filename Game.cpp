@@ -26,8 +26,8 @@ Game::Game()
 	bar->SetPosition(4.f, 4.f, 5.f);
 	bar->SetScale(1.f, 2.f, 3.f);	
 
-	balls[0]->SetPosition(dx::XMFLOAT3(1.f, 5.f, 1.f));
-	balls[1]->SetPosition(dx::XMFLOAT3(1.f, 5.f, 10.f));
+	balls[0]->SetPosition(1.f, 5.f, 1.f);
+	balls[1]->SetPosition(1.f, 5.f, 10.f);
 
 	for (auto& ball : balls)
 		objects.push_back(ball.get());
@@ -179,13 +179,13 @@ void Game::ShowItemsSubMenu()
 		{
 			static dx::XMFLOAT3 pos = movable->GetPosition();
 			if (ImGui::SliderFloat3("Item position", &pos.x, -100.f, 100.f))
-				movable->SetPosition(pos);
+				movable->SetPosition(pos.x, pos.y, pos.z);
 		}
 		if(auto scalable = dynamic_cast<IScalable*>(objects[current_item_selected]))
 		{
 			static dx::XMFLOAT3 scale = scalable->GetScale();
 			if (ImGui::SliderFloat3("Item scale", &scale.x, -100.f, 100.f))
-				scalable->SetScale(scale);
+				scalable->SetScale(scale.x, scale.y, scale.z);
 		}
 		if(auto colored = dynamic_cast<IColored*>(objects[current_item_selected]))
 		{

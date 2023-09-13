@@ -1,20 +1,18 @@
 #pragma once
-#include "IBindable.h"
+#include "Interfaces.h"
 #include "DOK_assert.h"
 #include "IndexBuffer.h"
 #include "Topology.h"
 #include <memory>
 
-class Drawable
+class Drawable : virtual public IObject
 {
 public:
 	~Drawable() = default;
 
-	virtual DirectX::XMMATRIX GetTransform() const noexcept = 0;
-
 	virtual void Draw(Graphics& Gfx)
 	{
-		DOK_assert(pIndexBuffer != nullptr, L"IndexBuffer hasn't been set before drawing object, add it with AddElement()");
+		DOK_assert(pIndexBuffer != nullptr, L"IndexBuffer hasn't been set before drawing object, add it with AddBindable()");
 
 		for (auto& el : PipelineElements)
 		{
@@ -60,14 +58,6 @@ protected:
 			}
 		}
 		return nullptr;
-	}
-
-	void SetTopology(const D3D11_PRIMITIVE_TOPOLOGY& tp)
-	{
-		if (Topology* topology = QueryBindable<Topology>())
-		{
-			topology->SetTopology(tp);
-		}
 	}
 
 	std::vector<std::unique_ptr<IBindable>> PipelineElements;

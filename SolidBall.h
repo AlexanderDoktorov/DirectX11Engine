@@ -5,7 +5,7 @@
 #include "Interfaces.h"
 #include "Sphere.h"
 
-class SolidBall : public DrawableBase<SolidBall>, virtual public IColored, virtual public IMovable, virtual public IToString, virtual public IObject
+class SolidBall : public DrawableBase<SolidBall>, public IColored, public IMovable, public IToString
 {
 public:
     SolidBall(Graphics& Gfx, dx::XMFLOAT4 solid_color = { 1.f,1.f,1.f,1.f })
@@ -45,7 +45,10 @@ public:
 
     void MakeSkeleton()
     {
-        SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        if (auto tp = QueryBindable<Topology>())
+        {
+            tp->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        }
     }
 
     void MakeSolid(Graphics& Gfx)
@@ -86,7 +89,6 @@ public:
     }
 
     // IMovable
-    using IMovable::SetPosition;
     virtual void SetPosition(float _x, float _y, float _z) override;
     virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
 

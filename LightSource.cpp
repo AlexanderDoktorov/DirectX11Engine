@@ -63,7 +63,7 @@ void LightSource::Bind(Graphics& Gfx) noexcept
 
 void LightSource::Draw(Graphics& Gfx)
 {
-	SolidBall::SetPosition(lightDesc.pos);
+	SolidBall::SetPosition(lightDesc.pos.x, lightDesc.pos.y, lightDesc.pos.z);
 	SolidBall::Draw(Gfx);
 }
 
