@@ -32,7 +32,7 @@
     <ProjectGuid>{d3a67ec7-2563-42c5-9a17-2506b81cdb8d}</ProjectGuid>
     <RootNamespace>ProjForTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Sorting Visualizer</ProjectName>
+    <ProjectName>Game Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -360,11 +360,9 @@
     <ClCompile Include="DOK_DX11.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Column.cpp" />
     <ClCompile Include="DOK_assert.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="GraphicsChild.cpp" />
-    <ClCompile Include="Histogramm.cpp" />
     <ClCompile Include="HullShader.cpp" />
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGui\backend\imgui_impl_win32.cpp" />
@@ -380,6 +378,8 @@
     <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Sheet.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShaderCommon.cpp" />
     <ClCompile Include="wWinMain.cpp" />
     <ClCompile Include="Mouse.cpp" />
@@ -436,15 +436,12 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Bar.h" />
     <ClInclude Include="RawInputDevices.h" />
-    <ClInclude Include="Sorts.h" />
     <ClInclude Include="ColorBuffer.h" />
-    <ClInclude Include="Column.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DOK_assert.h" />
     <ClInclude Include="DrawableBase.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Histogramm.h" />
     <ClInclude Include="HPipelineElements.h" />
     <ClInclude Include="HullShader.h" />
     <ClInclude Include="IColored.h" />
@@ -472,6 +469,7 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Topology.h" />
     <ClInclude Include="TransformBuffer.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexConstantBuffer.h" />
     <ClInclude Include="VertexShader.h" />

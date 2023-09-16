@@ -12,26 +12,16 @@ public:
 		SetColor(color);
 		if (!Initilized())
 		{
-			std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			};
+			Vertex::VertexLayout vertexLayout;
+			vertexLayout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Normal);
 
-			struct Vertex
-			{
-				dx::XMFLOAT3 pos;
-				dx::XMFLOAT3 n;
-			};
-
-			auto model = Polygon::Make<Vertex>(4U, 100.f);
-			model.SetNormalsIndependentFlat();
+			auto model = Polygon::Make(vertexLayout, 4U, 100.f);
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
 			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
-			AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));

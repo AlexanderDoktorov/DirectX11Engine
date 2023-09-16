@@ -92,9 +92,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Column.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
@@ -115,9 +112,6 @@
     </ClCompile>
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Histogramm.cpp">
-      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="PictureTexture.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
@@ -191,11 +185,14 @@
     <ClCompile Include="Bar.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sorts.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Exceptions.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -282,12 +279,6 @@
     </ClInclude>
     <ClInclude Include="WICTextureLoader.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Column.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="Histogramm.h">
-      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="Box.h">
       <Filter>Файлы заголовков\Items</Filter>
@@ -447,6 +438,9 @@
     </ClInclude>
     <ClInclude Include="IObject.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

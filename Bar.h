@@ -4,6 +4,7 @@
 #include "Interfaces.h"
 #include "Sampler.h"
 #include "Cube.h"
+#include "Vertex.h"
 
 class Bar : public DrawableBase<Bar>, public IMovable, public IScalable
 {
@@ -12,28 +13,14 @@ public:
 	{
 		if (!Initilized())
 		{
-			std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			};
-
-			struct Vertex
-			{
-				dx::XMFLOAT3 pos;
-				dx::XMFLOAT2 tc;
-				dx::XMFLOAT3 n;
-			};
-
-			auto model = Cube::MakeIndependentTextured<Vertex>();
+			auto model = Cube::MakeIndependentTextured();
 			model.SetNormalsIndependentFlat();
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryTexturedVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
 			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"GeometryTexturedPS.cso"));
-			AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, model.vertices.GetLayout().GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));

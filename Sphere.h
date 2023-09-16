@@ -1,100 +1,105 @@
 ﻿#pragma once
 #include "IndexedTriangleList.h"
-#include "IndexedTriangleStrip.h"
 #include "DOK_math.h"
 class Sphere
 {
 public:
-	template<class V>
-	static IndexedTriangleList<V> MakeTesselated(int latDiv, int longDiv)
+	static IndexedTriangleList MakeTesselated( Vertex::VertexLayout layout,int latDiv,int longDiv )
 	{
 		namespace dx = DirectX;
-		assert(latDiv >= 3);
-		assert(longDiv >= 3);
+		assert( latDiv >= 3 );
+		assert( longDiv >= 3 );
 
 		constexpr float radius = 1.0f;
-		const auto base = dx::XMVectorSet(0.0f, 0.0f, radius, 0.0f);
+		const auto base = dx::XMVectorSet( 0.0f,0.0f,radius,0.0f );
 		const float lattitudeAngle = PI / latDiv;
 		const float longitudeAngle = 2.0f * PI / longDiv;
 
-		std::vector<V> vertices;
-		for (int iLat = 1; iLat < latDiv; iLat++)
+		Vertex::VertexBuffer vb{ std::move( layout ) };
+		for( int iLat = 1; iLat < latDiv; iLat++ )
 		{
-			const auto latBase = dx::XMVector3Transform(
+			const auto latBase = dx::XMVector3Transform( 
 				base,
-				dx::XMMatrixRotationX(lattitudeAngle * iLat)
+				dx::XMMatrixRotationX( lattitudeAngle * iLat ) 
 			);
-			for (int iLong = 0; iLong < longDiv; iLong++)
+			for( int iLong = 0; iLong < longDiv; iLong++ )
 			{
-				vertices.emplace_back();
-				auto v = dx::XMVector3Transform(
+				dx::XMFLOAT3 calculatedPos;
+				auto v = dx::XMVector3Transform( 
 					latBase,
-					dx::XMMatrixRotationZ(longitudeAngle * iLong)
+					dx::XMMatrixRotationZ( longitudeAngle * iLong )
 				);
-				dx::XMStoreFloat3(&vertices.back().pos, v);
+				dx::XMStoreFloat3( &calculatedPos,v );
+				vb.EmplaceBack( calculatedPos );
 			}
 		}
 
 		// add the cap vertices
-		const auto iNorthPole = (unsigned short)vertices.size();
-		vertices.emplace_back();
-		dx::XMStoreFloat3(&vertices.back().pos, base);
-		const auto iSouthPole = (unsigned short)vertices.size();
-		vertices.emplace_back();
-		dx::XMStoreFloat3(&vertices.back().pos, dx::XMVectorNegate(base));
-
-		const auto calcIdx = [latDiv, longDiv](unsigned short iLat, unsigned short iLong)
-		{ return iLat * longDiv + iLong; };
-		std::vector<unsigned short> indices;
-		for (unsigned short iLat = 0; iLat < latDiv - 2; iLat++)
+		const auto iNorthPole = (unsigned short)vb.Size();
 		{
-			for (unsigned short iLong = 0; iLong < longDiv - 1; iLong++)
+			dx::XMFLOAT3 northPos;
+			dx::XMStoreFloat3( &northPos,base );
+			vb.EmplaceBack( northPos );
+		}
+		const auto iSouthPole = (unsigned short)vb.Size();
+		{
+			dx::XMFLOAT3 southPos;
+			dx::XMStoreFloat3( &southPos,dx::XMVectorNegate( base ) );
+			vb.EmplaceBack( southPos );
+		}
+
+		const auto calcIdx = [latDiv,longDiv]( unsigned short iLat,unsigned short iLong )
+			{ return iLat * longDiv + iLong; };
+		std::vector<unsigned short> indices;
+		for( unsigned short iLat = 0; iLat < latDiv - 2; iLat++ )
+		{
+			for( unsigned short iLong = 0; iLong < longDiv - 1; iLong++ )
 			{
-				indices.push_back(calcIdx(iLat, iLong));
-				indices.push_back(calcIdx(iLat + 1, iLong));
-				indices.push_back(calcIdx(iLat, iLong + 1));
-				indices.push_back(calcIdx(iLat, iLong + 1));
-				indices.push_back(calcIdx(iLat + 1, iLong));
-				indices.push_back(calcIdx(iLat + 1, iLong + 1));
+				indices.push_back( calcIdx( iLat,iLong ) );
+				indices.push_back( calcIdx( iLat + 1,iLong ) );
+				indices.push_back( calcIdx( iLat,iLong + 1 ) );
+				indices.push_back( calcIdx( iLat,iLong + 1 ) );
+				indices.push_back( calcIdx( iLat + 1,iLong ) );
+				indices.push_back( calcIdx( iLat + 1,iLong + 1 ) );
 			}
 			// wrap band
-			indices.push_back(calcIdx(iLat, longDiv - 1));
-			indices.push_back(calcIdx(iLat + 1, longDiv - 1));
-			indices.push_back(calcIdx(iLat, 0));
-			indices.push_back(calcIdx(iLat, 0));
-			indices.push_back(calcIdx(iLat + 1, longDiv - 1));
-			indices.push_back(calcIdx(iLat + 1, 0));
+			indices.push_back( calcIdx( iLat,longDiv - 1 ) );
+			indices.push_back( calcIdx( iLat + 1,longDiv - 1 ) );
+			indices.push_back( calcIdx( iLat,0 ) );
+			indices.push_back( calcIdx( iLat,0 ) );
+			indices.push_back( calcIdx( iLat + 1,longDiv - 1 ) );
+			indices.push_back( calcIdx( iLat + 1,0 ) );			
 		}
 
 		// cap fans
-		for (unsigned short iLong = 0; iLong < longDiv - 1; iLong++)
+		for( unsigned short iLong = 0; iLong < longDiv - 1; iLong++ )
 		{
 			// north
-			indices.push_back(iNorthPole);
-			indices.push_back(calcIdx(0, iLong));
-			indices.push_back(calcIdx(0, iLong + 1));
+			indices.push_back( iNorthPole );
+			indices.push_back( calcIdx( 0,iLong ) );
+			indices.push_back( calcIdx( 0,iLong + 1 ) );
 			// south
-			indices.push_back(calcIdx(latDiv - 2, iLong + 1));
-			indices.push_back(calcIdx(latDiv - 2, iLong));
-			indices.push_back(iSouthPole);
+			indices.push_back( calcIdx( latDiv - 2,iLong + 1 ) );
+			indices.push_back( calcIdx( latDiv - 2,iLong ) );
+			indices.push_back( iSouthPole );
 		}
 		// wrap triangles
 		// north
-		indices.push_back(iNorthPole);
-		indices.push_back(calcIdx(0, longDiv - 1));
-		indices.push_back(calcIdx(0, 0));
+		indices.push_back( iNorthPole );
+		indices.push_back( calcIdx( 0,longDiv - 1 ) );
+		indices.push_back( calcIdx( 0,0 ) );
 		// south
-		indices.push_back(calcIdx(latDiv - 2, 0));
-		indices.push_back(calcIdx(latDiv - 2, longDiv - 1));
-		indices.push_back(iSouthPole);
+		indices.push_back( calcIdx( latDiv - 2,0 ) );
+		indices.push_back( calcIdx( latDiv - 2,longDiv - 1 ) );
+		indices.push_back( iSouthPole );
 
-		return { std::move(vertices),std::move(indices) };
+		return { std::move( vb ),std::move( indices ) };
 	}
 
-	template <class V>
-	static IndexedTriangleList<V> MakeTesselatedIndependentTexturedNormalized(int numSlices, int numStacks, float radius)
+	static IndexedTriangleList MakeTesselatedIndependentTexturedNormalized(Vertex::VertexLayout layout, int numSlices, int numStacks, float radius)
 	{
-		std::vector<V> vertices;
+		Vertex::VertexBuffer vb{ std::move( layout ) };
+
 		std::vector<unsigned short> indices;
 
 		for (int i = 0; i <= numStacks; ++i)
@@ -104,18 +109,19 @@ public:
 			{
 				float theta = DirectX::XM_2PI * static_cast<float>(j) / static_cast<float>(numSlices);
 
-				V vertex;
-				vertex.pos.x = radius * sinf(phi) * cosf(theta);
-				vertex.pos.y = radius * cosf(phi);
-				vertex.pos.z = radius * sinf(phi) * sinf(theta);
-				vertex.tc.x = static_cast<float>(j) / static_cast<float>(numSlices);
-				vertex.tc.y = static_cast<float>(i) / static_cast<float>(numStacks);
+				dx::XMFLOAT3 pos{};
+				pos.x = radius * sinf(phi) * cosf(theta);
+				pos.y = radius * cosf(phi);
+				pos.z = radius * sinf(phi) * sinf(theta);
+				auto tcx = static_cast<float>(j) / static_cast<float>(numSlices);
+				auto tcy = static_cast<float>(i) / static_cast<float>(numStacks);
 
 				// Calculate normal as a normalized vertex position
-				DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&vertex.pos));
-				DirectX::XMStoreFloat3(&vertex.n, normal);
+				dx::XMFLOAT3 n;
+				DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&pos));
+				DirectX::XMStoreFloat3(&n, normal);
 
-				vertices.push_back(vertex);
+				vb.EmplaceBack(pos, dx::XMFLOAT2(tcx,tcy), n);
 			}
 		}
 
@@ -136,12 +142,6 @@ public:
 			}
 		}
 
-		return { std::move(vertices),std::move(indices) };
-	}
-
-	template<class V>
-	static IndexedTriangleList<V> Make()
-	{
-		return MakeTesselated<V>(12, 24);
+		return { std::move(vb),std::move(indices) };
 	}
 };

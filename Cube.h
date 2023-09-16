@@ -6,25 +6,24 @@ class Cube
 {
 public:
 
-	template<class V>
-	static IndexedTriangleList<V> Make()
+	static IndexedTriangleList Make(Vertex::VertexLayout layout)
 	{
 		namespace dx = DirectX;
+		Vertex::VertexBuffer vb{ std::move( layout ) };
 
 		constexpr float side = 1.0f / 2.0f;
 
-		std::vector<V> vertices(8);
-		vertices[0].pos = { -side,-side,-side };
-		vertices[1].pos = { side,-side,-side };
-		vertices[2].pos = { -side,side,-side };
-		vertices[3].pos = { side,side,-side };
-		vertices[4].pos = { -side,-side,side };
-		vertices[5].pos = { side,-side,side };
-		vertices[6].pos = { -side,side,side };
-		vertices[7].pos = { side,side,side };
+		vb.EmplaceBack(dx::XMFLOAT3({ -side,-side,-side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ side,-side,-side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ -side,side,-side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ side,side,-side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ -side,-side,side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ side,-side,side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ -side,side,side }));
+		vb.EmplaceBack(dx::XMFLOAT3({ side,side,side }));
 
 		return{
-			std::move(vertices),{
+			std::move(vb),{
 				0,2,1, 2,3,1,
 				1,3,5, 3,7,5,
 				2,6,3, 3,6,7,
@@ -35,40 +34,39 @@ public:
 		};
 	}
 
-	template <class V>
-	static IndexedTriangleList<V> MakeIndependent()
+	static IndexedTriangleList MakeIndependent(Vertex::VertexLayout layout)
 	{
 		float side = 0.5f;
 
-		std::vector<V> vertices(4U * 6U);
+		Vertex::VertexBuffer vb{ std::move( layout ), 24U };
 
-		vertices[0].pos = { -side,-side,-side };// 0 near side
-		vertices[1].pos = { side,-side,-side };// 1
-		vertices[2].pos = { -side,side,-side };// 2
-		vertices[3].pos = { side,side,-side };// 3
-		vertices[4].pos = { -side,-side,side };// 4 far side
-		vertices[5].pos = { side,-side,side };// 5
-		vertices[6].pos = { -side,side,side };// 6
-		vertices[7].pos = { side,side,side };// 7
-		vertices[8].pos = { -side,-side,-side };// 8 left side
-		vertices[9].pos = { -side,side,-side };// 9
-		vertices[10].pos = { -side,-side,side };// 10
-		vertices[11].pos = { -side,side,side };// 11
-		vertices[12].pos = { side,-side,-side };// 12 right side
-		vertices[13].pos = { side,side,-side };// 13
-		vertices[14].pos = { side,-side,side };// 14
-		vertices[15].pos = { side,side,side };// 15
-		vertices[16].pos = { -side,-side,-side };// 16 bottom side
-		vertices[17].pos = { side,-side,-side };// 17
-		vertices[18].pos = { -side,-side,side };// 18
-		vertices[19].pos = { side,-side,side };// 19
-		vertices[20].pos = { -side,side,-side };// 20 top side
-		vertices[21].pos = { side,side,-side };// 21
-		vertices[22].pos = { -side,side,side };// 22
-		vertices[23].pos = { side,side,side };// 23
+		vb[0].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,-side	});// 0 near side
+		vb[1].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,-side	});// 1
+		vb[2].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,-side	});// 2
+		vb[3].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,-side		});// 3
+		vb[4].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,side	});// 4 far side
+		vb[5].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,side		});// 5
+		vb[6].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,side		});// 6
+		vb[7].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,side		});// 7
+		vb[8].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,-side	});// 8 left side
+		vb[9].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,-side	});// 9
+		vb[10].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,side	});// 10
+		vb[11].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,side	});// 11
+		vb[12].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,-side	});// 12 right side
+		vb[13].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,-side	});// 13
+		vb[14].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,side	});// 14
+		vb[15].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,side		});// 15
+		vb[16].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,-side	});// 16 bottom side
+		vb[17].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,-side	});// 17
+		vb[18].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,side	});// 18
+		vb[19].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,side	});// 19
+		vb[20].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,-side	});// 20 top side
+		vb[21].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,-side	});// 21
+		vb[22].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,side	});// 22
+		vb[23].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,side		});// 23
 
 		return{
-			std::move(vertices),
+			std::move(vb),
 			{
 				0,2, 1,    2,3,1,
 				4,5, 7,    4,7,6,
@@ -80,35 +78,40 @@ public:
 		};
 	}
 
-	template<class V>
-	static IndexedTriangleList<V> MakeIndependentTextured()
+	static IndexedTriangleList MakeIndependentTextured()
 	{
-		auto itl = MakeIndependent<V>();
-
-		itl.vertices[0].tc = { 0.0f,0.0f };
-		itl.vertices[1].tc = { 1.0f,0.0f };
-		itl.vertices[2].tc = { 0.0f,1.0f };
-		itl.vertices[3].tc = { 1.0f,1.0f };
-		itl.vertices[4].tc = { 0.0f,0.0f };
-		itl.vertices[5].tc = { 1.0f,0.0f };
-		itl.vertices[6].tc = { 0.0f,1.0f };
-		itl.vertices[7].tc = { 1.0f,1.0f };
-		itl.vertices[8].tc = { 0.0f,0.0f };
-		itl.vertices[9].tc = { 1.0f,0.0f };
-		itl.vertices[10].tc = { 0.0f,1.0f };
-		itl.vertices[11].tc = { 1.0f,1.0f };
-		itl.vertices[12].tc = { 0.0f,0.0f };
-		itl.vertices[13].tc = { 1.0f,0.0f };
-		itl.vertices[14].tc = { 0.0f,1.0f };
-		itl.vertices[15].tc = { 1.0f,1.0f };
-		itl.vertices[16].tc = { 0.0f,0.0f };
-		itl.vertices[17].tc = { 1.0f,0.0f };
-		itl.vertices[18].tc = { 0.0f,1.0f };
-		itl.vertices[19].tc = { 1.0f,1.0f };
-		itl.vertices[20].tc = { 0.0f,0.0f };
-		itl.vertices[21].tc = { 1.0f,0.0f };
-		itl.vertices[22].tc = { 0.0f,1.0f };
-		itl.vertices[23].tc = { 1.0f,1.0f };
+		using Type = Vertex::VertexLayout::ElementType;
+	
+		auto itl = MakeIndependent( std::move( Vertex::VertexLayout{}
+			.Append( Vertex::VertexLayout::Position3D )
+			.Append( Vertex::VertexLayout::Normal )
+			.Append( Vertex::VertexLayout::Texture2D )
+		) );
+		
+		itl.vertices[0].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[1].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[2].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[3].Attr<Type::Texture2D>() = { 1.0f,1.0f };
+		itl.vertices[4].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[5].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[6].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[7].Attr<Type::Texture2D>() = { 1.0f,1.0f };
+		itl.vertices[8].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[9].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[10].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[11].Attr<Type::Texture2D>() = { 1.0f,1.0f };
+		itl.vertices[12].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[13].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[14].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[15].Attr<Type::Texture2D>() = { 1.0f,1.0f };
+		itl.vertices[16].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[17].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[18].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[19].Attr<Type::Texture2D>() = { 1.0f,1.0f };
+		itl.vertices[20].Attr<Type::Texture2D>() = { 0.0f,0.0f };
+		itl.vertices[21].Attr<Type::Texture2D>() = { 1.0f,0.0f };
+		itl.vertices[22].Attr<Type::Texture2D>() = { 0.0f,1.0f };
+		itl.vertices[23].Attr<Type::Texture2D>() = { 1.0f,1.0f };
 
 		return itl;
 	}

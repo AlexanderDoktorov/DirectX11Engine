@@ -6,16 +6,18 @@
 class Polygon
 {
 public:
-	template<class V>
-	static IndexedTriangleList<V> Make(const UINT& nVertex, const float& r = 1.f)
+	
+	static IndexedTriangleList Make(Vertex::VertexLayout layout, const UINT& nVertex, const float& r = 1.f)
 	{
 		DOK_assert_noexit(nVertex > 2, L"Trying to make polygon with less than 3 vertices");
+		dx::XMFLOAT3 normal = dx::XMFLOAT3(0.f, 0.f, -1.f); // 
 
-		std::vector<V> vertices(nVertex);
+		Vertex::VertexBuffer vb(std::move(layout));
+
 		for (unsigned int i = 0; i < nVertex; i++)
 		{
 			const float angle = i * 2 * PI / nVertex;
-			vertices[i].pos = { r * cosf(angle), r * sinf(angle), 0.f};
+			vb.EmplaceBack(dx::XMFLOAT3({r* cosf(angle), r* sinf(angle), 0.f}), normal);
 		}
 
 		std::vector<unsigned short> indicies;
@@ -26,6 +28,6 @@ public:
 			indicies.push_back(i + 1);
 		}
 
-		return { std::move(vertices), std::move(indicies) };
+		return { std::move(vb), std::move(indicies) };
 	}
 };

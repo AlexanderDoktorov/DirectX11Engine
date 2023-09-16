@@ -1,1 +1,1 @@
-G:\Visual Studio Projects\ProjForTests\x64\Debug\Sorting Visualizer.exe
+G:\Visual Studio Projects\ProjForTests\x64\Debug\Game Engine.exe

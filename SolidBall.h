@@ -13,27 +13,15 @@ public:
         SetColor(solid_color);
         if (!Initilized())
         {
-            struct Vertex
-            {
-                dx::XMFLOAT3 pos;
-                dx::XMFLOAT2 tc;
-                dx::XMFLOAT3 n;
-            };
+            Vertex::VertexLayout vertexLayout;
+            vertexLayout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Texture2D).Append(Vertex::VertexLayout::Normal);
 
-            auto model = Sphere::MakeTesselatedIndependentTexturedNormalized<Vertex>(40 , 40, 1);
-
-            std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
-            {
-                { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-            };
-
+            auto model = Sphere::MakeTesselatedIndependentTexturedNormalized(vertexLayout, 40 , 40, 1);
             std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryTexturedVS.cso");
 
             AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
             AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"GeometryTexturedPS.cso"));
-            AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+            AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
             AddStaticBindable(std::move(VS));
             AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
             AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
@@ -54,25 +42,17 @@ public:
     void MakeSolid(Graphics& Gfx)
     {
         ClearStaticBindables();
-        struct Vertex
-        {
-            dx::XMFLOAT3 pos;
-            dx::XMFLOAT3 n;
-        };
 
-        std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDesc =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        };
+        Vertex::VertexLayout vertexLayout;
+        vertexLayout.Append(Vertex::VertexLayout::Position3D);
 
-        auto model = Sphere::MakeTesselated<Vertex>(40 , 40);
+        auto model = Sphere::MakeTesselated(vertexLayout, 40 , 40);
 
         std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 
         AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
         AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"GeometryPS.cso"));
-        AddStaticBindable(std::make_unique<InputLayout>(Gfx, inputElementDesc, VS.get()));
+        AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
         AddStaticBindable(std::move(VS));
         AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
         AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
