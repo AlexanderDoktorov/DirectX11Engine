@@ -1,5 +1,5 @@
 #include "Vertex.h"
-namespace Vertex
+namespace DynamicVertex
 {
 	// VertexLayout
 	const VertexLayout::Element& VertexLayout::ResolveByIndex( size_t i ) const

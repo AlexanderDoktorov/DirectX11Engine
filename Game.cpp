@@ -13,6 +13,7 @@ Game::Game()
 	box				= std::make_unique<Box>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
+	house			= std::make_unique<House>(*gfx);
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(1.f, 0.f, 1.f, 1.f)));
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(.5f, 0.1f, 1.f, 1.f)));
 
@@ -33,6 +34,8 @@ Game::Game()
 
 	for (auto& light : lights)
 		objects.push_back(light.get());
+
+	objects.push_back(house.get());
 
 	LoadConfigurationFile("./game.config");
 }
@@ -111,6 +114,8 @@ void Game::UpdateFrame()
 			ball->Draw(*gfx);
 		}
 		sheet->Draw(*gfx);
+
+		house->Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 

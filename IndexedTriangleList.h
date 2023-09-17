@@ -4,6 +4,8 @@
 #include "Vertex.h"
 #include <DirectXMath.h>
 
+namespace Vertex = DynamicVertex;
+
 struct IndexedTriangleList
 {
 	IndexedTriangleList(Vertex::VertexBuffer verts_in, std::vector<unsigned short> indxs)

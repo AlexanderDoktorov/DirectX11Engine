@@ -1,6 +1,2 @@
-﻿G:\Visual Studio Community 2022\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: промежуточный каталог (x64\Debug\) содержит файлы, которые используются совместно с другим проектом (ProjForTests.vcxproj, Sorting Visualizer.vcxproj).  Это может привести к ошибкам очистки и перестроения.
-  Bar.cpp
-  Game.cpp
-  wWinMain.cpp
-  Создание кода...
+﻿  House.cpp
   ProjForTests.vcxproj -> G:\Visual Studio Projects\ProjForTests\x64\Debug\Game Engine.exe

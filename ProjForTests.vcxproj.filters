@@ -191,6 +191,9 @@
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="House.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Exceptions.h">
@@ -441,6 +444,9 @@
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="House.h">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-VertexBuffer::VertexBuffer(Graphics& gfx, const Vertex::VertexBuffer& vbuf)
+VertexBuffer::VertexBuffer(Graphics& gfx, const DynamicVertex::VertexBuffer& vbuf)
 	:
 	stride( (UINT)vbuf.GetLayout().Size() )
 {

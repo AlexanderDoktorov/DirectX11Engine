@@ -3,7 +3,7 @@
 #include <type_traits>
 #include "Graphics.h"
 
-namespace Vertex
+namespace DynamicVertex
 {
 	class VertexLayout
 	{

@@ -6,7 +6,7 @@ class TransformBuffer : public IBindable
 {
 public:
 
-	TransformBuffer(Graphics& Gfx, Drawable& parent);
+	TransformBuffer(Graphics& Gfx, Drawable& object);
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
 
@@ -24,6 +24,6 @@ private:
 		}
 	};
 
-	const Drawable& parent;
+	const Drawable& object;
 	static	std::unique_ptr<VertexConstantBuffer<Transformations>> Cbuff;
 };
