@@ -354,6 +354,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Template_metaprogramming\AverageNormalsCalculation.cpp" />
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
@@ -476,6 +477,7 @@
     <ClInclude Include="VertexConstantBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="VertexShaderCommon.h" />
+    <ClInclude Include="Vrtx.h" />
     <ClInclude Include="WICTextureLoader.h" />
     <ClInclude Include="DirectXWindow.h" />
     <ClInclude Include="WindowClass.h" />

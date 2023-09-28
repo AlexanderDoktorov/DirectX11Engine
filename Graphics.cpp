@@ -107,9 +107,9 @@ Graphics::Graphics(HWND hwnd) :
     CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
     CreateRTVForTexture(LightTexture.get(),      rtvLight);
 
-    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this, L"LightPS.cso");
-    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,  L"ScreenSpaceVS.cso");
-    pCombinePS              = std::make_unique<PixelShaderCommon>(*this, L"CombinePS.cso");
+    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"LightPS.cso");
+    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"ScreenSpaceVS.cso");
+    pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"CombinePS.cso");
 
     pLinearSampler->Bind(*this);
 

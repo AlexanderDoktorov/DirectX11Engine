@@ -21,3 +21,13 @@ dx::XMFLOAT3 Bar::GetScale() const noexcept
 {
 	return dx::XMFLOAT3(scale_x,scale_y,scale_z);
 }
+
+DirectX::XMFLOAT4 Bar::GetColor() const noexcept
+{
+	return color;
+}
+
+void Bar::SetColor(dx::XMFLOAT4 new_color) noexcept
+{
+	color = new_color;
+}
