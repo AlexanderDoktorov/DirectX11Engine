@@ -8,6 +8,7 @@ namespace Vertex = DynamicVertex;
 
 struct IndexedTriangleList
 {
+	IndexedTriangleList() = default;
 	IndexedTriangleList(Vertex::VertexBuffer verts_in, std::vector<unsigned short> indxs)
 		:
 		vertices(std::move(verts_in)),

@@ -101,6 +101,17 @@ namespace DynamicVertex
 			size_t offset;
 		};
 	public:
+
+		VertexLayout() = default;
+
+		VertexLayout(std::vector<ElementType> elements)
+		{
+			for (auto el : elements)
+			{
+				Append(el);
+			}
+		}
+
 		template<ElementType Type>
 		const Element& Resolve() const
 		{
@@ -114,6 +125,20 @@ namespace DynamicVertex
 			assert( "Could not resolve element type" && false );
 			return elements.front();
 		}
+
+		template<ElementType Type>
+		bool HasSuchElement() const
+		{
+			for( auto& e : elements )
+			{
+				if( e.GetType() == Type )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		const Element& ResolveByIndex( size_t i ) const;
 		VertexLayout& Append( ElementType type );
 		size_t Size() const;

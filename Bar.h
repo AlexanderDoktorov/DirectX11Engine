@@ -79,7 +79,7 @@ public:
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"GeometryPS.cso"));
+			AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"GeometryPS.cso"));
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, model.vertices.GetLayout().GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));

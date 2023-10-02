@@ -6,8 +6,8 @@ cbuffer solid_color_buffer : register(b0)
 struct VSOutput
 {
     float4 Position : SV_POSITION;
-    float4 WorldPos : TEXCOORD0;
-    float4 Normal : TEXCOORD1;
+    float4 WorldPos : WORLDPOS;
+    float4 Normal : Normal;
 };
 
 struct PSOutput

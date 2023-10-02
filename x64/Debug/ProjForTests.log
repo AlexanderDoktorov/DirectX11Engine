@@ -1,5 +1,53 @@
-﻿  Bar.cpp
-  Game.cpp
+﻿  Game.cpp
+G:\Visual Studio Projects\ProjForTests\Mesh.h(31,24): warning C4267: инициализация: преобразование из "size_t" в "unsigned int"; возможна потеря данных
+G:\Visual Studio Projects\ProjForTests\Mesh.h(42,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(43,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(44,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+  House.cpp
+G:\Visual Studio Projects\ProjForTests\Mesh.h(31,24): warning C4267: инициализация: преобразование из "size_t" в "unsigned int"; возможна потеря данных
+G:\Visual Studio Projects\ProjForTests\Mesh.h(42,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(43,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(44,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
   wWinMain.cpp
+G:\Visual Studio Projects\ProjForTests\Mesh.h(31,24): warning C4267: инициализация: преобразование из "size_t" в "unsigned int"; возможна потеря данных
+G:\Visual Studio Projects\ProjForTests\Mesh.h(42,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(43,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
+G:\Visual Studio Projects\ProjForTests\Mesh.h(44,40): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=unsigned short
+          ]
   Создание кода...
   ProjForTests.vcxproj -> G:\Visual Studio Projects\ProjForTests\x64\Debug\Game Engine.exe

@@ -8,11 +8,11 @@ cbuffer transform : register(b0)
 struct VS_OUT
 {
     float4 PixelScreenPos : SV_POSITION;
-    float4 WorldPos : TEXCOORD0;
-    float4 Normal : TEXCOORD1;
+    float4 WorldPos : WORLDPOS;
+    float4 Normal : Normal;
 };
 
-VS_OUT main(float3 pos : POSITION, float3 normal : NORMAL0)
+VS_OUT main(float3 pos : Position, float3 normal : Normal)
 {
     VS_OUT vs_out = (VS_OUT) 0;
     matrix WorldViewProjection = mul(mul(World, View), Projection);

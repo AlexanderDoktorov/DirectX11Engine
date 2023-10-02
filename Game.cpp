@@ -99,9 +99,6 @@ void Game::UpdateFrame()
 				cam.Translate({ 0.0f,-dt,0.0f });
 		}
 
-		if (window->GetKeyboard().IsKeyDown(Button::BUTTON_K))
-			balls[0]->MakeSolid(*gfx);
-
 		for (auto& light_source : lights)
 		{
 			light_source->Draw(*gfx);
@@ -155,10 +152,10 @@ void Game::ShowControlWindow()
 
 void Game::ShowItemsSubMenu()
 {
-	ImGui::BeginChild("Objects creation", ImVec2(600, 600));
+	if(ImGui::Begin("Objects creation"))
 	{
 		static unsigned int current_item_selected = 0;
-		ImGui::BeginListBox("Items", ImVec2(200, 100));
+		if(ImGui::BeginListBox("Items", ImVec2(200, 100)))
 		{
 			for (unsigned int i = 0; i < objects.size(); i++)
 			{
@@ -172,8 +169,9 @@ void Game::ShowItemsSubMenu()
 				if (ImGui::Selectable(str.c_str(), is_selected))
 					current_item_selected = i;
 			}
+			ImGui::EndListBox();
 		}
-		ImGui::EndListBox();
+		
 
 		ImGui::SameLine();
 		if (ImGui::Button("Create ball"))
@@ -198,7 +196,7 @@ void Game::ShowItemsSubMenu()
 				colored->SetColor(color);
 		}
 	}
-	ImGui::EndChild();
+	ImGui::End();
 }
 
 void Game::CreateBall()

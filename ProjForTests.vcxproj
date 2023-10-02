@@ -414,6 +414,7 @@
     <ClInclude Include="IToString.h" />
     <ClInclude Include="LightConstantBuffer.h" />
     <ClInclude Include="LightPassPixelShader.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="PixelShaderCommon.h" />
     <ClInclude Include="PixelShaderTexture.h" />
     <ClInclude Include="RenderTexture.h" />

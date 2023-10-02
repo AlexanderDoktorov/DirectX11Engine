@@ -44,7 +44,7 @@ public:
     {
         ClearStaticBindables();
         Vertex::VertexLayout vertexLayout;
-        vertexLayout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Normal);
+        vertexLayout.Append(Vertex::VertexLayout::Position3D);
         auto model = Sphere::MakeTesselated(vertexLayout, 40 , 40);
 
         std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
