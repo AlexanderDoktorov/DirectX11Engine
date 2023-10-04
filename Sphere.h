@@ -4,7 +4,7 @@
 class Sphere
 {
 public:
-	static IndexedTriangleList MakeTesselated( Vertex::VertexLayout layout,int latDiv,int longDiv )
+	static IndexedTriangleList MakeTesselated( DynamicVertex::VertexLayout layout,int latDiv,int longDiv )
 	{
 		namespace dx = DirectX;
 		assert( latDiv >= 3 );
@@ -15,7 +15,7 @@ public:
 		const float lattitudeAngle = PI / latDiv;
 		const float longitudeAngle = 2.0f * PI / longDiv;
 
-		Vertex::VertexBuffer vb{ std::move( layout ) };
+		DynamicVertex::VertexBuffer vb{ std::move( layout ) };
 		for( int iLat = 1; iLat < latDiv; iLat++ )
 		{
 			const auto latBase = dx::XMVector3Transform( 
@@ -96,9 +96,9 @@ public:
 		return { std::move( vb ),std::move( indices ) };
 	}
 
-	static IndexedTriangleList MakeTesselatedIndependentTexturedNormalized(Vertex::VertexLayout layout, int numSlices, int numStacks, float radius)
+	static IndexedTriangleList MakeTesselatedIndependentTexturedNormalized(DynamicVertex::VertexLayout layout, int numSlices, int numStacks, float radius)
 	{
-		Vertex::VertexBuffer vb{ std::move( layout ) };
+		DynamicVertex::VertexBuffer vb{ std::move( layout ) };
 
 		std::vector<unsigned short> indices;
 

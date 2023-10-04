@@ -38,7 +38,7 @@ private:
 	std::vector<IObject*> objects;
 	std::unique_ptr<Sheet> sheet;
 	std::unique_ptr<Box> box;
-	std::unique_ptr<House> house;
+	std::unique_ptr<Character> character;
 
 	std::vector<std::unique_ptr<SolidLightenedBall>> balls;
 

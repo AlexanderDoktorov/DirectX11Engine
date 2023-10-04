@@ -13,8 +13,8 @@ public:
         SetColor(solid_color);
         if (!Initilized())
         {
-            Vertex::VertexLayout vertexLayout;
-            vertexLayout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Texture2D).Append(Vertex::VertexLayout::Normal);
+            DynamicVertex::VertexLayout vertexLayout;
+            vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Texture2D).Append(DynamicVertex::VertexLayout::Normal);
 
             auto model = Sphere::MakeTesselatedIndependentTexturedNormalized(vertexLayout, 40 , 40, 1);
             std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryTexturedVS.cso");
@@ -43,8 +43,8 @@ public:
     {
         ClearStaticBindables();
 
-        Vertex::VertexLayout vertexLayout;
-        vertexLayout.Append(Vertex::VertexLayout::Position3D);
+        DynamicVertex::VertexLayout vertexLayout;
+        vertexLayout.Append(DynamicVertex::VertexLayout::Position3D);
 
         auto model = Sphere::MakeTesselated(vertexLayout, 40 , 40);
 

@@ -7,12 +7,12 @@ class Polygon
 {
 public:
 	
-	static IndexedTriangleList Make(Vertex::VertexLayout layout, const UINT& nVertex, const float& r = 1.f)
+	static IndexedTriangleList Make(DynamicVertex::VertexLayout layout, const UINT& nVertex, const float& r = 1.f)
 	{
 		DOK_assert_noexit(nVertex > 2, L"Trying to make polygon with less than 3 vertices");
 		dx::XMFLOAT3 normal = dx::XMFLOAT3(0.f, 0.f, -1.f); // 
 
-		Vertex::VertexBuffer vb(std::move(layout));
+		DynamicVertex::VertexBuffer vb(std::move(layout));
 
 		for (unsigned int i = 0; i < nVertex; i++)
 		{

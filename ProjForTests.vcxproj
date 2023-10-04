@@ -354,7 +354,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Template_metaprogramming\AverageNormalsCalculation.cpp" />
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
@@ -364,7 +363,7 @@
     <ClCompile Include="DOK_assert.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="GraphicsChild.cpp" />
-    <ClCompile Include="House.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="HullShader.cpp" />
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGui\backend\imgui_impl_win32.cpp" />
@@ -401,11 +400,10 @@
     <ClInclude Include="DOK_DX11.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GraphicsChild.h" />
-    <ClInclude Include="House.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="IAnimated.h" />
     <ClInclude Include="IBlob.h" />
     <ClInclude Include="IMovable.h" />
-    <ClInclude Include="IndexedTriangleStrip.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScalable.h" />
@@ -470,6 +468,7 @@
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="PictureTexture.h" />
+    <ClInclude Include="Tank.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Topology.h" />
     <ClInclude Include="TransformBuffer.h" />

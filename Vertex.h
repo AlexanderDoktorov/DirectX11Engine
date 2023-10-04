@@ -252,6 +252,27 @@ namespace DynamicVertex
 			buffer.resize( buffer.size() + layout.Size() );
 			Back().SetAttributeByIndex( 0u,std::forward<Params>( params )... );
 		}
+		template<VertexLayout::ElementType el, typename T = VertexLayout::Map<el>::SysType>
+		std::vector<T> GetAllThe() const noexcept
+		{
+			std::vector<T> result;
+			result.reserve(Size());
+			for (size_t i = 0; i < Size(); i++)
+			{
+				result.push_back((*this)[i].Attr<el>());
+			}
+			return result;
+		}
+		template<VertexLayout::ElementType el, typename T = VertexLayout::Map<el>::SysType>
+		void SetAllThe(const std::vector<T>& data) noexcept
+		{
+			using namespace DirectX;
+			assert ( data.size() <= Size() );
+			for (size_t i = 0; i < data.size(); i++)
+			{
+				(*this)[i].Attr<el>() = data[i];
+			}
+		}
 		Vertex Back();
 		Vertex Front();
 		Vertex operator[]( size_t i ) ;

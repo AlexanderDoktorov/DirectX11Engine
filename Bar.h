@@ -6,75 +6,19 @@
 #include "Cube.h"
 #include "Vertex.h"
 
-// Smooth nomals
-#include "G:\Visual Studio Projects\Template_metaprogramming\AverageNormalsCalculation.h"
-
-class Bar : public DrawableBase<Bar>, public IMovable, public IScalable, public IColored
+class Bar : public DrawableBase<Bar>, public IMovable, public IScalable, public IColored, public IToString
 {
 public:
-	Bar(Graphics& Gfx, float length = 4.f, float height = 1.f, float width = 1.f) : scale_x(length), scale_y(height), scale_z(width)
+	Bar(Graphics& Gfx, float length = 1.f, float height = 1.f, float width = 1.f) : scale(length, height, width)
 	{
 		if (!Initilized())
 		{
-			Vertex::VertexLayout layout{};
-			layout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Normal).Append(Vertex::VertexLayout::Texture2D);
+			DynamicVertex::VertexLayout layout{};
+			layout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Normal).Append(DynamicVertex::VertexLayout::Texture2D);
 			float side = 0.5f;
 
-			Vertex::VertexBuffer vb{ std::move( layout ), 8U };
-
-			vb[0].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,-side	});// 0 near side
-			vb[1].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,-side	});// 1
-			vb[2].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,-side	});// 2
-			vb[3].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,-side		});// 3
-			vb[4].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,-side,side	});// 4 far side
-			vb[5].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,-side,side		});// 5
-			vb[6].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ -side,side,side		});// 6
-			vb[7].Attr<Vertex::VertexLayout::Position3D>() = dx::XMFLOAT3({ side,side,side		});// 7
-
-			std::vector<unsigned short> indxs =
-			{
-				0,2,1, 2,3,1,
-				1,3,5, 3,7,5,
-				2,6,3, 3,6,7,
-				4,5,7, 4,7,6,
-				0,4,2, 2,4,6,
-				0,1,4, 1,5,4
-			};
-
-			std::vector<FaceDesc> faces =
-			{
-				FaceDesc(0,2,1), FaceDesc(2,3,1),
-				FaceDesc(1,3,5), FaceDesc(3,7,5),
-				FaceDesc(2,6,3), FaceDesc(3,6,7),
-				FaceDesc(4,5,7), FaceDesc(4,7,6),
-				FaceDesc(0,4,2), FaceDesc(2,4,6),
-				FaceDesc(0,1,4), FaceDesc(1,5,4)
-			};
-
-			std::vector<dx::XMFLOAT3> verts =
-			{
-				vb[0].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[1].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[2].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[3].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[4].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[5].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[6].Attr<Vertex::VertexLayout::Position3D>(),
-				vb[7].Attr<Vertex::VertexLayout::Position3D>(),
-			};
-
-			calc_mesh_normals(verts, faces);
-
-			vb[0].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ -side,-side,-side	});// 0 near side
-			vb[1].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ side,-side,-side	});// 1
-			vb[2].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ -side,side,-side	});// 2
-			vb[3].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ side,side,-side		});// 3
-			vb[4].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ -side,-side,side	});// 4 far side
-			vb[5].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ side,-side,side		});// 5
-			vb[6].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ -side,side,side		});// 6
-			vb[7].Attr<Vertex::VertexLayout::Normal>() = dx::XMFLOAT3({ side,side,side		});// 7
-
-			IndexedTriangleList model(vb, indxs);
+			auto model = Cube::Make(layout);;
+			model.SetNormalsSmooth();
 
 			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 
@@ -93,7 +37,7 @@ public:
 
 	virtual DirectX::XMMATRIX	GetTransform()				const noexcept override
 	{
-		return DirectX::XMMatrixScaling(scale_x, scale_y, scale_z) * DirectX::XMMatrixTranslation(x, y, z);
+		return DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * DirectX::XMMatrixTranslation(x, y, z);
 	}
 
 	// IMovable
@@ -101,21 +45,20 @@ public:
 	virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
 
 	// IScalable
-	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new) override;
-	virtual dx::XMFLOAT3 GetScale() const noexcept override;
+	virtual dx::XMFLOAT3& GetScaleRef() noexcept { return scale; }
 
 	// IColored
 	virtual DirectX::XMFLOAT4 GetColor()	const noexcept override;
 	virtual void SetColor(dx::XMFLOAT4 new_color) noexcept override;
+
+	// IToString
+	virtual const char* ToString() const noexcept override;
 
 private:
 	float x = 0.f;
 	float y = 0.f;
 	float z = 0.f;
 
-	float scale_x = 1.f;
-	float scale_y = 1.f;
-	float scale_z = 1.f;
-
 	DirectX::XMFLOAT4 color { 1.f,0.f,1.f,1.f };
+	DirectX::XMFLOAT3 scale { 1.f,1.f,1.f };
 };

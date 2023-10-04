@@ -1,12 +1,13 @@
-#include "House.h"
+#include "Character.h"
 
-House::House(Graphics& Gfx)
+Character::Character(Graphics& Gfx)
 {
 	if (!DrawableBase::Initilized())
 	{
 		DynamicVertex::VertexLayout vl({DynamicVertex::VertexLayout::Position3D, DynamicVertex::VertexLayout::Normal});
 
 		Mesh mesh{ "Models\\CharacterMesh.obj", vl, aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_Triangulate };
+		mesh.pItl->SetNormalsSmooth();
 
 		auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"GeometryVS.cso");
 		AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, mesh.pItl->vertices));
@@ -19,24 +20,17 @@ House::House(Graphics& Gfx)
 	AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
 }
 
-const char* House::ToString() const noexcept
+const char* Character::ToString() const noexcept
 {
-	return "House";
+	return "Character";
 }
 
-DirectX::XMMATRIX House::GetTransform() const noexcept
+DirectX::XMMATRIX Character::GetTransform() const noexcept
 {
-	return dx::XMMatrixTranslation(pos.x, pos.y, pos.z) * dx::XMMatrixScaling(scale.x,scale.y,scale.z);
+	return dx::XMMatrixTranslation(pos.x, pos.y, pos.z) * dx::XMMatrixScaling(scale.x, scale.y, scale.z);
 }
 
-dx::XMFLOAT3 House::GetScale() const noexcept
+dx::XMFLOAT3& Character::GetScaleRef() noexcept
 {
 	return scale;
-}
-
-void House::SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new)
-{
-	scale.x = scale_x_new;
-	scale.y = scale_y_new;
-	scale.z = scale_z_new;
 }

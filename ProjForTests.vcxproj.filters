@@ -131,12 +131,6 @@
     <ClCompile Include="DOK_DX11.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SolidBall.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="SolidLightenedBall.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="wWinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -170,9 +164,6 @@
     <ClCompile Include="LightSource.cpp">
       <Filter>Файлы заголовков\Items</Filter>
     </ClCompile>
-    <ClCompile Include="Sheet.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="RenderTexture.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -182,20 +173,26 @@
     <ClCompile Include="PixelShaderTexture.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Bar.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="House.cpp">
+    <ClCompile Include="Character.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\Template_metaprogramming\AverageNormalsCalculation.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="SolidBall.cpp">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="Sheet.cpp">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="SolidLightenedBall.cpp">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="Bar.cpp">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -427,9 +424,6 @@
     <ClInclude Include="IBlob.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="IndexedTriangleStrip.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="IAnimated.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -445,7 +439,7 @@
     <ClInclude Include="IObject.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="House.h">
+    <ClInclude Include="Character.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="Vrtx.h">
@@ -456,6 +450,9 @@
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Tank.h">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

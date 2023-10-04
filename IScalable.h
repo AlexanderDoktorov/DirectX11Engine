@@ -6,10 +6,17 @@ class IScalable
 public:
 	virtual ~IScalable() = default;
 
-	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new) = 0;
-	virtual void SetScale(const float& scale_new)
+	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new)
 	{
-		SetScale(scale_new, scale_new, scale_new);
+		GetScaleRef().x = scale_x_new;
+		GetScaleRef().y = scale_y_new;
+		GetScaleRef().z = scale_z_new;
 	}
-	virtual dx::XMFLOAT3 GetScale() const noexcept = 0;
+
+	virtual dx::XMFLOAT3 GetScale() const noexcept
+	{
+		return  const_cast<IScalable*>(this)->GetScaleRef();
+	}
+protected:
+	virtual dx::XMFLOAT3& GetScaleRef() noexcept = 0;
 };

@@ -10,18 +10,6 @@ DirectX::XMFLOAT3 Bar::GetPosition() const noexcept
 	return dx::XMFLOAT3(x,y,z);
 }
 
-void Bar::SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new)
-{
-	scale_x = scale_x_new;
-	scale_y = scale_y_new;
-	scale_z = scale_z_new;
-}
-
-dx::XMFLOAT3 Bar::GetScale() const noexcept
-{
-	return dx::XMFLOAT3(scale_x,scale_y,scale_z);
-}
-
 DirectX::XMFLOAT4 Bar::GetColor() const noexcept
 {
 	return color;
@@ -30,4 +18,9 @@ DirectX::XMFLOAT4 Bar::GetColor() const noexcept
 void Bar::SetColor(dx::XMFLOAT4 new_color) noexcept
 {
 	color = new_color;
+}
+
+const char* Bar::ToString() const noexcept
+{
+	return "Bar";
 }

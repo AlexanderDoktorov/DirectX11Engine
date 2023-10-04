@@ -12,8 +12,8 @@ public:
 		SetColor(color);
 		if (!Initilized())
 		{
-			Vertex::VertexLayout vertexLayout;
-			vertexLayout.Append(Vertex::VertexLayout::Position3D).Append(Vertex::VertexLayout::Normal);
+			DynamicVertex::VertexLayout vertexLayout;
+			vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Normal);
 
 			auto model = Polygon::Make(vertexLayout, 4U, 100.f);
 
@@ -48,11 +48,11 @@ public:
 	void SetColor(dx::XMFLOAT4 new_color) noexcept override;
 
 	// IScalable
-	virtual void SetScale(const float& scale_x_new, const float& scale_y_new, const float& scale_z_new) override;
-	virtual dx::XMFLOAT3 GetScale() const noexcept override;
+	virtual dx::XMFLOAT3& GetScaleRef() noexcept { return scale; }
 
 private:
-	dx::XMFLOAT4 color = { 1.f,1.f,1.f,1.f };
+	dx::XMFLOAT4 color { 1.f,1.f,1.f,1.f };
+	dx::XMFLOAT3 scale { 1.f,1.f,1.f };
 
 	float x = 0.f;
 	float y = 0.f;

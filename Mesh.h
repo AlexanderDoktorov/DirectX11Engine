@@ -28,20 +28,20 @@ public:
 		{
 			const auto pMesh = pScene->mMeshes[meshIdx];
 
-			for (unsigned int i = verticesPassed, j = 0; i < pMesh->mNumVertices + verticesPassed; i++, j++)
+			for (size_t i = verticesPassed, j = 0; i < pMesh->mNumVertices + verticesPassed; i++, j++)
 			{
 				if (vl.HasSuchElement<DynamicVertex::VertexLayout::Position3D>())
 					vb[i].Attr<DynamicVertex::VertexLayout::Position3D>() = *(dx::XMFLOAT3*)(&pMesh->mVertices[j]);
 				if (vl.HasSuchElement<DynamicVertex::VertexLayout::Normal>())
 					vb[i].Attr<DynamicVertex::VertexLayout::Normal>() = *(dx::XMFLOAT3*)(&pMesh->mNormals[j]);
 			}
-			for (unsigned int i = 0; i < pMesh->mNumFaces; i++)
+			for (size_t i = 0; i < pMesh->mNumFaces; i++)
 			{
 				const auto& face = pMesh->mFaces[i];
 				assert(face.mNumIndices == 3);
-				indices.push_back(face.mIndices[0] + verticesPassed);
-				indices.push_back(face.mIndices[1] + verticesPassed);
-				indices.push_back(face.mIndices[2] + verticesPassed);
+				indices.push_back(static_cast<unsigned short>(face.mIndices[0] + verticesPassed));
+				indices.push_back(static_cast<unsigned short>(face.mIndices[1] + verticesPassed));
+				indices.push_back(static_cast<unsigned short>(face.mIndices[2] + verticesPassed));
 			}
 			verticesPassed += pMesh->mNumVertices;
 		}

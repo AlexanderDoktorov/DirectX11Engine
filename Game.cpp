@@ -13,7 +13,7 @@ Game::Game()
 	box				= std::make_unique<Box>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
-	house			= std::make_unique<House>(*gfx);
+	character		= std::make_unique<Character>(*gfx);
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(1.f, 0.f, 1.f, 1.f)));
 	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(.5f, 0.1f, 1.f, 1.f)));
 
@@ -35,7 +35,11 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	objects.push_back(house.get());
+	objects.push_back(character.get());
+	objects.push_back(bar.get());
+	objects.push_back(box.get());
+
+
 
 	LoadConfigurationFile("./game.config");
 }
@@ -112,7 +116,7 @@ void Game::UpdateFrame()
 		}
 		sheet->Draw(*gfx);
 
-		house->Draw(*gfx);
+		character->Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -179,19 +183,19 @@ void Game::ShowItemsSubMenu()
 
 		if(auto movable = dynamic_cast<IMovable*>(objects[current_item_selected]))
 		{
-			static dx::XMFLOAT3 pos = movable->GetPosition();
+			dx::XMFLOAT3 pos = movable->GetPosition();
 			if (ImGui::SliderFloat3("Item position", &pos.x, -100.f, 100.f))
 				movable->SetPosition(pos.x, pos.y, pos.z);
 		}
 		if(auto scalable = dynamic_cast<IScalable*>(objects[current_item_selected]))
 		{
-			static dx::XMFLOAT3 scale = scalable->GetScale();
-			if (ImGui::SliderFloat3("Item scale", &scale.x, -100.f, 100.f))
+			dx::XMFLOAT3 scale = scalable->GetScale();
+			if (ImGui::SliderFloat3("Item scale", &scale.x, 0.f, 100.f))
 				scalable->SetScale(scale.x, scale.y, scale.z);
 		}
 		if(auto colored = dynamic_cast<IColored*>(objects[current_item_selected]))
 		{
-			static dx::XMFLOAT4 color = colored->GetColor();
+			dx::XMFLOAT4 color = colored->GetColor();
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
