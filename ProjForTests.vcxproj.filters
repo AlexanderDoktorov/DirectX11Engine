@@ -42,56 +42,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SolidPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="DefaultVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="GeometryTexturedVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="GeometryTexturedPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="SolidVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="GeometryPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="GeometryVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="LightComputeShader.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="ScreenSpaceVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="LightPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="CombinePS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Shift.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectXWindow.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="DOK_assert.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
@@ -113,107 +63,107 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="PictureTexture.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformBuffer.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="WICTextureLoader.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="src\Bar.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>Файлы заголовков\Devices</Filter>
-    </ClCompile>
-    <ClCompile Include="DOK_DX11.cpp">
+    <ClCompile Include="src\Blob.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="wWinMain.cpp">
+    <ClCompile Include="src\Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
+    <ClCompile Include="src\Character.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsChild.cpp">
+    <ClCompile Include="src\ColorBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="HullShader.cpp">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="ComputeShader.cpp">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexShaderCommon.cpp">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelShaderCommon.cpp">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="Blob.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorBuffer.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="LightSource.cpp">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderTexture.cpp">
+    <ClCompile Include="src\ComputeShader.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelShaderTexture.cpp">
+    <ClCompile Include="src\DirectXWindow.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
+    <ClCompile Include="src\DOK_assert.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Character.cpp">
+    <ClCompile Include="src\DOK_DX11.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Vertex.cpp">
+    <ClCompile Include="src\Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SolidBall.cpp">
-      <Filter>Файлы заголовков\Items</Filter>
+    <ClCompile Include="src\Graphics.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Sheet.cpp">
-      <Filter>Файлы заголовков\Items</Filter>
+    <ClCompile Include="src\GraphicsChild.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SolidLightenedBall.cpp">
-      <Filter>Файлы заголовков\Items</Filter>
+    <ClCompile Include="src\HullShader.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Bar.cpp">
-      <Filter>Файлы заголовков\Items</Filter>
+    <ClCompile Include="src\LightSource.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mouse.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PictureTexture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixelShader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixelShaderCommon.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixelShaderTexture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderTexture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sampler.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sheet.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shift.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SolidBall.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SolidLightenedBall.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringHelper.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformBuffer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vertex.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexBuffer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexShaderCommon.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WICTextureLoader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\wWinMain.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Exceptions.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Shift.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="DOK_assert.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="GenerateShuffledVector.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -241,223 +191,285 @@
     <ClInclude Include="ImGuiManager.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawableBase.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="HPipelineElements.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="InputLayout.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawable.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Sampler.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="PictureTexture.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Topology.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="WICTextureLoader.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Box.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="Items.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="RawInputDevices.h">
+    <ClInclude Include="include\Camera.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Device.h">
-      <Filter>Файлы заголовков\Devices</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Файлы заголовков\Devices</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>Файлы заголовков\Devices</Filter>
-    </ClInclude>
-    <ClInclude Include="LightSource.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexedTriangleList.h">
+    <ClInclude Include="include\DOK_assert.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Bar.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="DOK_math.h">
+    <ClInclude Include="include\DOK_DX11.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
+    <ClInclude Include="include\DOK_math.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="SolidLightenedBall.h">
-      <Filter>Файлы заголовков\Items</Filter>
+    <ClInclude Include="include\Exceptions.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
+    <ClInclude Include="include\Game.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GenerateShuffledVector.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graphics.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGuiManager.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexedTriangleList.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Player.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawInputDevices.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shift.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringHelper.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Timer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vertex.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vrtx.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BaseWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DirectXWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IResisingWindow.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WindowClass.h">
+      <Filter>Файлы заголовков\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ComputeShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HullShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PixelShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexShader.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PixelShaderCommon.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexShaderCommon.h">
+      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Blob.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ColorBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ConstantBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Drawable.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DrawableBase.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsChild.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HPipelineElements.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InputLayout.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LightConstantBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PictureTexture.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PixelConstantBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PixelShaderTexture.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourseBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sampler.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Topology.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransformBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderTexture.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexConstantBuffer.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WICTextureLoader.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Cube.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
     </ClInclude>
-    <ClInclude Include="Sphere.h">
+    <ClInclude Include="include\Polygon.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
     </ClInclude>
-    <ClInclude Include="LightConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="SolidBall.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="Polygon.h">
+    <ClInclude Include="include\Sphere.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
     </ClInclude>
-    <ClInclude Include="Sheet.h">
+    <ClInclude Include="include\Bar.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
-    <ClInclude Include="DOK_DX11.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="IColored.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IBindable.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IToString.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourseBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsChild.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="ScreenSpaceVertexShader.h">
-      <Filter>Файлы заголовков\Deffered Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="LightPassPixelShader.h">
-      <Filter>Файлы заголовков\Deffered Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="IResisingWindow.h">
-      <Filter>Файлы заголовков\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseWindow.h">
-      <Filter>Файлы заголовков\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectXWindow.h">
-      <Filter>Файлы заголовков\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowClass.h">
-      <Filter>Файлы заголовков\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="CombinePixelShader.h">
-      <Filter>Файлы заголовков\Deffered Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelShader.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexShaderCommon.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="HullShader.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="ComputeShader.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="IShader.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelShaderCommon.h">
-      <Filter>Файлы заголовков\Pipeline\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="Blob.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelShaderTexture.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="ITexture.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderTexture.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="ISlot.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IBlob.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IAnimated.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IMovable.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Interfaces.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IScalable.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Character.h">
+    <ClInclude Include="include\Box.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
-    <ClInclude Include="Vrtx.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Tank.h">
+    <ClInclude Include="include\Character.h">
       <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Items.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LightSource.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sheet.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolidBall.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolidLightenedBall.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tank.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IAnimated.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IBindable.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IBlob.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IColored.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IMovable.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Interfaces.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IObject.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IScalable.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IShader.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ISlot.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ITexture.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IToString.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Device.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mouse.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Keyboard.h">
+      <Filter>Файлы заголовков\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CombinePixelShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LightPassPixelShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScreenSpaceVertexShader.h">
+      <Filter>Файлы заголовков\Deffered Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
       <Filter>Файлы ресурсов</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\CombinePS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DefaultVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryTexturedPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryTexturedVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\LightComputeShader.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\LightPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\LightSourceVertexShader.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\SolidPS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\SolidVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
