@@ -2,6 +2,6 @@
 
 #include "Bar.h"
 #include "Box.h"
-#include "SolidLightenedBall.h"
+#include "SolidTexturedBall.h"
 #include "Sheet.h"
 #include "Character.h"

@@ -2,7 +2,7 @@
 // Input - 2d coords -> output -> 4d coords
 
 Texture2D Texture : register(t3);
-SamplerState CubeSamplerState : register(s0);
+SamplerState Sampler : register(s0);
 
 struct VS_OUT
 {
@@ -23,7 +23,7 @@ PSOutput main(VS_OUT ps_input) : SV_TARGET
 {
     PSOutput output = (PSOutput) 0;
     
-    output.Albedo = Texture.Sample(CubeSamplerState, ps_input.TexCoord);
+    output.Albedo = Texture.Sample(Sampler, ps_input.TexCoord);
     output.Normal = float4(ps_input.WorldNormal, 0.f);
     output.Position = float4(ps_input.WorldPosition, 0.f);
 

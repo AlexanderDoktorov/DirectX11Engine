@@ -11,3 +11,5 @@
 #include "IToString.h"
 #include "IScalable.h"
 #include "IObject.h"
+#include "IModel.h"
+#include "ILight.h"

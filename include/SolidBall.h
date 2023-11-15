@@ -14,13 +14,12 @@ public:
         if (!Initilized())
         {
             DynamicVertex::VertexLayout vertexLayout;
-            vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Texture2D).Append(DynamicVertex::VertexLayout::Normal);
+            vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Normal);
+            auto model = Sphere::MakeTessaletedNormalized(vertexLayout, 41 , 20);
 
-            auto model = Sphere::MakeTesselatedIndependentTexturedNormalized(vertexLayout, 40 , 40, 1);
-            std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryTexturedVS.cso");
-
+            std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryVS.cso");
             AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-            AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\GeometryTexturedPS.cso"));
+            AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\GeometryPS.cso"));
             AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
             AddStaticBindable(std::move(VS));
             AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
@@ -38,25 +37,6 @@ public:
             tp->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
         }
     }
-
-    void MakeSolid(Graphics& Gfx)
-    {
-        ClearStaticBindables();
-
-        DynamicVertex::VertexLayout vertexLayout;
-        vertexLayout.Append(DynamicVertex::VertexLayout::Position3D);
-
-        auto model = Sphere::MakeTesselated(vertexLayout, 40 , 40);
-
-        std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryVS.cso");
-
-        AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-        AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\GeometryPS.cso"));
-        AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
-        AddStaticBindable(std::move(VS));
-        AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-        AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
-    }
     
     DirectX::XMMATRIX GetTransform() const noexcept override
     {
@@ -69,8 +49,8 @@ public:
     }
 
     // IMovable
-    virtual void SetPosition(float _x, float _y, float _z) override;
-    virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
+    void SetPosition(float _x, float _y, float _z) override;
+    DirectX::XMFLOAT3 GetPosition() const noexcept override;
 
     // IToString
     const char* ToString() const noexcept override;
@@ -80,7 +60,7 @@ public:
     void SetColor(dx::XMFLOAT4 new_color) noexcept override;
 
 private:
-    dx::XMFLOAT3 scale = { 1.f,1.f,1.f };
-    dx::XMFLOAT3 world_position = { 0.f,0.f,0.f };
+    dx::XMFLOAT3 scale = { 1.f, 1.f, 1.f };
+    dx::XMFLOAT3 world_position = { 0.f, 0.f, 0.f };
     dx::XMFLOAT4 color = { 1.f, 1.f, 1.f, 1.f };
 };

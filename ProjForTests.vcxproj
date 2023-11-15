@@ -250,7 +250,7 @@
     <ClCompile Include="src\Sheet.cpp" />
     <ClCompile Include="src\Shift.cpp" />
     <ClCompile Include="src\SolidBall.cpp" />
-    <ClCompile Include="src\SolidLightenedBall.cpp" />
+    <ClCompile Include="src\SolidTexturedBall.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
     <ClCompile Include="src\TransformBuffer.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
@@ -289,7 +289,9 @@
     <ClInclude Include="include\IBindable.h" />
     <ClInclude Include="include\IBlob.h" />
     <ClInclude Include="include\IColored.h" />
+    <ClInclude Include="include\ILight.h" />
     <ClInclude Include="include\ImGuiManager.h" />
+    <ClInclude Include="include\IModel.h" />
     <ClInclude Include="include\IMovable.h" />
     <ClInclude Include="include\IndexBuffer.h" />
     <ClInclude Include="include\IndexedTriangleList.h" />
@@ -324,7 +326,7 @@
     <ClInclude Include="include\Sheet.h" />
     <ClInclude Include="include\Shift.h" />
     <ClInclude Include="include\SolidBall.h" />
-    <ClInclude Include="include\SolidLightenedBall.h" />
+    <ClInclude Include="include\SolidTexturedBall.h" />
     <ClInclude Include="include\Sphere.h" />
     <ClInclude Include="include\StringHelper.h" />
     <ClInclude Include="include\Tank.h" />
@@ -404,6 +406,22 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\LightSourceVertexShader.hlsl" />
+    <FxCompile Include="shaders\NormalTexturePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalTextureVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

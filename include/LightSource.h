@@ -2,23 +2,13 @@
 #include "imgui.h"
 #include "SolidBall.h"
 #include "LightConstantBuffer.h"
-#include <array>
+#include "ILight.h"
 
-struct LightDesc
-{
-	alignas(16) dx::XMFLOAT3 pos = dx::XMFLOAT3();
-	alignas(16) dx::XMFLOAT3 diffuseColor = dx::XMFLOAT3();
-	float diffuseIntensity = 1.f;
-	float Catt = 1.f;
-	float Latt = 1.f;
-	float Qatt = 1.f;
-};
-
-class LightSource : public SolidBall, public IBindable
+class LightSource : public SolidBall, public IBindable, public ILight
 {
 public:
 	LightSource(Graphics& Gfx);
-
+	
 	void		Draw(Graphics& Gfx) override;
 	void		Reset();
 	void		Bind(Graphics& Gfx) noexcept override;
@@ -31,6 +21,15 @@ public:
 
 	// IToString
 	const char* ToString() const noexcept override;
+
+	// ILight
+	virtual void SetDiffuseColor(const dx::XMFLOAT3& diffuseColor)				noexcept override;
+	virtual void SetDiffuseIntensity(float diffuseIntensity)					noexcept override;
+	virtual void SetConstantAttenuation(const float& Catt)						noexcept override;
+	virtual void SetLinearAttenuation(const float& Latt)						noexcept override;
+	virtual void SetQuadAttenuation(const float& Qatt)							noexcept override;
+
+	virtual LightDesc GetDesc() const noexcept override;
 
 private:
 	static std::unique_ptr<LightConstantBuffer<LightDesc>> pLightBuffer;

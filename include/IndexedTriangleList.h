@@ -48,7 +48,7 @@ struct IndexedTriangleList
 		}
 	}
 
-	void SetNormalsSmooth()
+	void SetNormalsSmooth() // Needs to be optimized
 	{
 		using enum DynamicVertex::VertexLayout::ElementType;
 		assert ( vertices.GetLayout().HasSuchElement<Position3D>() && vertices.GetLayout().HasSuchElement<Normal>() );

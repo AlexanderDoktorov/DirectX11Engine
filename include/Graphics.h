@@ -91,9 +91,9 @@ private:
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
 
-	std::unique_ptr<PixelShaderCommon>			 pCombinePS;
-	std::unique_ptr<PixelShaderCommon>			 pLightPassPixelShader;
-	std::unique_ptr<VertexShaderCommon>			 pScreenSpaceVS;
+	std::unique_ptr<PixelShaderCommon>		 pCombinePS;
+	std::unique_ptr<PixelShaderCommon>		 pLightPassPixelShader;
+	std::unique_ptr<VertexShaderCommon>		 pScreenSpaceVS;
 	std::unique_ptr<Sampler>				 pLinearSampler;
 	class DefferedRendering
 	{

@@ -13,17 +13,18 @@ Game::Game()
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
 	character		= std::make_unique<Character>(*gfx);
-	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(1.f, 0.f, 1.f, 1.f)));
-	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx, dx::XMFLOAT4(.5f, 0.1f, 1.f, 1.f)));
+	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
+	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
+	solidBall       = std::make_unique<SolidBall>(*gfx);
 
 	// Lights
-	lights.push_back(std::make_unique<LightSource>(*gfx));
 	lights.push_back(std::make_unique<LightSource>(*gfx));
 
 	box->SetPosition(0.f, 4.f, 5.f);
 	box->SetScale(0.5f);
 	bar->SetPosition(4.f, 4.f, 5.f);
 	bar->SetScale(1.f, 2.f, 3.f);	
+	sheet->Scale(20.f, 20.f, 20.f);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -107,6 +108,7 @@ void Game::UpdateFrame()
 
 		box->Draw(*gfx);
 		bar->Draw(*gfx);
+		solidBall->Draw(*gfx);
 		for (auto& ball : balls)
 		{
 			ball->Draw(*gfx);
@@ -196,13 +198,27 @@ void Game::ShowItemsSubMenu()
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
+		if(auto lightSource = dynamic_cast<ILight*>(objects[current_item_selected]))
+		{
+			auto lightDesc = lightSource->GetDesc();
+			if (ImGui::ColorPicker3("Diffuse color", &lightDesc.diffuseColor.x))
+				lightSource->SetDiffuseColor(lightDesc.diffuseColor);
+			if (ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 10.f))
+				lightSource->SetDiffuseIntensity(lightDesc.diffuseIntensity);
+			if (ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 10.f))
+				lightSource->SetConstantAttenuation(lightDesc.Catt);
+			if (ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 10.f))
+				lightSource->SetLinearAttenuation(lightDesc.Latt);
+			if (ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 10.f))
+				lightSource->SetQuadAttenuation(lightDesc.Qatt);
+		}
 	}
 	ImGui::End();
 }
 
 void Game::CreateBall()
 {
-	balls.push_back(std::make_unique<SolidLightenedBall>(*gfx));
+	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx));
 	objects.push_back(balls.back().get());
 }
 

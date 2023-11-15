@@ -71,3 +71,33 @@ const char* LightSource::ToString() const noexcept
 {
 	return "Light Source";
 }
+
+void LightSource::SetDiffuseColor(const dx::XMFLOAT3& diffuseColor) noexcept
+{
+	lightDesc.diffuseColor = diffuseColor;
+}
+
+void LightSource::SetDiffuseIntensity(float diffuseIntensity) noexcept
+{
+	lightDesc.diffuseIntensity = diffuseIntensity;
+}
+
+void LightSource::SetConstantAttenuation(const float& Catt) noexcept
+{
+	lightDesc.Catt = Catt;
+}
+
+void LightSource::SetLinearAttenuation(const float& Latt) noexcept
+{
+	lightDesc.Latt = Latt;
+}
+
+void LightSource::SetQuadAttenuation(const float& Qatt) noexcept
+{
+	lightDesc.Qatt = Qatt;
+}
+
+LightDesc LightSource::GetDesc() const noexcept
+{
+	return lightDesc;
+}

@@ -13,18 +13,21 @@ public:
 		if (!Initilized())
 		{
 			DynamicVertex::VertexLayout vertexLayout;
-			vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Normal);
+			vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Texture2D);
 
-			auto model = Polygon::Make(vertexLayout, 4U, 100.f);
+			auto model = Polygon::MakeTextured(vertexLayout, 4U, 1.f);
 
-			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryVS.cso");
+			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
-			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\GeometryPS.cso"));
+			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\NormalTexturePS.cso"));
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Gravel_001_BaseColor.jpg", 3U));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Gravel_001_Normal.jpg", 4U));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
+			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}
 		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
 		AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
