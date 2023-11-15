@@ -162,6 +162,9 @@
     <ClCompile Include="src\wWinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\TransformBufferPS.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -302,9 +305,6 @@
     <ClInclude Include="include\InputLayout.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\LightConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\PictureTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -434,6 +434,12 @@
     <ClInclude Include="include\ILight.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\TransformBufferPS.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataBufferPS.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
@@ -475,9 +481,6 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\SolidVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\NormalTextureVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\NormalTexturePS.hlsl">

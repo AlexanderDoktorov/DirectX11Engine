@@ -253,6 +253,7 @@
     <ClCompile Include="src\SolidTexturedBall.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
     <ClCompile Include="src\TransformBuffer.cpp" />
+    <ClCompile Include="src\TransformBufferPS.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\VertexShaderCommon.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="include\ComputeShader.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
     <ClInclude Include="include\Cube.h" />
+    <ClInclude Include="include\DataBufferPS.h" />
     <ClInclude Include="include\Device.h" />
     <ClInclude Include="include\DirectXWindow.h" />
     <ClInclude Include="include\DOK_assert.h" />
@@ -306,7 +308,6 @@
     <ClInclude Include="include\ITexture.h" />
     <ClInclude Include="include\IToString.h" />
     <ClInclude Include="include\Keyboard.h" />
-    <ClInclude Include="include\LightConstantBuffer.h" />
     <ClInclude Include="include\LightPassPixelShader.h" />
     <ClInclude Include="include\LightSource.h" />
     <ClInclude Include="include\Mesh.h" />
@@ -333,6 +334,7 @@
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Topology.h" />
     <ClInclude Include="include\TransformBuffer.h" />
+    <ClInclude Include="include\TransformBufferPS.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="include\VertexBuffer.h" />
     <ClInclude Include="include\VertexConstantBuffer.h" />
@@ -413,14 +415,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="shaders\NormalTextureVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
