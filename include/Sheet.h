@@ -12,25 +12,28 @@ public:
 		SetColor(color);
 		if (!Initilized())
 		{
+			using enum DynamicVertex::VertexLayout::ElementType;
 			DynamicVertex::VertexLayout vertexLayout;
-			vertexLayout.Append(DynamicVertex::VertexLayout::Position3D).Append(DynamicVertex::VertexLayout::Texture2D);
+			vertexLayout.Append(Position3D).Append(Texture2D).Append(Normal);
 
-			auto model = Polygon::MakeTextured(vertexLayout, 4U, 1.f);
+			auto model = Polygon::MakeTexturedNormalized(vertexLayout, 4U, 1.f);
 
-			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
+			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryTexturedVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
 			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\NormalTexturePS.cso"));
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Gravel_001_BaseColor.jpg", 3U));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Gravel_001_Normal.jpg", 4U));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_basecolor.jpg", 3U));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_normal.jpg", 4U));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
 			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}
 		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
-		AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
+		AddBindable(std::make_unique<TransformBufferPS>(Gfx, *this));
+		AddBindable(std::make_unique<DataBufferPS<DATA>>(Gfx, data, 2U));
+		// AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
 	}
 
 	virtual void				Scale(float scale_x_new = 1.f, float scale_y_new = 1.f, float scale_z_new = 1.f)
@@ -40,6 +43,15 @@ public:
 	virtual DirectX::XMMATRIX	GetTransform()				const noexcept override
 	{
 		return DirectX::XMMatrixRotationRollPitchYaw(Pitch, Yaw,  Roll) * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z) * DirectX::XMMatrixTranslation(x, y, z);
+	}
+
+	void ShowControlWindow() noexcept
+	{
+		if (ImGui::Begin("Sheet Options"))
+		{
+			ImGui::Checkbox("Enable normal map",  &data.normalMapEnabled);
+		}
+		ImGui::End();
 	}
 
 	// IMovable
@@ -56,6 +68,11 @@ public:
 private:
 	dx::XMFLOAT4 color { 1.f,1.f,1.f,1.f };
 	dx::XMFLOAT3 scale { 1.f,1.f,1.f };
+	
+	struct DATA
+	{
+		alignas (16) bool normalMapEnabled = true;
+	} data;
 
 	float x = 0.f;
 	float y = 0.f;
@@ -65,7 +82,7 @@ private:
 	float scale_y = 1.f;
 	float scale_z = 1.f;
 
-	float Roll = PI / 4.f;
-	float Pitch = PI / 2.f;
+	float Roll = 0; // PI / 4.f;
+	float Pitch = 0; // PI / 2.f;
 	float Yaw = 0.f;
 };

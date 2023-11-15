@@ -136,6 +136,7 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
+	sheet->ShowControlWindow();
 #endif
 
 

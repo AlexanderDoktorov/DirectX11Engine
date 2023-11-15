@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include "SolidBall.h"
-#include "LightConstantBuffer.h"
+#include "PixelConstantBuffer.h"
 #include "ILight.h"
 
 class LightSource : public SolidBall, public IBindable, public ILight
@@ -32,6 +32,6 @@ public:
 	virtual LightDesc GetDesc() const noexcept override;
 
 private:
-	static std::unique_ptr<LightConstantBuffer<LightDesc>> pLightBuffer;
+	static std::unique_ptr<PixelConstantBuffer<LightDesc>> pLightBuffer;
 	LightDesc lightDesc;
 };

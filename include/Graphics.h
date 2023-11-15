@@ -18,6 +18,20 @@ class Sampler;
 class VertexShaderCommon;
 class PixelShaderCommon;
 class RenderTexture;
+
+template<class T>
+class PixelConstantBuffer;
+
+struct CBLightPass
+{
+	dx::XMFLOAT3 worldDirection;
+	float padding = 0.f;
+
+	CBLightPass(const dx::XMFLOAT3& worldDirection)
+		: worldDirection(worldDirection)
+	{
+	}
+};
 interface ITexture;
 
 class Graphics
@@ -41,6 +55,7 @@ public:
 
 	void			SetProjection(dx::XMMATRIX projection) noexcept;
 	void			SetCamera(const Camera& cam);
+
 	void			SetAdditiveBlendingState();
 	void			ResetBlendingState();
 	void			EndFrame();
@@ -91,10 +106,11 @@ private:
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
 
-	std::unique_ptr<PixelShaderCommon>		 pCombinePS;
-	std::unique_ptr<PixelShaderCommon>		 pLightPassPixelShader;
-	std::unique_ptr<VertexShaderCommon>		 pScreenSpaceVS;
-	std::unique_ptr<Sampler>				 pLinearSampler;
+	std::unique_ptr<PixelShaderCommon>						pCombinePS;
+	std::unique_ptr<PixelShaderCommon>						pLightPassPixelShader;
+	std::unique_ptr<VertexShaderCommon>						pScreenSpaceVS;
+	std::unique_ptr<Sampler>								pLinearSampler;
+	std::unique_ptr<PixelConstantBuffer<CBLightPass>>		pLightTransformsBuffer;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

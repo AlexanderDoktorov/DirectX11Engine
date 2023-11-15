@@ -1,8 +1,9 @@
 #pragma once
 #include "IBindable.h"
+#include "ISlot.h"
 
 template <class T>
-class ConstantBuffer : public IBindable
+class ConstantBuffer : public IBindable, public ISlot
 {
 public:
     ConstantBuffer(Graphics& Gfx, const T& CBData)
@@ -40,8 +41,18 @@ public:
         GetContext(Gfx)->Unmap(p_ConstantBuffer.Get(), 0U);
     }
 
+    void SetBindSlot(UINT slot) noexcept override
+    {
+        bindSlot = slot;
+    }
+    UINT GetBindSlot() const noexcept override
+    {
+        return bindSlot;
+    }
+
     ~ConstantBuffer() = default;
 
 protected:
+    UINT bindSlot = 0U;
     wrl::ComPtr<ID3D11Buffer> p_ConstantBuffer;
 };

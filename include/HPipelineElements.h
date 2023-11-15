@@ -7,6 +7,8 @@
 	#include "IndexBuffer.h"
 	#include "VertexBuffer.h"
 	#include "TransformBuffer.h"
+	#include "TransformBufferPS.h"
+	#include "DataBufferPS.h"
 	#include "ColorBuffer.h"
 
 #pragma endregion Buffers

@@ -1,11 +1,7 @@
 #include "Graphics.h"
 #include "Exceptions.h"
 #include <assert.h>
-
-#include "RenderTexture.h"
-#include "Sampler.h"
-#include "PixelShaderCommon.h"
-#include "VertexShaderCommon.h"
+#include "../include/HPipelineElements.h"
 
 #pragma comment(lib, "d3d11")
 
@@ -108,6 +104,7 @@ Graphics::Graphics(HWND hwnd) :
     CreateRTVForTexture(LightTexture.get(),      rtvLight);
 
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
+    pLightTransformsBuffer  = std::make_unique<PixelConstantBuffer<CBLightPass>>(*this);
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
 
@@ -153,6 +150,11 @@ void Graphics::BeginLightningPass()
     ID3D11ShaderResourceView* srvs[3] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
+
+    // Update view and projection matrices and bind them to pipeline at slot 0
+    pLightTransformsBuffer->Update(*this, CBLightPass(GetCamera().GetPos()));
+    pLightTransformsBuffer->Bind(*this);
+
     pScreenSpaceVS->Bind(*this);
     pLightPassPixelShader->Bind(*this);
 }

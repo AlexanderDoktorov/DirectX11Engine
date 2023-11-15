@@ -1,12 +1,15 @@
 #include "LightSource.h"
 
-std::unique_ptr<LightConstantBuffer<LightDesc>> LightSource::pLightBuffer{};
+std::unique_ptr<PixelConstantBuffer<LightDesc>> LightSource::pLightBuffer{};
 
 LightSource::LightSource(Graphics& Gfx) :
 	SolidBall(Gfx)
 {
 	if (!pLightBuffer)
-		pLightBuffer = std::make_unique<LightConstantBuffer<LightDesc>>(Gfx);
+	{
+		pLightBuffer = std::make_unique<PixelConstantBuffer<LightDesc>>(Gfx);
+		pLightBuffer->SetBindSlot(1U);
+	}
 
 	SolidBall::SetScale(dx::XMFLOAT3(0.5, 0.5, 0.5));
 	Reset();

@@ -5,9 +5,7 @@
 class TransformBuffer : public IBindable
 {
 public:
-
 	TransformBuffer(Graphics& Gfx, Drawable& object);
-
 	virtual void Bind(Graphics& Gfx) noexcept override;
 
 private:
