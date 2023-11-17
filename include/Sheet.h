@@ -1,7 +1,7 @@
 #pragma once
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
-#include "Polygon.h"
+#include "../include/FlatRect.h"
 #include "Interfaces.h"
 
 class Sheet : public DrawableBase<Sheet>, public IColored, public IMovable, public IScalable
@@ -14,11 +14,11 @@ public:
 		{
 			using enum DynamicVertex::VertexLayout::ElementType;
 			DynamicVertex::VertexLayout vertexLayout;
-			vertexLayout.Append(Position3D).Append(Texture2D).Append(Normal);
+			vertexLayout.Append(Position3D).Append(Texture2D).Append(Normal).Append(Tangent).Append(Bitangent);
 
-			auto model = Polygon::MakeTexturedNormalized(vertexLayout, 4U, 1.f);
+			auto model = FlatRect::MakeNormalizedTexturedTBN(vertexLayout);
 
-			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryTexturedVS.cso");
+			std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
 			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\NormalTexturePS.cso"));
@@ -50,6 +50,9 @@ public:
 		if (ImGui::Begin("Sheet Options"))
 		{
 			ImGui::Checkbox("Enable normal map",  &data.normalMapEnabled);
+			ImGui::SliderAngle("Roll", &Roll);
+			ImGui::SliderAngle("Pitch", &Pitch);
+			ImGui::SliderAngle("Yaw", &Yaw);
 		}
 		ImGui::End();
 	}
@@ -82,7 +85,7 @@ private:
 	float scale_y = 1.f;
 	float scale_z = 1.f;
 
-	float Roll = 0; // PI / 4.f;
-	float Pitch = 0; // PI / 2.f;
+	float Roll = dx::XM_PI / 4.f;
+	float Pitch = dx::XM_PI / 2.f;
 	float Yaw = 0.f;
 };

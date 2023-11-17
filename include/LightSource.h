@@ -3,8 +3,9 @@
 #include "SolidBall.h"
 #include "PixelConstantBuffer.h"
 #include "ILight.h"
+#include "IAnimated.h"
 
-class LightSource : public SolidBall, public IBindable, public ILight
+class LightSource : public SolidBall, public IBindable, public ILight, public IAnimated
 {
 public:
 	LightSource(Graphics& Gfx);
@@ -29,9 +30,19 @@ public:
 	virtual void SetLinearAttenuation(const float& Latt)						noexcept override;
 	virtual void SetQuadAttenuation(const float& Qatt)							noexcept override;
 
-	virtual LightDesc GetDesc() const noexcept override;
+	// IAnimated
+	void Update(float dt)														noexcept override;
 
+	// SolidBall
+	virtual DirectX::XMMATRIX GetTransform()							  const noexcept override;
+
+	virtual LightDesc GetDesc() const noexcept override;
 private:
+
+	const float droll = 1.f;
+	const float dyaw = 1.f;
+	const float dpitch = 1.f;
+
 	static std::unique_ptr<PixelConstantBuffer<LightDesc>> pLightBuffer;
 	LightDesc lightDesc;
 };

@@ -1,7 +1,7 @@
-#include "Graphics.h"
-#include "Exceptions.h"
-#include <assert.h>
 #include "../include/HPipelineElements.h"
+#include "Exceptions.h"
+#include "Graphics.h"
+#include <assert.h>
 
 #pragma comment(lib, "d3d11")
 

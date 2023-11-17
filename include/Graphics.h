@@ -24,11 +24,11 @@ class PixelConstantBuffer;
 
 struct CBLightPass
 {
-	dx::XMFLOAT3 worldDirection;
+	dx::XMFLOAT3 worldPos;
 	float padding = 0.f;
 
-	CBLightPass(const dx::XMFLOAT3& worldDirection)
-		: worldDirection(worldDirection)
+	CBLightPass(const dx::XMFLOAT3& worldPos)
+		: worldPos(worldPos)
 	{
 	}
 };

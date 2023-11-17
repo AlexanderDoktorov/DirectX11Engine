@@ -281,6 +281,7 @@
     <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\DrawableBase.h" />
     <ClInclude Include="include\Exceptions.h" />
+    <ClInclude Include="include\FlatRect.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GenerateShuffledVector.h" />
     <ClInclude Include="include\Graphics.h" />
@@ -301,6 +302,7 @@
     <ClInclude Include="include\Interfaces.h" />
     <ClInclude Include="include\IObject.h" />
     <ClInclude Include="include\IResisingWindow.h" />
+    <ClInclude Include="include\IRotatable.h" />
     <ClInclude Include="include\IScalable.h" />
     <ClInclude Include="include\IShader.h" />
     <ClInclude Include="include\ISlot.h" />
@@ -331,6 +333,7 @@
     <ClInclude Include="include\Sphere.h" />
     <ClInclude Include="include\StringHelper.h" />
     <ClInclude Include="include\Tank.h" />
+    <ClInclude Include="include\Texture2D.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Topology.h" />
     <ClInclude Include="include\TransformBuffer.h" />
@@ -415,6 +418,17 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalTextureVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs_main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">vs_main</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vs_main</EntryPointName>
     </FxCompile>
     <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>

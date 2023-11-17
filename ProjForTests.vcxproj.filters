@@ -440,6 +440,15 @@
     <ClInclude Include="include\DataBufferPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="include\FlatRect.h">
+      <Filter>Файлы заголовков\Items\Geometries</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Texture2D.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IRotatable.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
@@ -484,6 +493,9 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\NormalTexturePS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalTextureVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>

@@ -26,3 +26,8 @@ void SolidBall::SetColor(dx::XMFLOAT4 new_color) noexcept
 {
     color = new_color;
 }
+
+dx::XMFLOAT3& SolidBall::GetScaleRef() noexcept
+{
+    return scale;
+}

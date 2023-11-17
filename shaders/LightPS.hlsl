@@ -55,9 +55,9 @@ float4 ApplyLightImpact(float3 world_normal, float3 world_pos, float4 materialco
 
 float4 main(in PS_INPUT input) : SV_Target0
 {
-    float3 position = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
+    float3 worldPosition = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 worldNormal = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
-    float4 color = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    float4 materialColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
     
-    return ApplyLightImpact(worldNormal, position, color);
+    return ApplyLightImpact(worldNormal, worldPosition, materialColor);
 }

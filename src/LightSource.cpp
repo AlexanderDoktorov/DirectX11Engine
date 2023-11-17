@@ -37,36 +37,42 @@ void LightSource::ShowControlChildWindow()
 
 void LightSource::SetPosition(float _x, float _y, float _z)
 {
-	lightDesc.pos = dx::XMFLOAT3(_x,_y,_z);
+	world_position = dx::XMFLOAT3(_x,_y,_z);
 }
 
 DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
 {
-	return lightDesc.pos;
+	DirectX::XMVECTOR vCenter = DirectX::XMVectorSet(0.f,0.f,0.f,0.f);
+	vCenter = DirectX::XMVector3Transform(vCenter, GetTransform());
+	DirectX::XMFLOAT3 Position3D;
+	DirectX::XMStoreFloat3(&Position3D, vCenter);
+	return Position3D;
 }
 
 void LightSource::Reset()
 {
+	world_position = { 0.f, 5.f, 20.f };
 	lightDesc =
 	{
-		{ 0.0f,7.0f,0.0f },
+		GetPosition(),
 		{ 1.0f,1.0f,1.0f },
-		1.0f,
-		1.0f,
-		0.045f,
+		62.0f,
+		34.0f,
+		6.7f,
 		0.0075f,
 	};
 }
 
 void LightSource::Bind(Graphics& Gfx) noexcept
 {
+	// lightDesc.pos - точка в центре шара (светильника)
+	lightDesc.pos = GetPosition();
 	pLightBuffer->Update(Gfx, lightDesc);
 	pLightBuffer->Bind(Gfx);
 }
 
 void LightSource::Draw(Graphics& Gfx)
 {
-	SolidBall::SetPosition(lightDesc.pos.x, lightDesc.pos.y, lightDesc.pos.z);
 	SolidBall::Draw(Gfx);
 }
 
@@ -98,6 +104,17 @@ void LightSource::SetLinearAttenuation(const float& Latt) noexcept
 void LightSource::SetQuadAttenuation(const float& Qatt) noexcept
 {
 	lightDesc.Qatt = Qatt;
+}
+
+void LightSource::Update(float dt) noexcept
+{
+	yaw += dyaw * dt;
+}
+
+DirectX::XMMATRIX LightSource::GetTransform() const noexcept
+{
+	// world position - точка, вокруг которой вращается SolidBall
+	return  DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * DirectX::XMMatrixTranslation(world_position.x, world_position.y, world_position.z) * DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw,  roll);
 }
 
 LightDesc LightSource::GetDesc() const noexcept

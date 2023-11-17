@@ -125,6 +125,7 @@ void Game::UpdateFrame()
 		for (auto& light_source : lights)
 		{
 			light_source->Bind(*gfx);
+			light_source->Update(dt);
 			gfx->Draw(3U);
 		}
 	}
@@ -204,13 +205,13 @@ void Game::ShowItemsSubMenu()
 			auto lightDesc = lightSource->GetDesc();
 			if (ImGui::ColorPicker3("Diffuse color", &lightDesc.diffuseColor.x))
 				lightSource->SetDiffuseColor(lightDesc.diffuseColor);
-			if (ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 10.f))
+			if (ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 100.f))
 				lightSource->SetDiffuseIntensity(lightDesc.diffuseIntensity);
-			if (ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 10.f))
+			if (ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 100.f))
 				lightSource->SetConstantAttenuation(lightDesc.Catt);
-			if (ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 10.f))
+			if (ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 100.f))
 				lightSource->SetLinearAttenuation(lightDesc.Latt);
-			if (ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 10.f))
+			if (ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 100.f))
 				lightSource->SetQuadAttenuation(lightDesc.Qatt);
 		}
 	}

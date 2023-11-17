@@ -5,7 +5,7 @@
 #include "Interfaces.h"
 #include "Sphere.h"
 
-class SolidBall : public DrawableBase<SolidBall>, public IColored, public IMovable, public IToString
+class SolidBall : public DrawableBase<SolidBall>, public IColored, public IMovable, public IToString, public IScalable
 {
 public:
     SolidBall(Graphics& Gfx, dx::XMFLOAT4 solid_color = { 1.f,1.f,1.f,1.f })
@@ -38,9 +38,9 @@ public:
         }
     }
     
-    DirectX::XMMATRIX GetTransform() const noexcept override
+    virtual DirectX::XMMATRIX GetTransform() const noexcept override
     {
-        return DOK_XMMatrixTranslation(world_position);
+        return DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw,  roll) * DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * DirectX::XMMatrixTranslation(world_position.x, world_position.y, world_position.z);
     }
 
     void SetScale(dx::XMFLOAT3 new_scale) noexcept
@@ -59,8 +59,14 @@ public:
     DirectX::XMFLOAT4 GetColor() const noexcept override;
     void SetColor(dx::XMFLOAT4 new_color) noexcept override;
 
-private:
+    // IScalable
+    virtual dx::XMFLOAT3& GetScaleRef() noexcept override;
+
+protected:
     dx::XMFLOAT3 scale = { 1.f, 1.f, 1.f };
     dx::XMFLOAT3 world_position = { 0.f, 0.f, 0.f };
     dx::XMFLOAT4 color = { 1.f, 1.f, 1.f, 1.f };
+    float roll = 0.f;
+    float pitch = 0.f;
+    float yaw = 0.f;
 };
