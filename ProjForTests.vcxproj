@@ -252,6 +252,7 @@
     <ClCompile Include="src\SolidBall.cpp" />
     <ClCompile Include="src\SolidTexturedBall.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
+    <ClCompile Include="src\TexturedBox.cpp" />
     <ClCompile Include="src\TransformBuffer.cpp" />
     <ClCompile Include="src\TransformBufferPS.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="include\IRotatable.h" />
     <ClInclude Include="include\IScalable.h" />
     <ClInclude Include="include\IShader.h" />
+    <ClInclude Include="include\IShaderResourse.h" />
     <ClInclude Include="include\ISlot.h" />
     <ClInclude Include="include\Items.h" />
     <ClInclude Include="include\ITexture.h" />
@@ -312,6 +314,7 @@
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\LightPassPixelShader.h" />
     <ClInclude Include="include\LightSource.h" />
+    <ClInclude Include="include\Materials.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Mouse.h" />
     <ClInclude Include="include\PictureTexture.h" />
@@ -332,8 +335,11 @@
     <ClInclude Include="include\SolidTexturedBall.h" />
     <ClInclude Include="include\Sphere.h" />
     <ClInclude Include="include\StringHelper.h" />
+    <ClInclude Include="include\StructuredBuffer.h" />
+    <ClInclude Include="include\StructuredBufferVS.h" />
     <ClInclude Include="include\Tank.h" />
     <ClInclude Include="include\Texture2D.h" />
+    <ClInclude Include="include\TexturedBox.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Topology.h" />
     <ClInclude Include="include\TransformBuffer.h" />
@@ -409,6 +415,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\LightSourceVertexShader.hlsl" />
     <FxCompile Include="shaders\NormalTexturePS.hlsl">
@@ -418,6 +427,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\NormalTextureVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
