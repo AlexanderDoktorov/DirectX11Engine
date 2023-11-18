@@ -30,7 +30,22 @@ DirectX::XMMATRIX Character::GetTransform() const noexcept
 	return dx::XMMatrixTranslation(pos.x, pos.y, pos.z) * dx::XMMatrixScaling(scale.x, scale.y, scale.z);
 }
 
-dx::XMFLOAT3& Character::GetScaleRef() noexcept
+void Character::SetScaleX(const float& scale_x_new)
+{
+	scale.x = scale_x_new;
+}
+
+void Character::SetScaleY(const float& scale_y_new)
+{
+	scale.y = scale_y_new;
+}
+
+void Character::SetScaleZ(const float& scale_z_new)
+{
+	scale.z = scale_z_new;
+}
+
+dx::XMFLOAT3 Character::GetScale() const noexcept
 {
 	return scale;
 }

@@ -60,7 +60,10 @@ public:
     void SetColor(dx::XMFLOAT4 new_color) noexcept override;
 
     // IScalable
-    virtual dx::XMFLOAT3& GetScaleRef() noexcept override;
+    virtual void SetScaleX(const float& scale_x_new) override;
+    virtual void SetScaleY(const float& scale_y_new) override;
+    virtual void SetScaleZ(const float& scale_z_new) override;
+    virtual dx::XMFLOAT3 GetScale() const noexcept	 override;
 
 protected:
     dx::XMFLOAT3 scale = { 1.f, 1.f, 1.f };

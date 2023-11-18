@@ -14,3 +14,4 @@
 #include "ISlot.h"
 #include "ITexture.h"
 #include "IToString.h"
+#include "IShaderResourse.h"

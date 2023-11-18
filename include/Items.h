@@ -5,3 +5,4 @@
 #include "SolidTexturedBall.h"
 #include "Sheet.h"
 #include "Character.h"
+#include "TexturedBox.h"

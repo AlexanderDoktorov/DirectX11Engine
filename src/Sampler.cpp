@@ -1,6 +1,6 @@
 #include "Sampler.h"
 
-Sampler::Sampler(Graphics& Gfx)
+Sampler::Sampler(Graphics& Gfx, UINT bindSlot)
 {
 	D3D11_SAMPLER_DESC samplerDesc{};
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -9,6 +9,8 @@ Sampler::Sampler(Graphics& Gfx)
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 
 	CHECK_HR(GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState));
+
+	SetBindSlot(bindSlot);
 }
 
 UINT Sampler::GetBindSlot() const noexcept
@@ -23,5 +25,5 @@ void Sampler::SetBindSlot(UINT slot) noexcept
 
 void Sampler::Bind(Graphics & Gfx) noexcept
 {
-	GetContext(Gfx)->PSSetSamplers(bindSlot, 1U, p_SamplerState.GetAddressOf());
+	GetContext(Gfx)->PSSetSamplers(GetBindSlot(), 1U, p_SamplerState.GetAddressOf());
 }

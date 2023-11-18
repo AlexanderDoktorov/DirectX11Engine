@@ -5,6 +5,11 @@ cbuffer transform : register(b0)
     matrix Projection;
 };
 
+cbuffer materialID : register(b1)
+{
+    uint materialID;
+};
+
 struct VS_IN
 {
     float3 mPosition : POSITION0;
@@ -20,6 +25,7 @@ struct VS_OUT
     float4 wPosition    : POSITION0; // Vertex position in world space (for G-buffer)
     float4 wNormal      : NORMAL0;
     float2 textCoord    : TEXCOORD; // Texture coordinates
+    uint   materialID   : MATERIALID0;
     float3x3 TBN        : TBN0;
 };
     
@@ -36,6 +42,9 @@ VS_OUT vs_main(VS_IN input)
     output.wPosition = mul(float4(input.mPosition, 1.0f), World);
     output.wNormal = normalize(mul(float4(input.mNormal, 0.0f), World));;
     output.textCoord = input.textCoord;
+    
+    // Material
+    output.materialID = materialID;
     
     float3 T = normalize(mul(float4(input.mTangent, 1.0f), World)).xyz;
     float3 B = normalize(mul(float4(input.mBintangent, 1.0f), World)).xyz;

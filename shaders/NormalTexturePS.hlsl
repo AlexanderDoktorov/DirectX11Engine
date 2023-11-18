@@ -1,10 +1,3 @@
-cbuffer transform : register(b1)
-{
-    matrix World;
-    matrix View;
-    matrix Projection;
-};
-
 cbuffer objectCbuff : register(b2)
 {
     bool isNormalMapEnabled;
@@ -20,14 +13,16 @@ struct VS_OUT
     float4 wPosition    : POSITION0; // Vertex position in world space (for G-buffer)
     float4 wNormal      : NORMAL0;
     float2 textCoord    : TEXCOORD0; // Texture coordinates
+    uint   materialID   : MATERIALID0;
     float3x3 TBN        : TBN0;
 };
 
 struct PSOutput
 {
-    float4 wPosition : SV_TARGET0;
-    float4 wNormal : SV_TARGET1;
-    float4 Albedo : SV_TARGET2;
+    float4 wPosition    : SV_TARGET0;
+    float4 wNormal      : SV_TARGET1;
+    float4 Albedo       : SV_TARGET2;
+    uint   materialID   : SV_TARGET3;
 };
 
 PSOutput main(VS_OUT ps_input)
@@ -47,8 +42,9 @@ PSOutput main(VS_OUT ps_input)
         output.wNormal = -ps_input.wNormal;
     }
 
-    output.Albedo   = Texture.Sample(Sampler, ps_input.textCoord);
-    output.wPosition = ps_input.wPosition;
+    output.Albedo       = Texture.Sample(Sampler, ps_input.textCoord);
+    output.wPosition    = ps_input.wPosition;
+    output.materialID   = ps_input.materialID;
     
     return output;
 }

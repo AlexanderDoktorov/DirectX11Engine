@@ -15,10 +15,10 @@ struct VS_INPUT
 
 struct VS_OUT
 {
-    float4 Position : SV_POSITION; // Position in homogeneous clip space
-    float4 WorldPosition : TEXCOORD0; // Vertex position in world space (for G-buffer)
-    float4 WorldNormal : TEXCOORD1; // Vertex normal in world space (for G-buffer)
-    float2 TexCoord : TEXCOORD2; // Texture coordinates
+    float4 Position         : SV_POSITION; // Position in homogeneous clip space
+    float4 WorldPosition    : TEXCOORD0; // Vertex position in world space (for G-buffer)
+    float4 WorldNormal      : TEXCOORD1; // Vertex normal in world space (for G-buffer)
+    float2 TexCoord         : TEXCOORD2; // Texture coordinates
 };
 
 // Vertex Shader function

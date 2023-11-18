@@ -27,7 +27,24 @@ void SolidBall::SetColor(dx::XMFLOAT4 new_color) noexcept
     color = new_color;
 }
 
-dx::XMFLOAT3& SolidBall::GetScaleRef() noexcept
+
+void SolidBall::SetScaleX(const float& scale_x_new)
+{
+    scale.x = scale_x_new;
+}
+
+void SolidBall::SetScaleY(const float& scale_y_new)
+{
+    scale.y = scale_y_new;
+}
+
+void SolidBall::SetScaleZ(const float& scale_z_new)
+{
+    scale.z = scale_z_new;
+}
+
+dx::XMFLOAT3 SolidBall::GetScale() const noexcept
 {
     return scale;
 }
+

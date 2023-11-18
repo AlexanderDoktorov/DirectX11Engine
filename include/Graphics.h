@@ -6,6 +6,7 @@
 #include <memory>
 #include "DirectXWindow.h"
 #include "Camera.h"
+#include "Materials.h"
 
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
@@ -19,19 +20,9 @@ class VertexShaderCommon;
 class PixelShaderCommon;
 class RenderTexture;
 
-template<class T>
-class PixelConstantBuffer;
+template <class T, size_t numStructs>
+class StructuredBufferVS;
 
-struct CBLightPass
-{
-	dx::XMFLOAT3 worldPos;
-	float padding = 0.f;
-
-	CBLightPass(const dx::XMFLOAT3& worldPos)
-		: worldPos(worldPos)
-	{
-	}
-};
 interface ITexture;
 
 class Graphics
@@ -100,17 +91,19 @@ private:
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvNormal;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
 
 	std::unique_ptr<RenderTexture>			PositionTexture;
 	std::unique_ptr<RenderTexture>			NormalTexture;
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
+	std::unique_ptr<RenderTexture>			MaterialIDTexture;
 
-	std::unique_ptr<PixelShaderCommon>						pCombinePS;
-	std::unique_ptr<PixelShaderCommon>						pLightPassPixelShader;
-	std::unique_ptr<VertexShaderCommon>						pScreenSpaceVS;
-	std::unique_ptr<Sampler>								pLinearSampler;
-	std::unique_ptr<PixelConstantBuffer<CBLightPass>>		pLightTransformsBuffer;
+	std::unique_ptr<PixelShaderCommon>										   pCombinePS;
+	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;
+	std::unique_ptr<VertexShaderCommon>										   pScreenSpaceVS;
+	std::unique_ptr<Sampler>												   pLinearSampler;
+	std::unique_ptr<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>> pRenderMaterialsBuffer;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

@@ -4,7 +4,6 @@
 template<class T>
 class ResourseBuffer : public IBindable
 {
-	friend class ShaderResourseView;
 public:
 	ResourseBuffer(Graphics& Gfx, const T& bufferData)
 	{

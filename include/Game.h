@@ -39,6 +39,7 @@ private:
 	std::unique_ptr<Sheet> sheet;
 	std::unique_ptr<Sheet> nmSheet;
 	std::unique_ptr<Box> box;
+	std::unique_ptr<TexturedBox> texturedBox;
 	std::unique_ptr<Character> character;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;

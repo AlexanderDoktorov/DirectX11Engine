@@ -10,6 +10,6 @@ public:
 
 	void SetScale(float k)
 	{
-		Bar::SetScale(k, k, k);
+		Bar::SetScale({ k, k, k });
 	}
 };

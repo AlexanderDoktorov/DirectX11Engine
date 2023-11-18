@@ -17,7 +17,11 @@ public:
 	DirectX::XMMATRIX GetTransform() const noexcept override;
 
 	// IScalable
-	dx::XMFLOAT3& GetScaleRef() noexcept override;
+	virtual void SetScaleX(const float& scale_x_new) override;
+	virtual void SetScaleY(const float& scale_y_new) override;
+	virtual void SetScaleZ(const float& scale_z_new) override;
+	virtual dx::XMFLOAT3 GetScale() const noexcept	 override;
+
 private:
 	dx::XMFLOAT3 pos	{ 0.f,0.f,0.f };
 	dx::XMFLOAT3 scale	{ 1.f,1.f,1.f };

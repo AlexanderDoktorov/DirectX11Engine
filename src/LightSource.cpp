@@ -54,6 +54,7 @@ void LightSource::Reset()
 	world_position = { 0.f, 5.f, 20.f };
 	lightDesc =
 	{
+
 		GetPosition(),
 		{ 1.0f,1.0f,1.0f },
 		62.0f,

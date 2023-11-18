@@ -2,6 +2,7 @@
 Texture2D<float4> GBufferPosition   : register(t0);
 Texture2D<float4> GBufferNormal     : register(t1);
 Texture2D<float4> GBufferAlbedo     : register(t2);
+Texture2D<uint>   GBufferMatID      : register(t3);
 SamplerState      sampleState       : register(s0);
 
 struct LightDesc
@@ -14,6 +15,16 @@ struct LightDesc
     float Qatt;
 };
 
+struct MaterialDesc
+{
+    float3  ambient;
+    float3  diffuse;
+    float3  specular;
+    float   shininess;
+};
+
+StructuredBuffer<MaterialDesc> RenderMaterials : register(t4);
+
 cbuffer CameraBuffer : register(b0)
 {
     float3 viewPos;
@@ -24,6 +35,7 @@ cbuffer LightingPassPSConstants : register(b1)
 {
     LightDesc ligthParams;
 };
+
 
 struct PS_INPUT
 {
@@ -44,10 +56,10 @@ float4 ApplyLightImpact(float3 world_normal, float3 world_pos, float4 materialco
     const float3 diffuse    = ligthParams.diffuseColor * ligthParams.diffuseIntensity * att * max(0.0f, dot(dirToL, world_normal));
     
     // specular
-    const float3 viewDir = normalize(viewPos - world_pos);
+    const float3 viewDir    = normalize(viewPos - world_pos);
     const float3 reflectDir = reflect(-dirToL, world_normal);
-    const float spec = pow(saturate(dot(viewDir, reflectDir)), specularPower);
-    const float3 specular = specularStrength * spec * ligthParams.diffuseColor;
+    const float  spec       = pow(saturate(dot(viewDir, reflectDir)), specularPower);
+    const float3 specular   = specularStrength * spec * ligthParams.diffuseColor;
 
     return float4(saturate((diffuse + ambient + specular) * materialcolor.rgb), 1.0f);
 }
@@ -55,9 +67,13 @@ float4 ApplyLightImpact(float3 world_normal, float3 world_pos, float4 materialco
 
 float4 main(in PS_INPUT input) : SV_Target0
 {
-    float3 worldPosition = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
-    float3 worldNormal = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
-    float4 materialColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    float3 worldPosition    = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
+    float3 worldNormal      = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
+    float4 materialColor    = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    
+    // Materials
+    uint   materialID       = GBufferMatID.Load(uint3(input.TexCoord, 0u));
+    MaterialDesc matDesc = RenderMaterials[materialID];
     
     return ApplyLightImpact(worldNormal, worldPosition, materialColor);
 }

@@ -11,6 +11,10 @@
 	#include "DataBufferPS.h"
 	#include "ColorBuffer.h"
 
+	#include "StructuredBuffer.h"
+	#include "StructuredBufferVS.h"
+
+
 #pragma endregion Buffers
 
 #pragma region Shaders
@@ -33,3 +37,9 @@
 
 #include "InputLayout.h"
 #include "Topology.h"
+
+#define SLOT_TEXTURE 3
+#define SLOT_NORMALMAP 4
+#define SLOT_TRANSFORM_BUFFER 0
+#define SLOT_MATERIAL_STRUCTURED_BUFFER 4
+#define SLOT_SAMPLER 0

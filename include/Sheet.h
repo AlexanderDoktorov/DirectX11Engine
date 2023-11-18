@@ -25,8 +25,8 @@ public:
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_basecolor.jpg", 3U));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_normal.jpg", 4U));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_basecolor.jpg", SLOT_TEXTURE));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_normal.jpg", SLOT_NORMALMAP));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
 			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}
@@ -66,7 +66,10 @@ public:
 	void SetColor(dx::XMFLOAT4 new_color) noexcept override;
 
 	// IScalable
-	virtual dx::XMFLOAT3& GetScaleRef() noexcept { return scale; }
+	virtual void SetScaleX(const float& scale_x_new) override;
+	virtual void SetScaleY(const float& scale_y_new) override;
+	virtual void SetScaleZ(const float& scale_z_new) override;
+	virtual dx::XMFLOAT3 GetScale() const noexcept	 override;
 
 private:
 	dx::XMFLOAT4 color { 1.f,1.f,1.f,1.f };

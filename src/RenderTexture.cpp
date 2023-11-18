@@ -11,7 +11,6 @@ RenderTexture::RenderTexture(Graphics& Gfx, const RenderTexture& otherTexture)
     CreateRenderTexture(Gfx, otherTexture.GetDesc().Format, otherTexture.GetDesc().Height, otherTexture.GetDesc().Width);
 }
 
-
 void RenderTexture::CreateRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
     D3D11_TEXTURE2D_DESC textureDesc;

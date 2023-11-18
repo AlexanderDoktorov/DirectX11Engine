@@ -10,20 +10,22 @@ Game::Game()
 
 	// Geometries
 	box				= std::make_unique<Box>(*gfx);
+	texturedBox		= std::make_unique<TexturedBox>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
 	character		= std::make_unique<Character>(*gfx);
-	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
-	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
 	solidBall       = std::make_unique<SolidBall>(*gfx);
+
+	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
+	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
 
 	// Lights
 	lights.push_back(std::make_unique<LightSource>(*gfx));
 
 	box->SetPosition(0.f, 4.f, 5.f);
-	box->SetScale(0.5f);
+	box->SetScaleX(0.5f);
 	bar->SetPosition(4.f, 4.f, 5.f);
-	bar->SetScale(1.f, 2.f, 3.f);	
+	bar->SetScale({ 1.f, 2.f, 3.f });
 	sheet->Scale(20.f, 20.f, 20.f);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
@@ -38,6 +40,7 @@ Game::Game()
 	objects.push_back(character.get());
 	objects.push_back(bar.get());
 	objects.push_back(box.get());
+	objects.push_back(texturedBox.get());
 
 	LoadConfigurationFile("./game.config");
 }
@@ -107,6 +110,7 @@ void Game::UpdateFrame()
 		}
 
 		box->Draw(*gfx);
+		texturedBox->Draw(*gfx);
 		bar->Draw(*gfx);
 		solidBall->Draw(*gfx);
 		for (auto& ball : balls)
@@ -192,7 +196,7 @@ void Game::ShowItemsSubMenu()
 		{
 			dx::XMFLOAT3 scale = scalable->GetScale();
 			if (ImGui::SliderFloat3("Item scale", &scale.x, 0.f, 100.f))
-				scalable->SetScale(scale.x, scale.y, scale.z);
+				scalable->SetScale(scale);
 		}
 		if(auto colored = dynamic_cast<IColored*>(objects[current_item_selected]))
 		{

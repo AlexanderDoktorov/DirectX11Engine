@@ -45,7 +45,10 @@ public:
 	virtual DirectX::XMFLOAT3 GetPosition() const noexcept override;
 
 	// IScalable
-	virtual dx::XMFLOAT3& GetScaleRef() noexcept { return scale; }
+	virtual void SetScaleX(const float& scale_x_new) override;
+	virtual void SetScaleY(const float& scale_y_new) override;
+	virtual void SetScaleZ(const float& scale_z_new) override;
+	virtual dx::XMFLOAT3 GetScale() const noexcept	 override;
 
 	// IColored
 	virtual DirectX::XMFLOAT4 GetColor()	const noexcept override;

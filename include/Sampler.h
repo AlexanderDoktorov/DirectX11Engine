@@ -6,7 +6,7 @@
 class Sampler : public ISlot, public IBindable
 {
 public:
-	Sampler(Graphics& Gfx);
+	Sampler(Graphics& Gfx, UINT bindSlot = 0U);
 
 	// IBindable
 	void Bind(Graphics& Gfx) noexcept override;

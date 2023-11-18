@@ -94,19 +94,21 @@ Graphics::Graphics(HWND hwnd) :
     // Create G-Buffer
     PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
-    LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    MaterialIDTexture       = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8_UINT,            rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     
     CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
     CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
     CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
     CreateRTVForTexture(LightTexture.get(),      rtvLight);
+    CreateRTVForTexture(MaterialIDTexture.get(), rtvMaterialID);
 
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
-    pLightTransformsBuffer  = std::make_unique<PixelConstantBuffer<CBLightPass>>(*this);
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
+    pRenderMaterialsBuffer = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
 
     pLinearSampler->Bind(*this);
 
@@ -127,33 +129,34 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[3] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get() };
+    ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvMaterialID.Get() };
     for (int i = 0; i < 3; ++i) {
         p_Context->ClearRenderTargetView(rtvs[i], clear_color);
     }
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
-    p_Context->OMSetRenderTargets(3U, rtvs, g_mainDepthStencilView.Get());
+    p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
 }
 
 void Graphics::EndGeometryPass()
 {
-    ID3D11RenderTargetView* nullRTVs[3] = { nullptr, nullptr, nullptr };
-    p_Context->OMSetRenderTargets(3U, nullRTVs, nullptr);
+    ID3D11RenderTargetView* nullRTVs[4] = { nullptr, nullptr, nullptr, nullptr };
+    p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
 }
 
 void Graphics::BeginLightningPass()
 {
+    // Clear render target before fill the light info
     const float light_clear[4] = { 0.f,0.f,0.f,0.f };
     p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
     SetAdditiveBlendingState();
 
-    ID3D11ShaderResourceView* srvs[3] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV() };
+    // Set shader resourses
+    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), MaterialIDTexture->GetSRV() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
 
-    // Update view and projection matrices and bind them to pipeline at slot 0
-    pLightTransformsBuffer->Update(*this, CBLightPass(GetCamera().GetPos()));
-    pLightTransformsBuffer->Bind(*this);
+    // Set materials structured buffer
+    pRenderMaterialsBuffer->Bind(*this);
 
     pScreenSpaceVS->Bind(*this);
     pLightPassPixelShader->Bind(*this);
@@ -161,7 +164,7 @@ void Graphics::BeginLightningPass()
 
 void Graphics::EndLightningPass()
 {
-    ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+    ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
 
     ID3D11RenderTargetView* nullRTV = nullptr;
