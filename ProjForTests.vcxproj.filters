@@ -40,6 +40,9 @@
     <Filter Include="Файлы заголовков\Pipeline\Shaders">
       <UniqueIdentifier>{231594a7-4118-4ce0-934a-b3fecb65bacb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Assimp">
+      <UniqueIdentifier>{aef780fc-5795-455e-b30a-0d7fd75d9dcb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -156,9 +159,6 @@
     <ClCompile Include="src\VertexShaderCommon.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\WICTextureLoader.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\wWinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -166,6 +166,18 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\TexturedBox.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture2D.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WICTextureLoader11.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -225,9 +237,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\IndexedTriangleList.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Mesh.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\Player.h">
@@ -336,9 +345,6 @@
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\VertexConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WICTextureLoader.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\Cube.h">
@@ -466,6 +472,15 @@
     </ClInclude>
     <ClInclude Include="include\IShaderResourse.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Model.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WICTextureLoader11.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

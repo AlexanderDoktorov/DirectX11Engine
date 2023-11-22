@@ -5,7 +5,7 @@ PixelShaderCommon::PixelShaderCommon(Graphics& Gfx, const wchar_t* FileName) : b
 	HRESULT hr = GetDevice(Gfx)->CreatePixelShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_PixelShader); CHECK_HR(hr);
 }
 
-void PixelShaderCommon::Load(Graphics& Gfx, const wchar_t* FileName)
+void PixelShaderCommon::LoadFromFile(Graphics& Gfx, const wchar_t* FileName)
 {
 	blob.ReadFile(FileName);
 	HRESULT hr = GetDevice(Gfx)->CreatePixelShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_PixelShader); CHECK_HR(hr);
@@ -26,12 +26,12 @@ void PixelShaderCommon::Bind(Graphics& Gfx) noexcept
 	GetContext(Gfx)->PSSetShader(p_PixelShader.Get(), nullptr, 0U);
 }
 
-ID3D11PixelShader* PixelShaderCommon::GetShader() const noexcept
-{
-	return p_PixelShader.Get();
-}
-
 ID3DBlob* PixelShaderCommon::GetBlob() noexcept
 {
 	return blob.GetBlob();
+}
+
+void* PixelShaderCommon::GetShaderImpl() const noexcept
+{
+	return (void*)p_PixelShader.Get();
 }

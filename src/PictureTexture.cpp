@@ -1,11 +1,30 @@
-#include "WICTextureLoader.h"
+#include "WICTextureLoader11.h"
 #include "PictureTexture.h"
 #include "Exceptions.h"
 
-PictureTexture::PictureTexture(Graphics& Gfx, const wchar_t* FileName)
+PictureTexture::PictureTexture(Graphics& Gfx, const wchar_t* filePath)
 {
-	CHECK_HR ( CoInitializeEx(NULL, COINIT_APARTMENTTHREADED) );
-	CHECK_HR ( CreateWICTextureFromFile(GetDevice(Gfx), GetContext(Gfx), FileName, reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), &p_ShaderResourseView));
+    CreatePictureTexture(Gfx, filePath);
+}
+
+PictureTexture::PictureTexture(Graphics& Gfx, const char* filePath)
+{
+    CreatePictureTexture(Gfx, filePath);
+}
+
+void PictureTexture::CreatePictureTexture(Graphics& Gfx, const char* filePath)
+{
+    std::string sfilePath(filePath);
+    std::wstring wFilePath(sfilePath.begin(), sfilePath.end());
+
+    CHECK_HR ( CoInitializeEx(NULL, COINIT_APARTMENTTHREADED) );
+    CHECK_HR ( DirectX::CreateWICTextureFromFile(GetDevice(Gfx), GetContext(Gfx), wFilePath.c_str(), reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), &p_ShaderResourseView));
+}
+
+void PictureTexture::CreatePictureTexture(Graphics& Gfx, const wchar_t* filePath)
+{
+    CHECK_HR ( CoInitializeEx(NULL, COINIT_APARTMENTTHREADED) );
+    CHECK_HR ( DirectX::CreateWICTextureFromFile(GetDevice(Gfx), GetContext(Gfx), filePath, reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), &p_ShaderResourseView) );
 }
 
 PictureTexture::~PictureTexture()

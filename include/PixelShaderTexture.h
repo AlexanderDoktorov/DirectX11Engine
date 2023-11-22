@@ -35,6 +35,14 @@ public:
 
 	}
 
+	PixelShaderPictureTexture(Graphics& Gfx, const char* FileName, UINT bindSlot)
+		:
+		PictureTexture(Gfx, FileName),
+		bindSlot(bindSlot)
+	{
+
+	}
+
 	// ISlot
 	void SetBindSlot(UINT slot) noexcept override;
 	UINT GetBindSlot() const noexcept override;

@@ -5,7 +5,7 @@ VertexShaderCommon::VertexShaderCommon(Graphics& Gfx, const wchar_t* FileName) :
 	CHECK_HR ( GetDevice(Gfx)->CreateVertexShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_VertexShader) );
 }
 
-void VertexShaderCommon::Load(Graphics& Gfx, const wchar_t* FileName)
+void VertexShaderCommon::LoadFromFile(Graphics& Gfx, const wchar_t* FileName)
 {
 	blob.ReadFile(FileName);
 	CHECK_HR ( GetDevice(Gfx)->CreateVertexShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_VertexShader) );
@@ -26,12 +26,12 @@ void VertexShaderCommon::Bind(Graphics& Gfx) noexcept
 	GetContext(Gfx)->VSSetShader(p_VertexShader.Get(), nullptr, 0U);
 }
 
-ID3D11VertexShader* VertexShaderCommon::GetShader() const noexcept
-{
-	return p_VertexShader.Get();
-}
-
 ID3DBlob* VertexShaderCommon::GetBlob() noexcept
 {
 	return blob.GetBlob();
+}
+
+void* VertexShaderCommon::GetShaderImpl() const noexcept
+{
+	return (void*)p_VertexShader.Get();
 }
