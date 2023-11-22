@@ -3,7 +3,6 @@
 #include "DOK_DX11.h"
 #include "DrawableBase.h"
 #include "HPipelineElements.h"
-#include "Mesh.h"
 
 class Character : public DrawableBase<Character>,  public IToString, public IScalable
 {

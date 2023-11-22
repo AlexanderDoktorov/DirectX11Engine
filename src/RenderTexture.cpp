@@ -59,10 +59,11 @@ ID3D11ShaderResourceView* RenderTexture::GetSRV() const noexcept
 
 D3D11_TEXTURE2D_DESC RenderTexture::GetDesc() const noexcept
 {
-    DOK_assert(p_Texture != nullptr, L"Render texture was null");
+    assert(p_Texture != nullptr && L"Trying to get desc from null RenderTexture");
 
     D3D11_TEXTURE2D_DESC desc{};
-    p_Texture->GetDesc(&desc);
+    if(p_Texture)
+        p_Texture->GetDesc(&desc);
 
     return desc;
 }

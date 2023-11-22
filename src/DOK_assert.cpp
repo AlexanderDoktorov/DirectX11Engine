@@ -10,3 +10,4 @@ void DOK_OnFailedAssert(const wchar_t* TEXT, UINT line, bool exit)
 		_exit(-1);
 	std::terminate();
 }
+

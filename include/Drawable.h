@@ -3,6 +3,7 @@
 #include "DOK_assert.h"
 #include "IndexBuffer.h"
 #include "Topology.h"
+#include "IBindable.h"
 #include <memory>
 
 class Drawable : virtual public IObject
@@ -20,6 +21,11 @@ public:
 		}
 		if (pIndexBuffer)
 			Gfx.DrawIndexed(pIndexBuffer->GetCount());
+	}
+
+	virtual DirectX::XMMATRIX GetTransform() const noexcept override
+	{
+		return DirectX::XMMatrixIdentity();
 	}
 
 protected:

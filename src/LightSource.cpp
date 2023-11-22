@@ -19,12 +19,12 @@ void LightSource::ShowControlChildWindow()
 {
 	ImGui::BeginChild("Light control", ImVec2(600, 200), true);
 	{
-		ImGui::SliderFloat3("XYZ", &lightDesc.pos.x, -200.f, 200.f);
+		ImGui::SliderFloat3("XYZ", &lightDesc.pos.x, -200.f, 200.f, "%.4f");
 		ImGui::SliderFloat3("Diffuse color RGB", &lightDesc.diffuseColor.x, 0.f, 1.f);
-		ImGui::SliderFloat("Catt", &lightDesc.Catt, 0.f, 1.f);
-		ImGui::SliderFloat("Latt", &lightDesc.Latt, 0.f, 1.f);
-		ImGui::SliderFloat("Qatt", &lightDesc.Qatt, 0.f, 1.f);
-		ImGui::SliderFloat("Diffuse intensity", &lightDesc.diffuseIntensity, 0.f, 10.f);
+		ImGui::SliderFloat("Catt", &lightDesc.Catt, 0.f, 1.f, "%.4f");
+		ImGui::SliderFloat("Latt", &lightDesc.Latt, 0.f, 1.f, "%.4f");
+		ImGui::SliderFloat("Qatt", &lightDesc.Qatt, 0.f, 1.f, "%.4f");
+		ImGui::SliderFloat("Diffuse intensity", &lightDesc.diffuseIntensity, 0.f, 10.f), "%.4f";
 
 		ImVec4 button_hovered_color = ImVec4(0.f, 0.f, 1.f, 1.f);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_hovered_color);
@@ -51,7 +51,7 @@ DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
 
 void LightSource::Reset()
 {
-	world_position = { 0.f, 5.f, 20.f };
+	world_position = { 0.f, 0.f, -10.f };
 	lightDesc =
 	{
 

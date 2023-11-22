@@ -13,7 +13,6 @@ Game::Game()
 	texturedBox		= std::make_unique<TexturedBox>(*gfx);
 	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
-	character		= std::make_unique<Character>(*gfx);
 	solidBall       = std::make_unique<SolidBall>(*gfx);
 
 	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
@@ -37,10 +36,18 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	objects.push_back(character.get());
+	pModel = std::make_unique<Model>(*gfx, "G:\\Visual Studio Projects\\ProjForTests\\Models\\nano_suit_textured\\nanosuit.obj",
+		aiProcess_Triangulate			|
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_ConvertToLeftHanded	|
+		aiProcess_GenNormals			|
+		aiProcess_CalcTangentSpace
+	);
+
 	objects.push_back(bar.get());
 	objects.push_back(box.get());
 	objects.push_back(texturedBox.get());
+	objects.push_back(pModel.get());
 
 	LoadConfigurationFile("./game.config");
 }
@@ -110,16 +117,15 @@ void Game::UpdateFrame()
 		}
 
 		box->Draw(*gfx);
-		texturedBox->Draw(*gfx);
+		//texturedBox->Draw(*gfx);
 		bar->Draw(*gfx);
-		solidBall->Draw(*gfx);
+		//solidBall->Draw(*gfx);
+		pModel->Draw(*gfx);
 		for (auto& ball : balls)
 		{
 			ball->Draw(*gfx);
 		}
-		sheet->Draw(*gfx);
-
-		character->Draw(*gfx);
+		//sheet->Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -129,7 +135,7 @@ void Game::UpdateFrame()
 		for (auto& light_source : lights)
 		{
 			light_source->Bind(*gfx);
-			light_source->Update(dt);
+			//light_source->Update(dt);
 			gfx->Draw(3U);
 		}
 	}
@@ -141,10 +147,8 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
-	sheet->ShowControlWindow();
+	pModel->ShowControlWindow();
 #endif
-
-
 	gfx->EndFrame();
 }
 

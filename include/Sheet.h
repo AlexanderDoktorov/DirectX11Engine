@@ -3,6 +3,7 @@
 #include "HPipelineElements.h"
 #include "../include/FlatRect.h"
 #include "Interfaces.h"
+#include "Mesh.h"
 
 class Sheet : public DrawableBase<Sheet>, public IColored, public IMovable, public IScalable
 {
@@ -25,8 +26,8 @@ public:
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_basecolor.jpg", SLOT_TEXTURE));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Textures\\Brick_Wall_017_normal.jpg", SLOT_NORMALMAP));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Models\\brick_wall\\brick_wall_diffuse.jpg", SLOT_TEXTURE_DIFFUSE));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Models\\brick_wall\\brick_wall_normal.jpg", SLOT_TEXTURE_NORMALMAP));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
 			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}

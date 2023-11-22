@@ -7,6 +7,7 @@
 #include "Timer.h"
 #include "LightSource.h"
 #include "Interfaces.h"
+#include "Model.h"
 
 class Game
 {
@@ -40,7 +41,8 @@ private:
 	std::unique_ptr<Sheet> nmSheet;
 	std::unique_ptr<Box> box;
 	std::unique_ptr<TexturedBox> texturedBox;
-	std::unique_ptr<Character> character;
+
+	std::unique_ptr<Model> pModel;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;

@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Mesh.h"
 
 Character::Character(Graphics& Gfx)
 {
@@ -6,12 +7,11 @@ Character::Character(Graphics& Gfx)
 	{
 		DynamicVertex::VertexLayout vl({DynamicVertex::VertexLayout::Position3D, DynamicVertex::VertexLayout::Normal});
 
-		Mesh mesh{ "Models\\CharacterMesh.obj", vl, aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_Triangulate };
-		//mesh.pItl->SetNormalsSmooth();
+		// Model mesh{ "Models\\CharacterMesh.obj", vl, aiPostProcessSteps::aiProcess_JoinIdenticalVertices | aiPostProcessSteps::aiProcess_Triangulate };
 
 		auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryVS.cso");
-		AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, mesh.pItl->vertices));
-		AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, mesh.pItl->indices));
+		// AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, mesh.pItl->vertices));
+		// AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, mesh.pItl->indices));
 		AddStaticBindable(std::make_unique<InputLayout>(Gfx, vl.GetD3DLayout(), (IShader*)VS.get()));
 		AddStaticBindable(std::move(VS));
 		AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\GeometryPS.cso"));

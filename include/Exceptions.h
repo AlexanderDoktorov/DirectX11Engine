@@ -27,4 +27,23 @@ private:
 	_com_error err;
 };
 
+class meshException
+{
+public:
+	meshException(std::string note) : note(note)
+	{
+
+	}
+
+	const char* what() const noexcept
+	{
+		return note.c_str() ? ("meshException occured : " + note + "\n").c_str() : "[Could not find a description for error.]\n";
+	}
+
+	~meshException() = default;
+
+private:
+	std::string note;
+};
+
 #define CHECK_HR(hr)  if(FAILED(hr)) throw hrException((HRESULT)hr)

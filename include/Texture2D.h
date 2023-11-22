@@ -1,9 +1,14 @@
 #pragma once
+#include "PictureTexture.h"
 #include <DirectXMath.h>
+#include <string>
 
-class Texture2D
+class Texture2D : public PictureTexture
 {
-	static DirectX::XMMATRIX GetTBN() noexcept
-	{
-	}
+public:
+	Texture2D() = default;
+	Texture2D(Graphics& Gfx, const std::string& type, const std::string& path);
+
+	std::string type;
+	std::string path;
 };

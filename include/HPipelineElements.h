@@ -29,7 +29,7 @@
 #pragma region Textures
 
 	#include "Sampler.h"
-	#include "PictureTexture.h"
+	#include "Texture2D.h"
 	#include "RenderTexture.h"
 	#include "PixelShaderTexture.h"
 
@@ -38,8 +38,8 @@
 #include "InputLayout.h"
 #include "Topology.h"
 
-#define SLOT_TEXTURE 3
-#define SLOT_NORMALMAP 4
+#define SLOT_TEXTURE_DIFFUSE 3
+#define SLOT_TEXTURE_NORMALMAP 4
 #define SLOT_TRANSFORM_BUFFER 0
 #define SLOT_MATERIAL_STRUCTURED_BUFFER 4
 #define SLOT_SAMPLER 0

@@ -22,8 +22,8 @@ public:
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"Textures\\Brick_Wall_017_basecolor.jpg", SLOT_TEXTURE));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"Textures\\Brick_Wall_017_normal.jpg", SLOT_NORMALMAP));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"Textures\\Brick_Wall_017_basecolor.jpg", SLOT_TEXTURE_DIFFUSE));
+			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx, L"Textures\\Brick_Wall_017_normal.jpg", SLOT_TEXTURE_NORMALMAP));
 			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}
 		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));

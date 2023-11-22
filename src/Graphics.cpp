@@ -108,7 +108,7 @@ Graphics::Graphics(HWND hwnd) :
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
-    pRenderMaterialsBuffer = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
+    pRenderMaterialsBuffer  = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
 
     pLinearSampler->Bind(*this);
 
@@ -306,11 +306,13 @@ void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
     NormalTexture->Resize(*this, height, width);
     AlbedoTexture->Resize(*this, height, width);
     LightTexture->Resize(*this, height, width);
+    MaterialIDTexture->Resize(*this, height, width);
 
     CreateRTVForTexture(PositionTexture.get(), rtvPosition);
     CreateRTVForTexture(NormalTexture.get(), rtvNormal);
     CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
     CreateRTVForTexture(LightTexture.get(), rtvLight);
+    CreateRTVForTexture(MaterialIDTexture.get(), rtvMaterialID);
 }
 
 void Graphics::CreateDepthStencilView()
