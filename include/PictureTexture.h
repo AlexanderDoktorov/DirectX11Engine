@@ -20,6 +20,7 @@ public:
 	~PictureTexture();
 
 private:
+	static bool COMInitilized;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> p_Texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> p_ShaderResourseView;
 };
