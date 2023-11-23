@@ -82,6 +82,7 @@ private:
 	wrl::ComPtr<ID3D11DeviceContext>	p_Context;
 	wrl::ComPtr<IDXGISwapChain>			p_SwapChain;
 	wrl::ComPtr<ID3D11RasterizerState>  p_RSState;
+	wrl::ComPtr<ID3D11BlendState>		p_BlendState;
 
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
@@ -98,6 +99,7 @@ private:
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
 	std::unique_ptr<RenderTexture>			MaterialIDTexture;
+
 
 	std::unique_ptr<PixelShaderCommon>										   pCombinePS;
 	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;

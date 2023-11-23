@@ -439,27 +439,41 @@ void Graphics::SetCamera(const Camera& new_cam)
 
 void Graphics::SetAdditiveBlendingState()
 {
-    ID3D11BlendState* pBlendState = nullptr;
+    D3D11_BLEND_DESC addBlendDesc{};
+    addBlendDesc.AlphaToCoverageEnable                 = FALSE;
+    addBlendDesc.IndependentBlendEnable                = FALSE;
+    addBlendDesc.RenderTarget[0].BlendEnable           = TRUE;
+    addBlendDesc.RenderTarget[0].BlendOp               = D3D11_BLEND_OP_ADD;
+    addBlendDesc.RenderTarget[0].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
+    addBlendDesc.RenderTarget[0].DestBlend             = D3D11_BLEND_ONE;
+    addBlendDesc.RenderTarget[0].DestBlendAlpha        = D3D11_BLEND_ONE;
+    addBlendDesc.RenderTarget[0].SrcBlend              = D3D11_BLEND_ONE;
+    addBlendDesc.RenderTarget[0].SrcBlendAlpha         = D3D11_BLEND_ONE;
+    addBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-    D3D11_BLEND_DESC blendDesc{};
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    if (!p_BlendState.Get())
+    {
+        HRESULT hr = p_Device->CreateBlendState(&addBlendDesc, &p_BlendState);
+        CHECK_HR(hr);
+    }
+    else
+    {
+        D3D11_BLEND_DESC currentBlendDesc{};
+        p_BlendState->GetDesc(&currentBlendDesc);
 
-    CHECK_HR ( p_Device->CreateBlendState(&blendDesc, &pBlendState) );
-    p_Context->OMSetBlendState(pBlendState, nullptr, 0xFFFFFFFF);
-
-    pBlendState->Release();
+        if (currentBlendDesc != addBlendDesc)
+        {
+            HRESULT hr = p_Device->CreateBlendState(&addBlendDesc, &p_BlendState);
+            CHECK_HR(hr);
+        }
+    }
+    
+    p_Context->OMSetBlendState(p_BlendState.Get(), nullptr, UINT_MAX);
 }
 
 void Graphics::ResetBlendingState()
 {
-    p_Context->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
+    p_Context->OMSetBlendState(nullptr, nullptr, UINT_MAX);
 }
 
 Camera Graphics::GetCamera() const
