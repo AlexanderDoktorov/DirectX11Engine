@@ -116,6 +116,10 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiS
 			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_NORMALMAP));
 		if (textures[i].type == "texture_diffuse")
 			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_DIFFUSE));
+		if (textures[i].type == "texture_specular")
+			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_SPECULAR));
+		if (textures[i].type == "texture_height")
+			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_HEIGHT));
 	}
 	
 	auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
