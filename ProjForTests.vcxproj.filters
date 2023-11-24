@@ -66,9 +66,6 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bar.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Blob.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -358,12 +355,6 @@
     </ClInclude>
     <ClInclude Include="include\Sphere.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Bar.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Box.h">
-      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="include\Character.h">
       <Filter>Файлы заголовков\Items</Filter>

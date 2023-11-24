@@ -225,7 +225,6 @@
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Bar.cpp" />
     <ClCompile Include="src\Blob.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Character.cpp" />
@@ -266,10 +265,8 @@
     <ClCompile Include="src\wWinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Bar.h" />
     <ClInclude Include="include\BaseWindow.h" />
     <ClInclude Include="include\Blob.h" />
-    <ClInclude Include="include\Box.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Character.h" />
     <ClInclude Include="include\ColorBuffer.h" />
