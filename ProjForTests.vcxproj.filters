@@ -180,6 +180,9 @@
     <ClCompile Include="src\WICTextureLoader11.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\ISlot.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -529,6 +532,9 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\NormalTextureVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\PS_DNS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>

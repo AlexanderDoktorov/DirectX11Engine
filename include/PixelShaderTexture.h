@@ -4,33 +4,27 @@
 #include "RenderTexture.h"
 #include "PictureTexture.h"
 
-class PixelShaderRenderTexture : public RenderTexture, public IBindable, public ISlot
+class PixelShaderRenderTexture : public RenderTexture, public IBindable, public Slotted
 {
 public:
 	PixelShaderRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth, UINT bindSlot)
 		:
 		RenderTexture(Gfx, textureFormat, TextureHeight, TextureWidth),
-		bindSlot(bindSlot)
+		Slotted(bindSlot)
 	{
 
 	}
-	
-	// ISlot
-	void SetBindSlot(UINT slot) noexcept override;
-	UINT GetBindSlot() const noexcept override;
-	
+
 	virtual void Bind(Graphics& Gfx) noexcept override;
-private:
-	UINT bindSlot = 0U;
 };
 
-class PixelShaderPictureTexture : public PictureTexture, public IBindable, public ISlot
+class PixelShaderPictureTexture : public PictureTexture, public IBindable, public Slotted
 {
 public:
 	PixelShaderPictureTexture(Graphics& Gfx, const wchar_t* FileName, UINT bindSlot)
 		:
 		PictureTexture(Gfx, FileName),
-		bindSlot(bindSlot)
+		Slotted(bindSlot)
 	{
 
 	}
@@ -38,17 +32,10 @@ public:
 	PixelShaderPictureTexture(Graphics& Gfx, const char* FileName, UINT bindSlot)
 		:
 		PictureTexture(Gfx, FileName),
-		bindSlot(bindSlot)
+		Slotted(bindSlot)
 	{
 
 	}
 
-	// ISlot
-	void SetBindSlot(UINT slot) noexcept override;
-	UINT GetBindSlot() const noexcept override;
-
 	virtual void Bind(Graphics& Gfx) noexcept override;
-
-private:
-	UINT bindSlot = 0U;
 };
