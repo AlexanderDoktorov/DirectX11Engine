@@ -155,7 +155,7 @@ std::vector<Texture2D> Model::loadMaterialTextures(Graphics& Gfx, aiMaterial* ma
 			Texture2D texture;
 			texture.CreatePictureTexture(Gfx, fullFilePath.c_str());
 			texture.type = typeName;
-			texture.path = fullFilePath.c_str();
+			texture.path = fullFilePath;
 			textures.push_back(texture);
 			texturesLoaded.push_back(texture); // add to loaded textures
 		}

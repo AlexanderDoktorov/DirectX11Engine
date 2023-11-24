@@ -33,7 +33,6 @@ PSOutput main(VS_OUT ps_input)
     {
         output.wNormal = NormalMap.Sample(Sampler, ps_input.textCoord);
         output.wNormal.xyz = output.wNormal.xyz * 2.f - 1.f; // ranges from -1.f to +1.f now
-        output.wNormal.z = -output.wNormal.z;
         output.wNormal = normalize(float4(mul(output.wNormal.xyz, ps_input.TBN), 1.f));
     }
     else
