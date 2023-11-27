@@ -19,10 +19,10 @@ float4 main(PS_INPUT input) : SV_TARGET0
     float4 albedo = gBufferAlbedo.Sample(linearSampler, input.TexCoord);
 
     // Sample accumulated lighting
-    float4 lighting = lightAccumulation.Sample(linearSampler, input.TexCoord);
+    float3 lightImpact = lightAccumulation.Sample(linearSampler, input.TexCoord).rgb;
 
     // Combine G-buffer data and lighting to produce the final color
-    float3 finalColor = saturate(lighting.rgb * albedo.rgb);
+    float3 finalColor = saturate(lightImpact * albedo.rgb);
 
     return float4(finalColor, 1.f);
 }

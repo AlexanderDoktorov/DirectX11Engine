@@ -162,9 +162,6 @@
     <ClCompile Include="src\TransformBufferPS.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\TexturedBox.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Texture2D.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

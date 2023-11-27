@@ -9,9 +9,6 @@ Game::Game()
 	gfx				= std::make_unique<Graphics>(window->GetWnd());
 
 	// Geometries
-	box				= std::make_unique<Box>(*gfx);
-	texturedBox		= std::make_unique<TexturedBox>(*gfx);
-	bar				= std::make_unique<Bar>(*gfx, 1.f,10.f,3.f);
 	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
 	solidBall       = std::make_unique<SolidBall>(*gfx);
 
@@ -21,10 +18,6 @@ Game::Game()
 	// Lights
 	lights.push_back(std::make_unique<LightSource>(*gfx));
 
-	box->SetPosition(0.f, 4.f, 5.f);
-	box->SetScaleX(0.5f);
-	bar->SetPosition(4.f, 4.f, 5.f);
-	bar->SetScale({ 1.f, 2.f, 3.f });
 	sheet->Scale(20.f, 20.f, 20.f);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
@@ -36,17 +29,13 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	pModel = std::make_unique<Model>(*gfx, "G:\\Visual Studio Projects\\ProjForTests\\Models\\nano_suit_textured\\nanosuit.obj",
+	pModel = std::make_unique<Model>(*gfx, "G:\\Visual Studio Projects\\ProjForTests\\Models\\brick_wall\\brick_wall.obj",
 		aiProcess_Triangulate			|
 		aiProcess_JoinIdenticalVertices |
-		aiProcess_ConvertToLeftHanded	|
 		aiProcess_GenNormals			|
-		aiProcess_CalcTangentSpace
+		aiProcess_CalcTangentSpace		
 	);
 
-	objects.push_back(bar.get());
-	objects.push_back(box.get());
-	objects.push_back(texturedBox.get());
 	objects.push_back(pModel.get());
 
 	LoadConfigurationFile("./game.config");
@@ -116,9 +105,6 @@ void Game::UpdateFrame()
 			light_source->Draw(*gfx);
 		}
 
-		box->Draw(*gfx);
-		//texturedBox->Draw(*gfx);
-		bar->Draw(*gfx);
 		//solidBall->Draw(*gfx);
 		pModel->Draw(*gfx);
 		for (auto& ball : balls)
