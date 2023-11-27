@@ -14,6 +14,7 @@ public:
 	void SetConstantBuffers(Graphics& Gfx, UINT start_slot, std::vector<ID3D11Buffer*> constant_buffers) noexcept override;
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
+	virtual void Unbind(Graphics& Gfx) noexcept override;
 	ID3DBlob*			GetBlob() noexcept;
 
 private:

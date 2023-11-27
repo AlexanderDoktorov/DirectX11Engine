@@ -3,9 +3,12 @@
 #include "ISlot.h"
 
 template <class T>
-class ConstantBuffer : public IBindable, public ISlot
+class ConstantBuffer : public IBindable, public IUnbindable, public Slotted
 {
 public:
+    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot) : Slotted(bindSlot), ConstantBuffer(Gfx, CBData)
+    { }
+
     ConstantBuffer(Graphics& Gfx, const T& CBData)
     {
         D3D11_BUFFER_DESC CBDesc = {};

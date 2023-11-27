@@ -21,6 +21,11 @@ void VertexShaderCommon::SetConstantBuffers(Graphics& Gfx, UINT start_slot, std:
 	GetContext(Gfx)->VSSetConstantBuffers(start_slot, (UINT)constant_buffers.size(), constant_buffers.data());
 }
 
+void VertexShaderCommon::Unbind(Graphics& Gfx) noexcept
+{
+	GetContext(Gfx)->VSSetShader(nullptr, nullptr, 0U);
+}
+
 void VertexShaderCommon::Bind(Graphics& Gfx) noexcept
 {
 	GetContext(Gfx)->VSSetShader(p_VertexShader.Get(), nullptr, 0U);

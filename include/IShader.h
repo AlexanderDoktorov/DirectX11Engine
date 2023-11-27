@@ -2,7 +2,7 @@
 #include "IBindable.h"
 #include "IBlob.h"
 
-struct IShader : virtual public IBindable, virtual  public IBlob
+struct IShader : virtual public IBindable, virtual public IUnbindable, virtual  public IBlob
 {
 	virtual ~IShader() = default;
 	virtual void LoadFromFile(Graphics& Gfx, const wchar_t* FileName) = 0;

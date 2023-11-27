@@ -3,17 +3,14 @@
 #include "IBindable.h"
 #include <wrl.h>
 
-class Sampler : public ISlot, public IBindable
+class Sampler : public Slotted, public IBindable, public IUnbindable
 {
 public:
 	Sampler(Graphics& Gfx, UINT bindSlot = 0U);
 
 	// IBindable
 	void Bind(Graphics& Gfx) noexcept override;
-
-	// ISlot
-	void SetBindSlot(UINT slot) noexcept override;
-	UINT GetBindSlot() const noexcept override;
+	void Unbind(Graphics& Gfx) noexcept override;
 
 private:
 	UINT bindSlot = 0U;

@@ -11,10 +11,11 @@ struct VS_OUT
 {
     float4 Position     : SV_POSITION; // Position in homogeneous clip space
     float4 wPosition    : POSITION0; // Vertex position in world space (for G-buffer)
-    float4 wNormal      : NORMAL0;
-    float2 textCoord    : TEXCOORD0; // Texture coordinates
+    float3 wNormal      : NORMAL0;
+    float3 wBitangent   : BITANGENT0;
+    float3 wTangent     : TANGENT0;
+    float2 textCoord    : TEXCOORD; // Texture coordinates
     uint   materialID   : MATERIALID0;
-    float3x3 TBN        : TBN0;
 };
 
 struct PSOutput
@@ -31,13 +32,22 @@ PSOutput main(VS_OUT ps_input)
     
     if (isNormalMapEnabled)
     {
-        output.wNormal = NormalMap.Sample(Sampler, ps_input.textCoord);
-        output.wNormal.xyz = output.wNormal.xyz * 2.f - 1.f; // ranges from -1.f to +1.f now
-        output.wNormal = normalize(float4(mul(output.wNormal.xyz, ps_input.TBN), 1.f));
+        // build the tranform (rotation) into tangent space
+            const float3x3 tanToWorld = float3x3(
+            normalize(ps_input.wTangent),
+            normalize(ps_input.wBitangent),
+            normalize(ps_input.wNormal)
+        );
+        // unpack the normal from map into tangent space        
+            const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
+            float3 n = normalSample * 2.0f - 1.0f;
+            n.y = -n.y;
+        // bring normal from tanspace into view space
+            output.wNormal = float4(mul(n, tanToWorld), 0.f);
     }
     else
     {
-        output.wNormal = ps_input.wNormal;
+        output.wNormal = float4(ps_input.wNormal, 0.f);;
     }
 
     output.Albedo       = Texture.Sample(Sampler, ps_input.textCoord);

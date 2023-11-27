@@ -23,6 +23,9 @@ class RenderTexture;
 template <class T, size_t numStructs>
 class StructuredBufferVS;
 
+template <class T>
+class PixelConstantBuffer;
+
 interface ITexture;
 
 class Graphics
@@ -100,12 +103,12 @@ private:
 	std::unique_ptr<RenderTexture>			LightTexture;
 	std::unique_ptr<RenderTexture>			MaterialIDTexture;
 
-
 	std::unique_ptr<PixelShaderCommon>										   pCombinePS;
 	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;
 	std::unique_ptr<VertexShaderCommon>										   pScreenSpaceVS;
 	std::unique_ptr<Sampler>												   pLinearSampler;
 	std::unique_ptr<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>> pRenderMaterialsBuffer;
+	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

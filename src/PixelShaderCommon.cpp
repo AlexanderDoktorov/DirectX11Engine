@@ -26,6 +26,12 @@ void PixelShaderCommon::Bind(Graphics& Gfx) noexcept
 	GetContext(Gfx)->PSSetShader(p_PixelShader.Get(), nullptr, 0U);
 }
 
+void PixelShaderCommon::Unbind(Graphics& Gfx) noexcept
+{
+	// Unbind pixel shader
+	GetContext(Gfx)->PSSetShader(nullptr, nullptr, 0U);
+}
+
 ID3DBlob* PixelShaderCommon::GetBlob() noexcept
 {
 	return blob.GetBlob();

@@ -26,6 +26,7 @@ struct MaterialDesc
 cbuffer CameraBuffer : register(b0)
 {
     float3 worldCameraPosition;
+    float  padding[1];
 };
 
 // Constant buffer for lighting parameters

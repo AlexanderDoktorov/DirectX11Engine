@@ -108,9 +108,9 @@ Graphics::Graphics(HWND hwnd) :
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
-    pRenderMaterialsBuffer  = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
 
-    pLinearSampler->Bind(*this);
+    pRenderMaterialsBuffer  = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
+    pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
@@ -150,25 +150,43 @@ void Graphics::BeginLightningPass()
     p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
     SetAdditiveBlendingState();
 
-    // Set shader resourses
+    // Bind shader resourses
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), MaterialIDTexture->GetSRV() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
 
     // Set materials structured buffer
-    pRenderMaterialsBuffer->Bind(*this);
+    // TO DO // 
 
+    // Bind CameraBuffer
+    const dx::XMFLOAT3 camPos = cam.GetPos();
+    pPixelCameraBuffer->Update(*this, dx::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.f));
+    pPixelCameraBuffer->Bind(*this);
+
+    // Bind shaders
     pScreenSpaceVS->Bind(*this);
     pLightPassPixelShader->Bind(*this);
+
+    // Bind linear sampler
+    pLinearSampler->Bind(*this);
 }
 
 void Graphics::EndLightningPass()
 {
+    // Unbind resourses
     ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
 
+    // Unbind render targets
     ID3D11RenderTargetView* nullRTV = nullptr;
     p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
+
+    // Unbind buffers
+    pPixelCameraBuffer->Unbind(*this);
+
+    // Unbind shaders
+    pScreenSpaceVS->Unbind(*this);
+    pLightPassPixelShader->Unbind(*this);
 
     ResetBlendingState();
 }
@@ -189,9 +207,17 @@ void Graphics::PerformCombinePass()
     pScreenSpaceVS->Bind(*this);
     Draw(3U);
 
-    // Unbind
+    // Unbind shader resourses
     ID3D11ShaderResourceView* nullSRV[4] = { nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, 4U, nullSRV);
+
+    // Unbind render targets
+    ID3D11RenderTargetView* nullRTV = nullptr;
+    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
+
+    // Unbind shaders
+    pCombinePS->Unbind(*this);
+    pScreenSpaceVS->Unbind(*this);
 }
 
 void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
@@ -235,6 +261,7 @@ void Graphics::EndFrame()
         // First make SRV then clear RTV !!!
         backBuffer = MakeSRVFromRTV(g_mainRenderTargetView);
         const float clear_color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
+        p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
         p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 
         static bool open = true;
