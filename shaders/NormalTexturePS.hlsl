@@ -32,18 +32,18 @@ PSOutput main(VS_OUT ps_input)
     
     if (isNormalMapEnabled)
     {
-        // build the tranform (rotation) into tangent space
-            const float3x3 tanToWorld = float3x3(
+        // build the tranform (rotation) into world space
+        const float3x3 tanToWorld = float3x3(
             normalize(ps_input.wTangent),
             normalize(ps_input.wBitangent),
             normalize(ps_input.wNormal)
         );
         // unpack the normal from map into tangent space        
-            const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
-            float3 n = normalSample * 2.0f - 1.0f;
-            n.y = -n.y;
-        // bring normal from tanspace into view space
-            output.wNormal = float4(mul(n, tanToWorld), 0.f);
+        const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
+        float3 worldNormal = normalSample * 2.0f - 1.0f;
+        // bring normal from tanspace into world space
+        worldNormal = normalize(mul(worldNormal, tanToWorld));
+        output.wNormal = float4(worldNormal, 0.f);
     }
     else
     {

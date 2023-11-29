@@ -113,7 +113,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiS
 	for (size_t i = 0; i < textures.size(); i++)
 	{
 		if (textures[i].type == "texture_normal")
-			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_NORMALMAP));
+			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_NORMALMAP, DirectX::WIC_LOADER_IGNORE_SRGB));
 		if (textures[i].type == "texture_diffuse")
 			bindablePtrs.push_back(std::make_unique<PixelShaderPictureTexture>(Gfx, textures[i].path.c_str(), SLOT_TEXTURE_DIFFUSE));
 		if (textures[i].type == "texture_specular")

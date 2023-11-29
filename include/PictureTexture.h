@@ -1,17 +1,18 @@
 #pragma once
 #include "GraphicsChild.h"
+#include "WICTextureLoader11.h"
 #include "ITexture.h"
 #include <wrl.h>
 
 class PictureTexture : virtual public GraphicsChild, public ITexture
 {
 public:
-	PictureTexture() = default;
-	PictureTexture(Graphics& Gfx, const wchar_t* filePath);
-	PictureTexture(Graphics& Gfx, const char* filePath); // questinable (casting char* to wchar_t*)
+	PictureTexture();
+	PictureTexture(Graphics& Gfx, const wchar_t* filePath, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT);
+	PictureTexture(Graphics& Gfx, const char* filePath, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT);
 
-	void CreatePictureTexture(Graphics& Gfx, const char* filePath);
-	void CreatePictureTexture(Graphics& Gfx, const wchar_t* filePath);
+	void CreatePictureTexture(Graphics& Gfx, const char* filePath, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT);
+	void CreatePictureTexture(Graphics& Gfx, const wchar_t* filePath, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT);
 
 	ID3D11Texture2D*				GetTexture() const noexcept;
 	ID3D11ShaderResourceView*		GetSRV() const noexcept;

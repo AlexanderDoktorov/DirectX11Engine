@@ -21,17 +21,17 @@ public:
 class PixelShaderPictureTexture : public PictureTexture, public IBindable, public Slotted
 {
 public:
-	PixelShaderPictureTexture(Graphics& Gfx, const wchar_t* FileName, UINT bindSlot)
+	PixelShaderPictureTexture(Graphics& Gfx, const wchar_t* FileName, UINT bindSlot, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT)
 		:
-		PictureTexture(Gfx, FileName),
+		PictureTexture(Gfx, FileName, loadFlags),
 		Slotted(bindSlot)
 	{
 
 	}
 
-	PixelShaderPictureTexture(Graphics& Gfx, const char* FileName, UINT bindSlot)
+	PixelShaderPictureTexture(Graphics& Gfx, const char* FileName, UINT bindSlot, DirectX::WIC_LOADER_FLAGS loadFlags = DirectX::WIC_LOADER_DEFAULT)
 		:
-		PictureTexture(Gfx, FileName),
+		PictureTexture(Gfx, FileName, loadFlags),
 		Slotted(bindSlot)
 	{
 

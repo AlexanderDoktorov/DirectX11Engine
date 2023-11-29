@@ -1,40 +1,63 @@
-#include "WICTextureLoader11.h"
 #include "PictureTexture.h"
 #include "Exceptions.h"
 
 bool PictureTexture::COMInitilized = false;
 
-PictureTexture::PictureTexture(Graphics& Gfx, const wchar_t* filePath)
+PictureTexture::PictureTexture()
 {
-    CreatePictureTexture(Gfx, filePath);
+    if (!COMInitilized)
+    {
+        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
+        COMInitilized = SUCCEEDED(hr);
+    }
 }
 
-PictureTexture::PictureTexture(Graphics& Gfx, const char* filePath)
+PictureTexture::PictureTexture(Graphics& Gfx, const wchar_t* filePath, DirectX::WIC_LOADER_FLAGS loadFlags) : PictureTexture()
 {
-    CreatePictureTexture(Gfx, filePath);
+    CreatePictureTexture(Gfx, filePath, loadFlags);
 }
 
-void PictureTexture::CreatePictureTexture(Graphics& Gfx, const char* filePath)
+PictureTexture::PictureTexture(Graphics& Gfx, const char* filePath, DirectX::WIC_LOADER_FLAGS loadFlags) : PictureTexture()
+{
+    CreatePictureTexture(Gfx, filePath, loadFlags);
+}
+
+void PictureTexture::CreatePictureTexture(Graphics& Gfx, const char* filePath, DirectX::WIC_LOADER_FLAGS loadFlags)
 {
     std::string sfilePath(filePath);
     std::wstring wFilePath(sfilePath.begin(), sfilePath.end());
 
-    if (!COMInitilized)
-    {
-        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
-        COMInitilized = SUCCEEDED(hr);
-    }
-    CHECK_HR ( DirectX::CreateWICTextureFromFile(GetDevice(Gfx), GetContext(Gfx), wFilePath.c_str(), reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), &p_ShaderResourseView));
+    CreatePictureTexture(Gfx, wFilePath.c_str(), loadFlags);
 }
 
-void PictureTexture::CreatePictureTexture(Graphics& Gfx, const wchar_t* filePath)
+void PictureTexture::CreatePictureTexture(Graphics& Gfx, const wchar_t* filePath, DirectX::WIC_LOADER_FLAGS loadFlags)
 {
-    if (!COMInitilized)
+    if (loadFlags != DirectX::WIC_LOADER_DEFAULT)
     {
-        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
-        COMInitilized = SUCCEEDED(hr);
+        CHECK_HR ( DirectX::CreateWICTextureFromFileEx(
+            GetDevice(Gfx),
+            GetContext(Gfx), 
+            filePath, 
+            0Ui64, 
+            D3D11_USAGE_DEFAULT, 
+            D3D11_BIND_SHADER_RESOURCE, 
+            0, 
+            0, 
+            loadFlags,
+            reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), 
+            &p_ShaderResourseView
+        ));
     }
-    CHECK_HR ( DirectX::CreateWICTextureFromFile(GetDevice(Gfx), GetContext(Gfx), filePath, reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()), &p_ShaderResourseView) );
+    else
+    {
+        CHECK_HR ( DirectX::CreateWICTextureFromFile(
+            GetDevice(Gfx), 
+            GetContext(Gfx), 
+            filePath, 
+            reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()),
+            &p_ShaderResourseView) 
+        );
+    }
 }
 
 PictureTexture::~PictureTexture()
