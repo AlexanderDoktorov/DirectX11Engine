@@ -1,10 +1,15 @@
-cbuffer objectCbuff : register(b2)
+cbuffer objectCbuff : register(b0)
 {
+	float3 diffuseColor;
     bool isNormalMapEnabled;
+    bool isDiffuseMapEnabled;
 }
 
-Texture2D Texture : register(t3);
-Texture2D NormalMap : register(t4);
+Texture2DArray DiffuseMaps  : register(t0);
+Texture2DArray NormalMaps   : register(t1);
+Texture2DArray SpecularMaps : register(t2);
+Texture2DArray HeightMaps   : register(t3);
+
 SamplerState Sampler : register(s0);
 
 struct VS_OUT
@@ -38,8 +43,8 @@ PSOutput main(VS_OUT ps_input)
             normalize(ps_input.wBitangent),
             normalize(ps_input.wNormal)
         );
-        // unpack the normal from map into tangent space        
-        const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
+        // unpack the normal from map into tangent space                           --> textID
+        const float3 normalSample = NormalMaps.Sample(Sampler, float3(ps_input.textCoord, 0)).xyz;
         float3 worldNormal = normalSample * 2.0f - 1.0f;
         // bring normal from tanspace into world space
         worldNormal = normalize(mul(worldNormal, tanToWorld));
@@ -50,7 +55,15 @@ PSOutput main(VS_OUT ps_input)
         output.wNormal = float4(ps_input.wNormal, 0.f);;
     }
 
-    output.Albedo       = Texture.Sample(Sampler, ps_input.textCoord);
+    if(isDiffuseMapEnabled)
+    {
+        output.Albedo = DiffuseMaps.Sample(Sampler, float3(ps_input.textCoord, 0));
+    }
+    else
+    {
+        output.Albedo = float4(diffuseColor, 1.f);
+
+    }
     output.wPosition    = ps_input.wPosition;
     output.materialID   = ps_input.materialID;
     

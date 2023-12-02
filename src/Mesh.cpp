@@ -14,3 +14,4 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables)
 
 	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
 }
+

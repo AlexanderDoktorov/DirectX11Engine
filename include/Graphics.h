@@ -6,7 +6,6 @@
 #include <memory>
 #include "DirectXWindow.h"
 #include "Camera.h"
-#include "Materials.h"
 
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
@@ -107,7 +106,6 @@ private:
 	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;
 	std::unique_ptr<VertexShaderCommon>										   pScreenSpaceVS;
 	std::unique_ptr<Sampler>												   pLinearSampler;
-	std::unique_ptr<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>> pRenderMaterialsBuffer;
 	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
 	class DefferedRendering
 	{

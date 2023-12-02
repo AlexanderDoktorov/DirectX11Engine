@@ -117,7 +117,7 @@
     <ClCompile Include="src\PixelShaderCommon.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\PixelShaderTexture.cpp">
+    <ClCompile Include="src\ShaderResoursesPS.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Player.cpp">
@@ -176,6 +176,15 @@
     </ClCompile>
     <ClCompile Include="src\ISlot.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Node.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialProperty.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,9 +260,6 @@
     <ClInclude Include="include\Timer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\Vertex.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="include\Vrtx.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -320,7 +326,7 @@
     <ClInclude Include="include\PixelConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\PixelShaderTexture.h">
+    <ClInclude Include="include\ShaderResoursesPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\ResourseBuffer.h">
@@ -452,9 +458,6 @@
     <ClInclude Include="include\TexturedBox.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
-    <ClInclude Include="include\Materials.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\StructuredBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -472,6 +475,18 @@
     </ClInclude>
     <ClInclude Include="include\WICTextureLoader11.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Node.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Material.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialProperty.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vertex.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -26,8 +26,8 @@ public:
 			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Models\\brick_wall\\brick_wall_diffuse.jpg", SLOT_TEXTURE_DIFFUSE));
-			AddStaticBindable(std::make_unique<PixelShaderPictureTexture>(Gfx,  L"Models\\brick_wall\\brick_wall_normal.jpg", SLOT_TEXTURE_NORMALMAP));
+			AddStaticBindable(std::make_unique<TextureArrayPS>(Gfx,  L"Models\\brick_wall\\brick_wall_diffuse.jpg", SLOT_TEXTURE_ARRAY_DIFFUSE));
+			AddStaticBindable(std::make_unique<TextureArrayPS>(Gfx,  L"Models\\brick_wall\\brick_wall_normal.jpg", SLOT_TEXTURE_ARRAY_NORMALMAP));
 			AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
 			AddStaticBindable(std::make_unique<Sampler>(Gfx));
 		}

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "StringHelper.h"
 #include <fstream>
+#include <regex>
 
 Game::Game()
 {
@@ -29,7 +30,7 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	pModel = std::make_unique<Model>(*gfx, "G:\\Visual Studio Projects\\ProjForTests\\Models\\brick_wall\\brick_wall.obj",
+	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\nano_suit_textured\nanosuit.obj)",
 		aiProcess_Triangulate			|
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_GenNormals			|
@@ -133,7 +134,8 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
-	pModel->ShowControlWindow();
+	ImGui::ShowDemoWindow();
+	pModel->ShowControlWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }

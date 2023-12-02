@@ -109,7 +109,6 @@ Graphics::Graphics(HWND hwnd) :
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
 
-    pRenderMaterialsBuffer  = std::make_unique<StructuredBufferVS<Material::MaterialDesc, NUM_MATERIALS>>(*this, Material::MaterialDescs);
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
