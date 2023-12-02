@@ -6,9 +6,6 @@ template <class T>
 class ConstantBuffer : public IBindable, public IUnbindable, public Slotted
 {
 public:
-    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot) : Slotted(bindSlot), ConstantBuffer(Gfx, CBData)
-    { }
-
     ConstantBuffer(Graphics& Gfx, const T& CBData)
     {
         D3D11_BUFFER_DESC CBDesc = {};
@@ -21,6 +18,11 @@ public:
         CBSubData.pSysMem = &CBData;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &p_ConstantBuffer); assert(SUCCEEDED(hr));
+    }
+
+    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot) : ConstantBuffer(Gfx, CBData)
+    {
+        SetBindSlot(bindSlot);
     }
 
     ConstantBuffer(Graphics& Gfx)

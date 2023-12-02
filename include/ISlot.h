@@ -10,7 +10,9 @@ struct ISlot
 
 struct Slotted : public ISlot
 {
-	Slotted(UINT numSlot = 0U) : numSlot(numSlot)
+	Slotted(UINT numSlot) : numSlot(numSlot)
+	{}
+	Slotted() : numSlot(0U)
 	{}
 	void SetBindSlot(UINT slot) noexcept override;
 	UINT GetBindSlot() const noexcept override;
