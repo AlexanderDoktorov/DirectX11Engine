@@ -461,7 +461,7 @@
     <ClInclude Include="include\StructuredBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\StructuredBufferVS.h">
+    <ClInclude Include="include\StructuredBufferPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IShaderResourse.h">

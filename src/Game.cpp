@@ -30,7 +30,7 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\nano_suit_textured\nanosuit.obj)",
+	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\brick_wall\brick_wall.obj)",
 		aiProcess_Triangulate			|
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_GenNormals			|
@@ -134,7 +134,6 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
-	ImGui::ShowDemoWindow();
 	pModel->ShowControlWindow(*gfx);
 #endif
 	gfx->EndFrame();

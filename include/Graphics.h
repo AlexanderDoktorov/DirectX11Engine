@@ -14,18 +14,20 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+#pragma region forward_declarations
+
 class Sampler;
 class VertexShaderCommon;
 class PixelShaderCommon;
 class RenderTexture;
-
-template <class T, size_t numStructs>
-class StructuredBufferVS;
-
-template <class T>
-class PixelConstantBuffer;
-
+template <class T> class PixelConstantBuffer;
+template<class T, size_t numStructs> class StructuredBufferPS;
+struct MaterialDesc;
 interface ITexture;
+
+#pragma endregion forward_declarations
+
+#define MAX_MATERIALS (size_t)10
 
 class Graphics
 {
@@ -58,6 +60,12 @@ public:
 
 	// Render targets
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
+	
+	// Materials
+	void UpdateMaterialAt(MaterialDesc materialDesc, size_t indx) noexcept;
+	MaterialDesc GetMaterialAt(size_t indx) noexcept;
+	static consteval size_t GetMaterialsCount() noexcept { return MAX_MATERIALS; }
+	
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -89,16 +97,21 @@ private:
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
 
+private:
 	// G-buffer
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvPosition;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvNormal;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
+	wrl::ComPtr<ID3D11RenderTargetView>		rtvSpecular;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
+
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
+	std::unique_ptr<StructuredBufferPS<MaterialDesc, MAX_MATERIALS>> pMaterialStructuredBuffer;
 
 	std::unique_ptr<RenderTexture>			PositionTexture;
 	std::unique_ptr<RenderTexture>			NormalTexture;
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
+	std::unique_ptr<RenderTexture>			SpecularTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
 	std::unique_ptr<RenderTexture>			MaterialIDTexture;
 

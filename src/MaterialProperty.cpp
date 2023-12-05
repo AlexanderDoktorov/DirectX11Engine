@@ -1,30 +1,31 @@
 #include "MaterialProperty.h"
 
-void* MaterialProperty::GetData() const noexcept
+MaterialProperty::MaterialProperty(std::string pKey, unsigned int indx, const aiPropertyTypeInfo& propertyType, const char* data_, unsigned int dataSize)
+	:
+	pKey(pKey),
+	propertyType(propertyType),
+	indx(indx)
+{
+	data.resize(dataSize);
+	std::memcpy(data.data(), data_, dataSize);
+}
+
+const std::vector<unsigned char>& MaterialProperty::GetData() const
 {
 	return data;
 }
 
-bool MaterialProperty::Empty() const noexcept
+const size_t MaterialProperty::GetSize() const
 {
-	return data == nullptr;
+	return data.size();
 }
 
-EMATERIAL_PROPERTY MaterialProperty::GetPropertyType() const noexcept
+aiPropertyTypeInfo MaterialProperty::GetType() const noexcept
 {
-	return materialProperty;
+	return propertyType;
 }
 
-MaterialProperty::operator bool() const noexcept
+std::string MaterialProperty::GetKey() const noexcept
 {
-	return !Empty();
-}
-
-MaterialProperty::~MaterialProperty()
-{
-	if (data)
-	{
-		delete data;
-		data = nullptr;
-	}
+	return pKey;
 }

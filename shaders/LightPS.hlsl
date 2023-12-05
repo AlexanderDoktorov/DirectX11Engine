@@ -2,10 +2,11 @@
 Texture2D<float4> GBufferPosition   : register(t0);
 Texture2D<float4> GBufferNormal     : register(t1);
 Texture2D<float4> GBufferAlbedo     : register(t2);
-Texture2D<uint>   GBufferMatID      : register(t3);
+Texture2D<float4> GBufferSpecular   : register(t3);
+Texture2D<int>    GBufferMatID      : register(t4);
 SamplerState      sampleState       : register(s0);
 
-struct LightDesc
+struct PointLightDesc
 {
     float3 pos;
     float3 diffuseColor;
@@ -13,14 +14,6 @@ struct LightDesc
     float  Catt;
     float  Latt;
     float  Qatt;
-};
-
-struct MaterialDesc
-{
-    float3  ambient;
-    float3  diffuse;
-    float3  specular;
-    float   shininess;
 };
 
 cbuffer CameraBuffer : register(b0)
@@ -32,9 +25,22 @@ cbuffer CameraBuffer : register(b0)
 // Constant buffer for lighting parameters
 cbuffer LightingPassPSConstants : register(b1)
 {
-    LightDesc ligthParams;
+    PointLightDesc ligthParams;
 };
 
+struct MaterialDesc
+{
+    bool hasNormalMap;
+    bool hasDiffuseMap;
+    bool hasSpecularMap;
+    bool hasHeightMap;
+    float3 Kd; // color diffuse
+    float3 Ks; // color specular
+    float3 Ka; // color ambient
+    float  Ns; // shininess
+};
+
+StructuredBuffer<MaterialDesc> RenderMaterials : register(t5);
 
 struct PS_INPUT
 {
@@ -42,38 +48,74 @@ struct PS_INPUT
     float4 Position : SV_Position;
 };
 
-static float3 ambient = float3(0.1f, 0.1f, 0.1f);
-static float specularPower = 256;
-
-float4 CalulateLightImpact(float3 world_normal, float3 world_pos)
+float GetLambertian(const float3 dirToL, const float3 worldNormal)
 {
-    const float3 vToL       = ligthParams.pos - world_pos;
-    const float  distToL    = length(vToL);
-    const float3 dirToL     = normalize(vToL);
-    const float  att        = 1.0f / (ligthParams.Catt + ligthParams.Latt * distToL + ligthParams.Qatt * (distToL * distToL));
-    const float  kDiff      = max(0.0f, dot(dirToL, world_normal));
-    const float3 diffuse    = att * ligthParams.diffuseIntensity * kDiff * ligthParams.diffuseColor;
-    
-    // pixel->camera vector
-    const float3 viewDir = normalize(worldCameraPosition - world_pos);
-    const float3 reflectDir = reflect(-dirToL, world_normal);
-    
-    // light->pixel refl ray
-    float specularIntensity = pow(saturate(dot(viewDir, reflectDir)), specularPower);
-    const float3 specular   = specularIntensity * ligthParams.diffuseColor;
-
-    return float4((ambient + diffuse + specular), 1.f);
+    return max(0.0f, dot(dirToL, worldNormal));
 }
 
+float4 CalulateLightImpactForMaterial(float att, float lambertian, float specAngle, MaterialDesc matDesc)
+{
+    // Ambient
+    const float3 ambientLightImpact = matDesc.Ka;
+    // Diffuse
+    const float3 diffuseLightImpact = matDesc.Kd * (ligthParams.diffuseIntensity * ligthParams.diffuseColor) * att * lambertian;
+    // Specular
+    const float3 specularLightImpact = matDesc.Ks * ligthParams.diffuseColor * pow(specAngle, matDesc.Ns);
+    
+    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact), 1.f);
+}
 
+float4 CalulateLightImpact(float att, float lambertian, float specAngle, float shininess)
+{
+    // Ambient
+    const float3 ambientLightImpact = { 0.1f, 0.1f, 0.1f };
+    // Diffuse
+    const float3 diffuseLightImpact = ligthParams.diffuseIntensity * ligthParams.diffuseColor * att * lambertian;
+    // Specular
+    const float3 specularLightImpact = ligthParams.diffuseColor * pow(specAngle, shininess);
+    
+    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact), 1.f);
+}
+
+// Shader that calculates light impact that will be later multiplied by material color
 float4 main(in PS_INPUT input) : SV_Target0
 {
     float3 worldPosition    = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 worldNormal      = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
     
-    // Materials
-    // uint   materialID       = GBufferMatID.Load(uint3(input.TexCoord, 0u));
-    // MaterialDesc matDesc = RenderMaterials[materialID];
+    // Directions
+    const float3    vToL    = ligthParams.pos - worldPosition;
+    const float     distToL = length(vToL);
+    const float3    dirToL  = normalize(vToL);
+    const float     att     = 1.0f / (ligthParams.Catt + ligthParams.Latt * distToL + ligthParams.Qatt * (distToL * distToL));
+    // Diffuse component
+    const float     lambertian  = max(dot(worldNormal, dirToL), 0.0);
+    // Specular component
+    const float3 viewDir    = normalize(worldCameraPosition - worldPosition);
+    const float3 reflectDir = reflect(-dirToL, worldNormal);
+    const float  specAngle  = saturate(dot(viewDir, reflectDir));
     
-    return CalulateLightImpact(worldNormal, worldPosition);
+    // Get material id from texture
+    uint textureWidth;
+    uint textureHeight;
+    GBufferMatID.GetDimensions(textureWidth, textureHeight);
+    int2 texelCoordinates;
+    texelCoordinates.x = input.TexCoord.x * textureWidth;
+    texelCoordinates.y = input.TexCoord.y * textureHeight;
+    int materialID = GBufferMatID.Load(int3(texelCoordinates, 0));
+    
+    if (materialID < 0)
+    {
+        return CalulateLightImpact(att, lambertian, specAngle, 256);
+    }
+    else
+    {
+        MaterialDesc matDesc = RenderMaterials.Load(materialID);
+        if (matDesc.hasSpecularMap)
+        {
+            matDesc.Ns = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
+            matDesc.Ks = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb; // or should we multiply Ks * SpecularColor ?
+        }
+        return CalulateLightImpactForMaterial(att, lambertian, specAngle, matDesc);
+    }
 }

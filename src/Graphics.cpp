@@ -1,6 +1,7 @@
-#include "../include/HPipelineElements.h"
+#include "HPipelineElements.h"
 #include "Exceptions.h"
 #include "Graphics.h"
+#include "Material.h"
 #include <assert.h>
 
 #pragma comment(lib, "d3d11")
@@ -95,19 +96,25 @@ Graphics::Graphics(HWND hwnd) :
     PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
     LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    MaterialIDTexture       = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8_UINT,            rc.bottom - rc.top, rc.right - rc.left);
+    MaterialIDTexture       = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R32_SINT,            rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     
+    // Create render targets for textures
     CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
     CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
     CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
+    CreateRTVForTexture(SpecularTexture.get(),   rtvSpecular);
     CreateRTVForTexture(LightTexture.get(),      rtvLight);
     CreateRTVForTexture(MaterialIDTexture.get(), rtvMaterialID);
 
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
+
+    // Create material structured buffer
+    pMaterialStructuredBuffer = std::make_unique<StructuredBufferPS<MaterialDesc, 10>>(*this, SLOT_MATERIAL_STRUCTURED_BUFFER);
 
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
@@ -128,17 +135,24 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_co
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvMaterialID.Get() };
-    for (int i = 0; i < 3; ++i) {
-        p_Context->ClearRenderTargetView(rtvs[i], clear_color);
+    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), rtvMaterialID.Get()};
+    
+    // Clear render targets
+    const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
+    for (size_t i = 0; i < ARRAYSIZE(rtvs); i++)
+    {
+        p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
     }
+    const float rtvMaterialIdClear [4] = { -1.f,-1.f,-1.f,-1.f };
+    p_Context->ClearRenderTargetView(rtvMaterialID.Get(), rtvMaterialIdClear);
+
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
 }
 
 void Graphics::EndGeometryPass()
 {
-    ID3D11RenderTargetView* nullRTVs[4] = { nullptr, nullptr, nullptr, nullptr };
+    ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
 }
 
@@ -150,12 +164,12 @@ void Graphics::BeginLightningPass()
     SetAdditiveBlendingState();
 
     // Bind shader resourses
-    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), MaterialIDTexture->GetSRV() };
+    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), MaterialIDTexture->GetSRV() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
 
     // Set materials structured buffer
-    // TO DO // 
+    pMaterialStructuredBuffer->Bind(*this);
 
     // Bind CameraBuffer
     const dx::XMFLOAT3 camPos = cam.GetPos();
@@ -173,7 +187,7 @@ void Graphics::BeginLightningPass()
 void Graphics::EndLightningPass()
 {
     // Unbind resourses
-    ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
+    ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
 
     // Unbind render targets
@@ -197,7 +211,7 @@ void Graphics::PerformCombinePass()
     p_Context->IASetInputLayout(nullptr);
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), light_clear);
 
-    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
+    ID3D11ShaderResourceView* srvs[2] = { AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
 
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
     p_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -207,8 +221,8 @@ void Graphics::PerformCombinePass()
     Draw(3U);
 
     // Unbind shader resourses
-    ID3D11ShaderResourceView* nullSRV[4] = { nullptr, nullptr, nullptr, nullptr };
-    p_Context->PSSetShaderResources(0U, 4U, nullSRV);
+    ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
+    p_Context->PSSetShaderResources(0U, 2U, nullSRV);
 
     // Unbind render targets
     ID3D11RenderTargetView* nullRTV = nullptr;
@@ -332,12 +346,14 @@ void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
     NormalTexture->Resize(*this, height, width);
     AlbedoTexture->Resize(*this, height, width);
     LightTexture->Resize(*this, height, width);
+    SpecularTexture->Resize(*this, height, width);
     MaterialIDTexture->Resize(*this, height, width);
 
     CreateRTVForTexture(PositionTexture.get(), rtvPosition);
     CreateRTVForTexture(NormalTexture.get(), rtvNormal);
     CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
     CreateRTVForTexture(LightTexture.get(), rtvLight);
+    CreateRTVForTexture(SpecularTexture.get(), rtvSpecular);
     CreateRTVForTexture(MaterialIDTexture.get(), rtvMaterialID);
 }
 
@@ -500,6 +516,16 @@ void Graphics::SetAdditiveBlendingState()
 void Graphics::ResetBlendingState()
 {
     p_Context->OMSetBlendState(nullptr, nullptr, UINT_MAX);
+}
+
+void Graphics::UpdateMaterialAt(MaterialDesc materialDesc, size_t indx) noexcept
+{
+    pMaterialStructuredBuffer->Update(*this, materialDesc, indx);
+}
+
+MaterialDesc Graphics::GetMaterialAt(size_t indx) noexcept
+{
+    return pMaterialStructuredBuffer->GetData(*this, indx);
 }
 
 Camera Graphics::GetCamera() const

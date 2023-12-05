@@ -5,11 +5,6 @@ cbuffer transform : register(b0)
     matrix Projection;
 };
 
-cbuffer materialID : register(b1)
-{
-    uint materialID;
-};
-
 struct VS_IN
 {
     float3 mPosition : POSITION0;
@@ -27,7 +22,6 @@ struct VS_OUT
     float3 wBitangent   : BITANGENT0;
     float3 wTangent     : TANGENT0;
     float2 textCoord    : TEXCOORD; // Texture coordinates
-    uint   materialID   : MATERIALID0;
 };
     
 VS_OUT vs_main(VS_IN input)
@@ -46,7 +40,5 @@ VS_OUT vs_main(VS_IN input)
     output.wBitangent = normalize(mul(float4(input.mBintangent, 0.0f), World)).xyz;
     output.textCoord = input.textCoord;
     
-    // Material
-    output.materialID = materialID;
     return output;
 }

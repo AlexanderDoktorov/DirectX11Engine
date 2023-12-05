@@ -169,6 +169,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -186,6 +187,7 @@
       <PreprocessorDefinitions>_DEBUG;_NOIMGUI;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -205,6 +207,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -342,7 +345,7 @@
     <ClInclude Include="include\Sphere.h" />
     <ClInclude Include="include\StringHelper.h" />
     <ClInclude Include="include\StructuredBuffer.h" />
-    <ClInclude Include="include\StructuredBufferVS.h" />
+    <ClInclude Include="include\StructuredBufferPS.h" />
     <ClInclude Include="include\Tank.h" />
     <ClInclude Include="include\Texture2D.h" />
     <ClInclude Include="include\TexturedBox.h" />

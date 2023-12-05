@@ -17,11 +17,9 @@ public:
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiScene* pScene);
-	std::vector<Texture2D> loadMaterialTextures(Graphics& Gfx, aiMaterial* mat, aiTextureType type);
 private:
-	std::vector<std::unique_ptr<Mesh>>		meshesPtrs;
-	std::vector<std::unique_ptr<Material>>  materialsPtrs; // TO DO
+	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;
+	std::vector<std::shared_ptr<Material>>  materialsPtrs;
 	std::unique_ptr<Node>			        pRootNode;
-	std::vector<Texture2D>                  texturesLoaded;
 	std::string directory;
 };
