@@ -12,6 +12,7 @@ newmtl Cube
 	Kd 0.5880 0.5880 0.5880
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka Cube_diffuse.jpg
+	map_Ka Cube_ambient.jpg
+	map_Ks Cube_specular.jpg
 	map_Kd Cube_diffuse.jpg
 	map_Kn Cube_normal.jpg

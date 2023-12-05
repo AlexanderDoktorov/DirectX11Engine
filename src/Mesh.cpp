@@ -22,32 +22,27 @@ Mesh::Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique
 	AddBindable (std::make_unique<PixelConstantBuffer<MeshDesc>>(Gfx, meshDesc, 0U));
 }
 
-void Mesh::ShowControlWindow(Graphics& Gfx) noexcept
+void Mesh::ShowMeshControls(Graphics& Gfx) noexcept
 {
 	typedef PixelConstantBuffer<MeshDesc> meshBuffer;
-	if (auto pMeshBuffer = QueryBindable<meshBuffer>())
+	static constexpr ImVec4 redColor	  = ImVec4(1.f, 0.f, 0.f, 1.f);
+	static constexpr ImVec4 yellowColor   = ImVec4(1.f, 1.f, 0.f, 1.f);
+	auto makeStr = [&](const char* text) -> std::string
 	{
-		if (ImGui::Begin( ("Mesh control window with material id = " + std::to_string(meshDesc.matId)).c_str() ))
-		{
-			bool changed = false;
-			changed |= ImGui::Checkbox("Use normal map", &meshDesc.useNormalMap);
-			changed |= ImGui::Checkbox("Use diffuse map", &meshDesc.useDiffuseMap);
-			if(!meshDesc.useDiffuseMap)
-				changed |= ImGui::ColorEdit3("Albedo color", &meshDesc.albedoColor.x);
-			changed |= ImGui::Checkbox("Use specular map", &meshDesc.useSpecularMap);
+		return text + std::string("##") + std::to_string(meshDesc.matId);
+	};
 
-			if (changed)
-			{
-				pMeshBuffer->Update(Gfx, meshDesc);
-				auto newDesc = Gfx.GetMaterialAt(meshDesc.matId);
-				newDesc.hasDiffuseMap = meshDesc.useDiffuseMap;
-				newDesc.hasNormalMap = meshDesc.useNormalMap;
-				newDesc.hasSpecularMap = meshDesc.useSpecularMap;
-				Gfx.UpdateMaterialAt(newDesc, meshDesc.matId);
-			}
-		}
-		ImGui::End();
-	}
+	ImGui::Text("Mesh with material id = %d", meshDesc.matId);
+		
+	bool changed = false;
+	ImGui::TextColored(meshDesc.useSpecularMap ? yellowColor : redColor , "Use specular map: %s", meshDesc.useSpecularMap ? "True" : "False");
+	ImGui::TextColored(meshDesc.useNormalMap ? yellowColor : redColor , "Use normal map: %s", meshDesc.useNormalMap ? "True" : "False");
+	ImGui::TextColored(meshDesc.useDiffuseMap ? yellowColor : redColor , "Use diffuse map: %s", meshDesc.useDiffuseMap ? "True" : "False");
+	if(!meshDesc.useDiffuseMap)
+		changed |= ImGui::ColorEdit3(makeStr("Albedo color").c_str(), &meshDesc.albedoColor.x);
+
+	if (auto pMeshBuffer = QueryBindable<meshBuffer>(); changed && pMeshBuffer)
+		pMeshBuffer->Update(Gfx, meshDesc);
 }
 
 int Mesh::GetMaterialIndex() const noexcept

@@ -30,10 +30,9 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\brick_wall\brick_wall.obj)",
+	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.obj)",
 		aiProcess_Triangulate			|
 		aiProcess_JoinIdenticalVertices |
-		aiProcess_GenNormals			|
 		aiProcess_CalcTangentSpace		
 	);
 

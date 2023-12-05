@@ -14,15 +14,14 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 	ProcessMaterial(Gfx, pMaterial);
 
 	// Fill mat Desc
-	matDesc.Ks = GetPropertyAsColorDx(AI_MATKEY_COLOR_SPECULAR);
-	matDesc.Kd = GetPropertyAsColorDx(AI_MATKEY_COLOR_DIFFUSE);
-	matDesc.Ka = GetPropertyAsColorDx(AI_MATKEY_COLOR_AMBIENT);
-	matDesc.Ns = GetPropertyAs<float>(AI_MATKEY_SHININESS);
+	matDesc.Ks = reinterpret_cast<dx::XMFLOAT3&&>(GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_SPECULAR).value());
+	matDesc.Kd = reinterpret_cast<dx::XMFLOAT3&&>(GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_DIFFUSE).value());
+	matDesc.Ka = reinterpret_cast<dx::XMFLOAT3&&>(GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_AMBIENT).value());
+	matDesc.Ns = GetPropertyAs<float>(AI_MATKEY_SHININESS).value_or(10.f);
 	matDesc.hasDiffuseMap  = pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0;
 	matDesc.hasNormalMap   = pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0;
 	matDesc.hasSpecularMap = pMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0;
 	matDesc.hasHeightMap   = pMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0;
-
 }
 
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
@@ -39,21 +38,23 @@ const std::vector<std::shared_ptr<Texture2D>>& Material::GetTextures() const noe
 	return materialTextures;
 }
 
-void Material::ShowControlWindow(Graphics& Gfx)
+void Material::ShowMaterialControls(Graphics& Gfx)
 {
-	if(ImGui::Begin(("Material control window with indx = " + std::to_string(materialIndex)).c_str()))
+	bool changed = false;
+
+	ImGui::Text("Material indx = %d", materialIndex);
+	auto makeStr = [=](const char* text) -> std::string
 	{
-		bool changed = false;
+		return text + std::string("##") + std::to_string(materialIndex);
+	};
+	changed |= ImGui::ColorEdit3( makeStr("Diffuse material color").c_str(), &matDesc.Kd.x);
+	changed |= ImGui::ColorEdit3( makeStr("Ambient material color").c_str(), &matDesc.Ka.x);
+	changed |= ImGui::ColorEdit3( makeStr("Specular material color").c_str(), &matDesc.Ks.x);
+	if(!matDesc.hasSpecularMap)
+		changed |= ImGui::DragFloat( makeStr("Shininess").c_str(), &matDesc.Ns);
 
-		changed |= ImGui::ColorEdit3("Diffuse material color", &matDesc.Kd.x);
-		changed |= ImGui::ColorEdit3("Ambient material color", &matDesc.Ka.x);
-		changed |= ImGui::ColorEdit3("Specular material color", &matDesc.Ks.x);
-		changed |= ImGui::DragFloat("Shininess", &matDesc.Ns);
-
-		if (changed)
-			Gfx.UpdateMaterialAt(matDesc, materialIndex);
-	}
-	ImGui::End();
+	if (changed)
+		Gfx.UpdateMaterialAt(matDesc, materialIndex);
 }
 
 int Material::IsLoaded(const std::string& textureFileName, aiTextureType textureType) noexcept

@@ -34,9 +34,9 @@ struct MaterialDesc
     bool hasDiffuseMap;
     bool hasSpecularMap;
     bool hasHeightMap;
-    float3 Kd; // color diffuse
-    float3 Ks; // color specular
-    float3 Ka; // color ambient
+    float3 Kd; // reflected color diffuse
+    float3 Ks; // reflected color specular
+    float3 Ka; // reflected color ambient
     float  Ns; // shininess
 };
 
@@ -114,7 +114,7 @@ float4 main(in PS_INPUT input) : SV_Target0
         if (matDesc.hasSpecularMap)
         {
             matDesc.Ns = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
-            matDesc.Ks = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb; // or should we multiply Ks * SpecularColor ?
+            matDesc.Ks *= GBufferSpecular.Sample(sampleState, input.TexCoord).rgb; // or should we multiply Ks * SpecularColor ?
         }
         return CalulateLightImpactForMaterial(att, lambertian, specAngle, matDesc);
     }

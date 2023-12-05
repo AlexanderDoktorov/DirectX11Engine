@@ -26,7 +26,7 @@ public:
 	Mesh() = default;
 	Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique_ptr<IBindable>> pBindables);
 
-	void ShowControlWindow(Graphics& Gfx) noexcept;
+	void ShowMeshControls(Graphics& Gfx) noexcept;
 	int  GetMaterialIndex() const noexcept;
 private:
 	MeshDesc meshDesc{};

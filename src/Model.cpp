@@ -39,12 +39,17 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 
 void Model::ShowControlWindow(Graphics& Gfx) noexcept
 {
-	// Materials options
-	for (size_t i = 0; i < materialsPtrs.size(); i++)
-		materialsPtrs[i]->ShowControlWindow(Gfx);
 	// Meshes options
 	for (size_t i = 0; i < meshesPtrs.size(); i++)
-		meshesPtrs[i]->ShowControlWindow(Gfx);
+	{
+		if (ImGui::Begin("Model control window"))
+		{
+			meshesPtrs[i]->ShowMeshControls(Gfx);
+			if (auto meshMaterialIndex = meshesPtrs[i]->GetMaterialIndex(); meshMaterialIndex < materialsPtrs.size())
+				materialsPtrs[meshMaterialIndex]->ShowMaterialControls(Gfx);
+		}
+		ImGui::End();
+	}
 }
 
 void Model::Draw(Graphics& Gfx)
@@ -130,38 +135,32 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiS
 	if (HasAnyMaps)
 		bindablePtrs.push_back(std::make_unique<Sampler>(Gfx));
 
-	if (pMat->HasDiffuseMaps() && HasNormalMaps && HasSpecularMaps)
-	{
-		// TO DO
-	}
-	else if (HasDiffuseMaps && HasNormalMaps)
-	{
-		DynamicVertex::VertexBuffer vb(std::move(
-			DynamicVertex::VertexLayout{}
-			.Append(DynamicVertex::VertexLayout::Position3D)
-			.Append(DynamicVertex::VertexLayout::Normal)
-			.Append(DynamicVertex::VertexLayout::Texture2D)
-			.Append(DynamicVertex::VertexLayout::Tangent)
-			.Append(DynamicVertex::VertexLayout::Bitangent)
-		));
 
-		for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
-		{
-			vb.EmplaceBack(
-				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mVertices[i])),
-				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i])),
-				*(reinterpret_cast<DirectX::XMFLOAT2*>(&pMesh->mTextureCoords[0][i])),
-				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mTangents[i])),
-				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mBitangents[i]))
-			);
-		}
+	DynamicVertex::VertexBuffer vb(std::move(
+		DynamicVertex::VertexLayout{}
+		.Append(DynamicVertex::VertexLayout::Position3D)
+		.Append(DynamicVertex::VertexLayout::Normal)
+		.Append(DynamicVertex::VertexLayout::Texture2D)
+		.Append(DynamicVertex::VertexLayout::Tangent)
+		.Append(DynamicVertex::VertexLayout::Bitangent)
+	));
 
-		auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
-		bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vb));
-		bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vb.GetLayout().GetD3DLayout(), (IShader*)VS.get()));
-		bindablePtrs.push_back(std::move(VS));
-		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
+	for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
+	{
+		vb.EmplaceBack(
+			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mVertices[i])),
+			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i])),
+			*(reinterpret_cast<DirectX::XMFLOAT2*>(&pMesh->mTextureCoords[0][i])),
+			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mTangents[i])),
+			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mBitangents[i]))
+		);
 	}
+
+	auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
+	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vb));
+	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vb.GetLayout().GetD3DLayout(), (IShader*)VS.get()));
+	bindablePtrs.push_back(std::move(VS));
+	bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
 
 	// Fill index buffer
 	std::vector<unsigned short> indices;

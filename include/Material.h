@@ -28,7 +28,7 @@ struct MaterialDesc
 	dx::XMFLOAT3 Kd{}; // color diffuse
 	dx::XMFLOAT3 Ks{}; // color specular
 	dx::XMFLOAT3 Ka{}; // color ambient
-	float Ns{}; // shininess
+	float Ns{};		   // shininess
 };
 
 class Material
@@ -37,10 +37,10 @@ public:
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
 	const std::vector<std::shared_ptr<Texture2D>>& GetTextures() const noexcept;
-	void ShowControlWindow(Graphics& Gfx);
+	void ShowMaterialControls(Graphics& Gfx);
 
 	template<class T>
-	T GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept
+	std::optional<T> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept(!_DEBUG)
 	{
 		static_assert(HasValueMember<PMap<T>>::value, "Trying to get property type with unknown type");
 		if constexpr (HasValueMember<PMap<T>>::value)
@@ -52,18 +52,9 @@ public:
 					return *reinterpret_cast<const T*>(matProp->GetData().data());
 				}
 			}
-			assert(false && "No matching property found!");
 		}
-		return T();
-	}
-	decltype(auto) GetPropertyAsColor(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept
-	{
-		return GetPropertyAs<aiColor3D>(pKey);
-	}
-	dx::XMFLOAT3 GetPropertyAsColorDx(std::string pKey, [[maybe_unused]] unsigned int, [[maybe_unused]] unsigned int) const noexcept
-	{
-		auto data = GetPropertyAsColor(pKey);
-		return *reinterpret_cast<dx::XMFLOAT3*>(&data);
+		assert(false && "Property was not found");
+		return std::nullopt;
 	}
 	MaterialDesc GetDesc() const noexcept;
 	int  GetIndex() const noexcept;
