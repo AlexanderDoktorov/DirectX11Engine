@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "ImGuiMakeHash.h"
 
 // ********** Model **********
 
@@ -86,9 +85,13 @@ void Model::Draw(Graphics& Gfx)
 	}
 }
 
-DirectX::XMMATRIX Model::GetTransform() const noexcept
+Model& Model::Translate(float dx, float dy, float dz) noexcept
 {
-	return DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z);
+	for (auto& pMesh : meshesPtrs)
+	{
+		pMesh->Translate(dx, dy, dz);
+	}
+	return *this;
 }
 
 std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode)

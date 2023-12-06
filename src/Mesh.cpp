@@ -50,3 +50,16 @@ int Mesh::GetMaterialIndex() const noexcept
 	return meshDesc.matId;
 }
 
+DirectX::XMMATRIX Mesh::GetTransform() const noexcept
+{
+	return DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z);
+}
+
+Mesh& Mesh::Translate(float dx, float dy, float dz) noexcept
+{
+	worldTranslation.x += dx;
+	worldTranslation.y += dy;
+	worldTranslation.z += dz;
+	return *this;
+}
+

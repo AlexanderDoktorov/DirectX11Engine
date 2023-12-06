@@ -14,7 +14,7 @@ public:
 	Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags);
 	void ShowControlWindow(Graphics& Gfx) noexcept;
 	virtual void Draw(Graphics& Gfx) override;
-	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
+	Model& Translate(float dx, float dy, float dz) noexcept;
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiScene* pScene);
@@ -24,8 +24,6 @@ private:
 	std::unique_ptr<Node>			        pRootNode;
 	std::string directory;
 private:
-	dx::XMFLOAT3 worldTranslation{};
-	dx::XMFLOAT3 worldRotation{};
 	size_t modelNum;
 private:
 	static std::vector<std::shared_ptr<Material>>  loadedMaterialsPtrs;

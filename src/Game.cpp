@@ -35,6 +35,7 @@ Game::Game()
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_CalcTangentSpace		
 	);
+	pModel->Translate(10, 0, 0);
 
 	pModel2 = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.obj)",
 		aiProcess_Triangulate			|

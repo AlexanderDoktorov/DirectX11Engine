@@ -28,6 +28,10 @@ public:
 
 	void ShowMeshControls(Graphics& Gfx) noexcept;
 	int  GetMaterialIndex() const noexcept;
+	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
+	Mesh& Translate(float dx, float dy, float dz) noexcept;
 private:
+	dx::XMFLOAT3 worldTranslation{};
+	dx::XMFLOAT3 worldRotation{};
 	MeshDesc meshDesc{};
 };
