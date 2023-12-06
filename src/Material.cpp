@@ -2,14 +2,12 @@
 #include <filesystem>
 
 std::vector<std::shared_ptr<Texture2D>>  Material::loadedTextures{};
-int Material::materialsCount = int(0);
 
-Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) 
+Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory, int materialIndex) 
 	: 
 	materialName(pMaterial->GetName().C_Str()), 
 	materialDirectory(materialDirectory),
-	// Set material index with global materialsCount and increase it
-	materialIndex(materialsCount++)
+	materialIndex(materialIndex)
 {
 	ProcessMaterial(Gfx, pMaterial);
 
@@ -76,12 +74,22 @@ MaterialDesc Material::GetDesc() const noexcept
 {
 	return matDesc;
 }
-
+std::string Material::GetName() const noexcept
+{
+	return materialName;
+}
+std::string Material::GetDirectory() const noexcept
+{
+	return materialDirectory;
+}
 int Material::GetIndex() const noexcept
 {
 	return materialIndex;
 }
-
+bool Material::operator==(const Material& rhs) const noexcept
+{
+	return materialName == rhs.materialName && materialDirectory == rhs.materialDirectory;
+}
 bool Material::HasNormalMaps() const noexcept
 {
 	return matDesc.hasNormalMap;

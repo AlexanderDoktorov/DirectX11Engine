@@ -1,8 +1,14 @@
 #include "Model.h"
+#include "ImGuiMakeHash.h"
 
 // ********** Model **********
 
+std::vector<std::shared_ptr<Material>>  Model::loadedMaterialsPtrs{};
+size_t Model::modelsCount = 1;
+
 Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
+	:
+	modelNum(modelsCount++)
 {
 	Assimp::Importer imp;
 	const aiScene* pScene = imp.ReadFile(fileName.c_str(), aippFlags);
@@ -21,9 +27,29 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 	materialsPtrs.reserve(pScene->mNumMaterials);
 	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
 	{
-		auto pMaterial = std::make_shared<Material>(Gfx, pScene->mMaterials[i], directory);
-		Gfx.UpdateMaterialAt(pMaterial->GetDesc(), pMaterial->GetIndex());
-		materialsPtrs.push_back( std::move(pMaterial) );
+		std::string NewMaterialName = std::string(pScene->mMaterials[i]->GetName().C_Str());
+		bool hasMaterial = false;
+		size_t index = 0;
+		for (auto& pLoadedMat : loadedMaterialsPtrs)
+		{
+			if (NewMaterialName == pLoadedMat->GetName() && directory == pLoadedMat->GetDirectory())
+			{
+				hasMaterial = true;
+				index = pLoadedMat->GetIndex();
+				break;
+			}
+		}
+		if (hasMaterial)
+		{
+			materialsPtrs.push_back(loadedMaterialsPtrs.at(index));
+		}
+		else
+		{
+			auto pMaterial = std::make_shared<Material>(Gfx, pScene->mMaterials[i], directory, (int)loadedMaterialsPtrs.size());
+			Gfx.UpdateMaterialAt(pMaterial->GetDesc(), pMaterial->GetIndex());
+			loadedMaterialsPtrs.push_back( pMaterial );
+			materialsPtrs.push_back( pMaterial );
+		}
 	}
 
 	// Fill meshesPtrs array with all scene meshes
@@ -42,7 +68,7 @@ void Model::ShowControlWindow(Graphics& Gfx) noexcept
 	// Meshes options
 	for (size_t i = 0; i < meshesPtrs.size(); i++)
 	{
-		if (ImGui::Begin("Model control window"))
+		if (ImGui::Begin( ("Model control window" + std::string("##") + std::to_string(modelNum)).c_str()))
 		{
 			meshesPtrs[i]->ShowMeshControls(Gfx);
 			if (auto meshMaterialIndex = meshesPtrs[i]->GetMaterialIndex(); meshMaterialIndex < materialsPtrs.size())
@@ -58,6 +84,11 @@ void Model::Draw(Graphics& Gfx)
 	{
 		meshesPtrs[i]->Draw(Gfx);
 	}
+}
+
+DirectX::XMMATRIX Model::GetTransform() const noexcept
+{
+	return DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z);
 }
 
 std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode)

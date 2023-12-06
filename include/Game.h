@@ -40,6 +40,7 @@ private:
 	std::unique_ptr<Sheet> nmSheet;
 
 	std::unique_ptr<Model> pModel;
+	std::unique_ptr<Model> pModel2;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;

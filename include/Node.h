@@ -17,18 +17,6 @@ public:
 
 	}
 
-	template<class T, typename BufferType = T>
-	void ShowContolWindow(Graphics& Gfx)
-	{
-		// TO DO
-	}
-
-	template<class T, typename BufferType = T>
-	void BuildTree(Graphics& Gfx, Node* pNode)
-	{
-		// TO DO
-	}
-
 private:
 	void Reserve(size_t cap);
 	void AddChild(std::unique_ptr<Node> pNode) noexcept(!_DEBUG);

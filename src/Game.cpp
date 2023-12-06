@@ -36,6 +36,12 @@ Game::Game()
 		aiProcess_CalcTangentSpace		
 	);
 
+	pModel2 = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.obj)",
+		aiProcess_Triangulate			|
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_CalcTangentSpace		
+	);
+
 	objects.push_back(pModel.get());
 
 	LoadConfigurationFile("./game.config");
@@ -107,6 +113,7 @@ void Game::UpdateFrame()
 
 		//solidBall->Draw(*gfx);
 		pModel->Draw(*gfx);
+		pModel2->Draw(*gfx);
 		for (auto& ball : balls)
 		{
 			ball->Draw(*gfx);
@@ -134,6 +141,7 @@ void Game::UpdateFrame()
 	ShowControlWindow();
 	cam.ShowControlWindow();
 	pModel->ShowControlWindow(*gfx);
+	pModel2->ShowControlWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }

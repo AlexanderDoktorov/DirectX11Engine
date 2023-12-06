@@ -1,9 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <unordered_map>
 #include <type_traits>
-#include <stdexcept>
 #include "Texture2D.h"
 #include "MaterialProperty.h"
 
@@ -34,7 +32,7 @@ struct MaterialDesc
 class Material
 {
 public:
-	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
+	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory,  int materialIndex);
 	
 	const std::vector<std::shared_ptr<Texture2D>>& GetTextures() const noexcept;
 	void ShowMaterialControls(Graphics& Gfx);
@@ -58,10 +56,13 @@ public:
 	}
 	MaterialDesc GetDesc() const noexcept;
 	int  GetIndex() const noexcept;
+	std::string  GetName() const noexcept;
+	std::string  GetDirectory() const noexcept;
 	bool HasNormalMaps() const noexcept;
 	bool HasDiffuseMaps() const noexcept;
 	bool HasSpecularMaps() const noexcept;
 	bool HasHeightMaps() const noexcept;
+	bool operator==(const Material& rhs) const noexcept;
 private:
 	void ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial);
 	void LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType);
@@ -73,12 +74,11 @@ private:
 	std::vector<std::shared_ptr<MaterialProperty>> materialProperties;
 
 	MaterialDesc matDesc    = {};
-	int  materialIndex      = 0;
+	int			 materialIndex      = 0;
 private:
 	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
 	static std::shared_ptr<Texture2D> PushTexture(Graphics& Gfx, const std::string& texturePath,  aiTextureType textureType) noexcept;
 private:
 	static std::vector<std::shared_ptr<Texture2D>> loadedTextures;
-	static int materialsCount;
 };
 
