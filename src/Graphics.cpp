@@ -114,7 +114,7 @@ Graphics::Graphics(HWND hwnd) :
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
 
     // Create material structured buffer
-    pMaterialStructuredBuffer = std::make_unique<StructuredBufferPS<MaterialDesc, 10>>(*this, SLOT_MATERIAL_STRUCTURED_BUFFER);
+    pMaterialStructuredBuffer = std::make_unique<StructuredBufferPS<MaterialDesc, MAX_MATERIALS>>(*this, SLOT_MATERIAL_STRUCTURED_BUFFER);
 
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
@@ -518,14 +518,35 @@ void Graphics::ResetBlendingState()
     p_Context->OMSetBlendState(nullptr, nullptr, UINT_MAX);
 }
 
-void Graphics::UpdateMaterialAt(MaterialDesc materialDesc, size_t indx) noexcept
+std::shared_ptr<Material> Graphics::PushMaterial(aiMaterial* pAiMaterial, std::string materialDirectory) noexcept(!_DEBUG)
 {
-    pMaterialStructuredBuffer->Update(*this, materialDesc, indx);
+    assert(materialPtrs.size() < MAX_MATERIALS);
+    materialPtrs.push_back(std::make_shared<Material>(*this, pAiMaterial, std::move(materialDirectory), materialPtrs.size()));
+
+    pMaterialStructuredBuffer->Update(*this, materialPtrs.back()->GetDesc(), materialPtrs.size() - 1ull);
+    return materialPtrs.back();
 }
 
-MaterialDesc Graphics::GetMaterialAt(size_t indx) noexcept
+int Graphics::HasMaterial(const std::string& materialName, const std::string& directory) const noexcept
 {
-    return pMaterialStructuredBuffer->GetData(*this, indx);
+    for (size_t i = 0; i < materialPtrs.size(); ++i)
+    {
+        if (materialName == materialPtrs[i]->GetName() && directory == materialPtrs[i]->GetDirectory())
+        {
+            return (int)i;
+        }
+    }
+    return -1;
+}
+
+std::shared_ptr<Material> Graphics::GetMaterialAt(size_t indx) noexcept
+{
+    return materialPtrs.at(indx);
+}
+
+void Graphics::UpdateMaterialAt(MaterialDesc matDesc, size_t indx) noexcept
+{
+    pMaterialStructuredBuffer->Update(*this, matDesc, indx);
 }
 
 Camera Graphics::GetCamera() const

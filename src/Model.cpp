@@ -2,13 +2,17 @@
 
 // ********** Model **********
 
-std::vector<std::shared_ptr<Material>>  Model::loadedMaterialsPtrs{};
-size_t Model::modelsCount = 1;
-
 Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 	:
-	modelNum(modelsCount++)
+	modelNum(GetCount())
 {
+	Load(Gfx, fileName, aippFlags);
+}
+
+void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept
+{
+	ClearData();
+
 	Assimp::Importer imp;
 	const aiScene* pScene = imp.ReadFile(fileName.c_str(), aippFlags);
 
@@ -21,33 +25,18 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 
 	directory = fileName.substr(0, fileName.find_last_of('\\'));
 
-
 	// Fill materialPtrs array with all scene materials and push them to structured buffer
 	materialsPtrs.reserve(pScene->mNumMaterials);
 	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
 	{
 		std::string NewMaterialName = std::string(pScene->mMaterials[i]->GetName().C_Str());
-		bool hasMaterial = false;
-		size_t index = 0;
-		for (auto& pLoadedMat : loadedMaterialsPtrs)
+		if (int matId = Gfx.HasMaterial(NewMaterialName, directory); matId >= 0)
 		{
-			if (NewMaterialName == pLoadedMat->GetName() && directory == pLoadedMat->GetDirectory())
-			{
-				hasMaterial = true;
-				index = pLoadedMat->GetIndex();
-				break;
-			}
-		}
-		if (hasMaterial)
-		{
-			materialsPtrs.push_back(loadedMaterialsPtrs.at(index));
+			materialsPtrs.push_back( Gfx.GetMaterialAt(matId) );
 		}
 		else
 		{
-			auto pMaterial = std::make_shared<Material>(Gfx, pScene->mMaterials[i], directory, (int)loadedMaterialsPtrs.size());
-			Gfx.UpdateMaterialAt(pMaterial->GetDesc(), pMaterial->GetIndex());
-			loadedMaterialsPtrs.push_back( pMaterial );
-			materialsPtrs.push_back( pMaterial );
+			materialsPtrs.push_back( Gfx.PushMaterial(pScene->mMaterials[i], directory) );
 		}
 	}
 
@@ -62,12 +51,21 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 	pRootNode = ProcessNode(Gfx, StartId, pScene->mRootNode);
 }
 
+void Model::ClearData() noexcept
+{
+	meshesPtrs.clear();
+	materialsPtrs.clear();
+	if(pRootNode)
+		pRootNode->Clear();
+	directory.clear();
+}
+
 void Model::ShowControlWindow(Graphics& Gfx) noexcept
 {
 	// Meshes options
 	for (size_t i = 0; i < meshesPtrs.size(); i++)
 	{
-		if (ImGui::Begin( ("Model control window" + std::string("##") + std::to_string(modelNum)).c_str()))
+		if (ImGui::Begin( ( std::string("Model ") + std::to_string(modelNum) + " control window").c_str()))
 		{
 			meshesPtrs[i]->ShowMeshControls(Gfx);
 			if (auto meshMaterialIndex = meshesPtrs[i]->GetMaterialIndex(); meshMaterialIndex < materialsPtrs.size())

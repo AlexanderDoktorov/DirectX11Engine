@@ -3,7 +3,7 @@
 
 std::vector<std::shared_ptr<Texture2D>>  Material::loadedTextures{};
 
-Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory, int materialIndex) 
+Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory, size_t materialIndex) 
 	: 
 	materialName(pMaterial->GetName().C_Str()), 
 	materialDirectory(materialDirectory),
@@ -82,7 +82,7 @@ std::string Material::GetDirectory() const noexcept
 {
 	return materialDirectory;
 }
-int Material::GetIndex() const noexcept
+size_t Material::GetIndex() const noexcept
 {
 	return materialIndex;
 }

@@ -41,6 +41,7 @@ private:
 
 	std::unique_ptr<Model> pModel;
 	std::unique_ptr<Model> pModel2;
+	Model myModel;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;

@@ -43,6 +43,14 @@ Game::Game()
 		aiProcess_CalcTangentSpace		
 	);
 
+	myModel.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\brick_wall\brick_wall.obj)",
+		aiProcess_ConvertToLeftHanded |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_CalcTangentSpace | 
+		aiProcess_GenNormals
+	);
+
 	objects.push_back(pModel.get());
 
 	LoadConfigurationFile("./game.config");
@@ -55,6 +63,7 @@ Game::~Game()
 
 int Game::Start(int nCmdShow)
 {
+
 	window->Show(nCmdShow);
 	bool open = true;
 	gfx->RenderToImGui(true);
@@ -112,14 +121,13 @@ void Game::UpdateFrame()
 			light_source->Draw(*gfx);
 		}
 
-		//solidBall->Draw(*gfx);
 		pModel->Draw(*gfx);
 		pModel2->Draw(*gfx);
+		myModel.Draw(*gfx);
 		for (auto& ball : balls)
 		{
 			ball->Draw(*gfx);
 		}
-		//sheet->Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -143,6 +151,7 @@ void Game::UpdateFrame()
 	cam.ShowControlWindow();
 	pModel->ShowControlWindow(*gfx);
 	pModel2->ShowControlWindow(*gfx);
+	myModel.ShowControlWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }

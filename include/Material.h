@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 #include <type_traits>
+#include "IBindable.h"
+#include "Numerated.h"
 #include "Texture2D.h"
 #include "MaterialProperty.h"
 
@@ -32,7 +34,7 @@ struct MaterialDesc
 class Material
 {
 public:
-	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory,  int materialIndex);
+	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory, size_t materialIndex);
 	
 	const std::vector<std::shared_ptr<Texture2D>>& GetTextures() const noexcept;
 	void ShowMaterialControls(Graphics& Gfx);
@@ -54,8 +56,8 @@ public:
 		assert(false && "Property was not found");
 		return std::nullopt;
 	}
+	size_t GetIndex() const noexcept;
 	MaterialDesc GetDesc() const noexcept;
-	int  GetIndex() const noexcept;
 	std::string  GetName() const noexcept;
 	std::string  GetDirectory() const noexcept;
 	bool HasNormalMaps() const noexcept;
@@ -72,9 +74,8 @@ private:
 	std::string materialDirectory;
 	std::vector<std::shared_ptr<Texture2D>>		   materialTextures;
 	std::vector<std::shared_ptr<MaterialProperty>> materialProperties;
-
 	MaterialDesc matDesc    = {};
-	int			 materialIndex      = 0;
+	size_t materialIndex    = {};
 private:
 	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
 	static std::shared_ptr<Texture2D> PushTexture(Graphics& Gfx, const std::string& texturePath,  aiTextureType textureType) noexcept;

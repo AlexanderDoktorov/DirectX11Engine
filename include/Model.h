@@ -6,12 +6,15 @@
 #include "assimp/postprocess.h"
 #include "assimp/Scene.h"
 #include "Material.h"
+#include "Numerated.h"
 
-class Model : public Drawable
+class Model : public Drawable, public Numerated<Model>
 {
 public:
 	Model() = default;
 	Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags);
+	void Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept;
+	void ClearData() noexcept;
 	void ShowControlWindow(Graphics& Gfx) noexcept;
 	virtual void Draw(Graphics& Gfx) override;
 	Model& Translate(float dx, float dy, float dz) noexcept;
@@ -25,7 +28,4 @@ private:
 	std::string directory;
 private:
 	size_t modelNum;
-private:
-	static std::vector<std::shared_ptr<Material>>  loadedMaterialsPtrs;
-	static size_t modelsCount;
 };

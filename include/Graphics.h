@@ -4,6 +4,8 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <memory>
+#include <array>
+#include "assimp\material.h"
 #include "DirectXWindow.h"
 #include "Camera.h"
 
@@ -23,11 +25,12 @@ class RenderTexture;
 template <class T> class PixelConstantBuffer;
 template<class T, size_t numStructs> class StructuredBufferPS;
 struct MaterialDesc;
+class Material;
 interface ITexture;
 
 #pragma endregion forward_declarations
 
-#define MAX_MATERIALS (size_t)10
+#define MAX_MATERIALS (size_t)20
 
 class Graphics
 {
@@ -62,10 +65,11 @@ public:
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
 	
 	// Materials
-	void UpdateMaterialAt(MaterialDesc materialDesc, size_t indx) noexcept;
-	MaterialDesc GetMaterialAt(size_t indx) noexcept;
-	static consteval size_t GetMaterialsCount() noexcept { return MAX_MATERIALS; }
-	
+	std::shared_ptr<Material>	PushMaterial(aiMaterial* pAiMaterial, std::string materialDirectory) noexcept(!_DEBUG); // returns position of pushed material
+	int							HasMaterial(const std::string& materialName, const std::string& directory) const noexcept;
+	std::shared_ptr<Material>	GetMaterialAt(size_t indx) noexcept;
+	void						UpdateMaterialAt(MaterialDesc matDesc, size_t indx) noexcept;
+	static consteval size_t		GetMaterialsCount() noexcept { return MAX_MATERIALS; }
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -107,6 +111,7 @@ private:
 
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
 	std::unique_ptr<StructuredBufferPS<MaterialDesc, MAX_MATERIALS>> pMaterialStructuredBuffer;
+	std::vector<std::shared_ptr<Material>>			 materialPtrs;
 
 	std::unique_ptr<RenderTexture>			PositionTexture;
 	std::unique_ptr<RenderTexture>			NormalTexture;

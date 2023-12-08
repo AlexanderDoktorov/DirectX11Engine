@@ -278,6 +278,8 @@
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
+    <ClInclude Include="include\MaterialSystem.h" />
+    <ClInclude Include="include\Numerated.h" />
     <ClInclude Include="include\Cube.h" />
     <ClInclude Include="include\DataBufferPS.h" />
     <ClInclude Include="include\Device.h" />
@@ -393,6 +395,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="shaders\GeometryTexturedVS.hlsl">
       <EnableDebuggingInformation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</EnableDebuggingInformation>

@@ -17,6 +17,17 @@ public:
 
 	}
 
+	void Clear() noexcept
+	{
+		id = -1;
+		nodeTag.clear();
+		NodeMeshesPtrs.clear();
+		for (auto& pChild : pChildren)
+		{
+			pChild->Clear();
+		}
+	}
+
 private:
 	void Reserve(size_t cap);
 	void AddChild(std::unique_ptr<Node> pNode) noexcept(!_DEBUG);

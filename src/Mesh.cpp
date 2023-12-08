@@ -15,7 +15,7 @@ Mesh::Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique
 
 	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
 
-	meshDesc.matId			= pMeshMaterial->GetIndex();
+	meshDesc.matId			= (int)pMeshMaterial->GetIndex();
 	meshDesc.useDiffuseMap	= pMeshMaterial->HasDiffuseMaps();
 	meshDesc.useNormalMap	= pMeshMaterial->HasNormalMaps();
 	meshDesc.useSpecularMap = pMeshMaterial->HasSpecularMaps();
