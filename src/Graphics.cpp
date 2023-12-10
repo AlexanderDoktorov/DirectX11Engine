@@ -122,7 +122,7 @@ Graphics::Graphics(HWND hwnd) :
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
 
-void Graphics::BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4])
+void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
 {
     ResizeRenderTargetViews(pWnd);
 

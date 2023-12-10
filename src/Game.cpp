@@ -84,11 +84,8 @@ void Game::UpdateFrame()
 	// Graphics
 	auto dt = timer.Check();
 
-	const float color[4] = { 0.2f, 0.2f, 0.2f , 0.1f };
-	//gfx->BeginFrame(window.get(), color);
-
 	// Fill G-buffer
-	gfx->BeginGeometryPass(window.get(), color);
+	gfx->BeginGeometryPass(window.get());
 	{
 		if (window->MouseCaptured())
 		{

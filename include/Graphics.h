@@ -65,7 +65,7 @@ public:
 	// Deffered Rendering
 	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
 
-	void			BeginGeometryPass(const DirectXWindow* pWnd, const float clear_color[4]);
+	void			BeginGeometryPass(const DirectXWindow* pWnd);
 	void			EndGeometryPass();
 
 	void			BeginLightningPass();
