@@ -45,9 +45,11 @@ private:
 		void Initilize(Graphics& Gfx, const RECT& rc) noexcept;
 		void OnResize(UINT resizeWidth, UINT resizeHeight) noexcept;
 		size_t GetMaterialIndex(Material& material) noxnd;
+		size_t GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd;
 		bool UpdateMaterialAt(size_t indx) noexcept;
 		Material* GetMaterialAt(size_t indx) noexcept;
 		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
+		std::optional<size_t> IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept;
 		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
 
 	private:

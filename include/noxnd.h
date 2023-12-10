@@ -1,3 +1,10 @@
 #pragma once
 
-#define noxnd noexcept(!_DEBUG_EN)
+#ifndef noxnd
+#ifdef _DEBUG
+#define noxnd
+#else
+#define noxnd noexcept
+#endif // _DEBUG
+#endif
+

@@ -2,6 +2,7 @@
 #include <optional>
 #include "DOK_traits.h"
 #include "MaterialProperty.h"
+#include "noxnd.h"
 
 class MaterialPropertiesDesc
 {
@@ -20,7 +21,7 @@ public:
 		properties.emplace_back(args...);
 	}
 	template<class T>
-	std::optional<T> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept(!_DEBUG_EN)
+	std::optional<T> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noxnd
 	{
 		static_assert(HasValueMember<PMap<T>>::value, "Trying to get property type with unknown type");
 		if constexpr (HasValueMember<PMap<T>>::value)

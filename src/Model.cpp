@@ -29,8 +29,7 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 	materialsIndices.reserve(pScene->mNumMaterials);
 	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
 	{
-		auto mat = Material(Gfx, pScene->mMaterials[i], directory);
-		materialsIndices.push_back(Gfx.GetMaterialSystem().GetMaterialIndex(mat));
+		materialsIndices.push_back(Gfx.GetMaterialSystem().GetMaterialIndex(pScene->mMaterials[i], directory));
 	}
 
 	// Fill meshesPtrs array with all scene meshes

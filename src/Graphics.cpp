@@ -576,6 +576,20 @@ size_t Graphics::MaterialSystem::GetMaterialIndex(Material& material) noxnd
     }
 }
 
+size_t Graphics::MaterialSystem::GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd
+{
+    if (std::optional<size_t> indx = IsLoaded(pMaterial->GetName().C_Str(), materialDirectory))
+        return indx.value();
+    else
+    {
+        auto newIndex = loadedMaterials.size();
+        assert(loadedMaterials.size() <= MAX_MATERIALS);
+        loadedMaterials.push_back(std::make_unique<Material>(*pGfx, pMaterial, materialDirectory));
+        pMaterialBuffer->Update(*pGfx, loadedMaterials.back()->GetMaterialDesc(), newIndex);
+        return newIndex;
+    }
+}
+
 bool Graphics::MaterialSystem::UpdateMaterialAt(size_t indx) noexcept
 {
     if (indx >= MAX_MATERIALS || !pMaterialBuffer.get())
@@ -604,6 +618,15 @@ std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const Material& materia
     }
     return std::nullopt;
 
+}
+std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept
+{
+    for (size_t i = 0U; i < loadedMaterials.size(); i++)
+    {
+        if (loadedMaterials[i]->GetDirectory() == materialDirectory && loadedMaterials[i]->GetName() == materialName)
+            return i;
+    }
+    return std::nullopt;
 }
 void Graphics::MaterialSystem::ShowMaterialsWindow(bool* p_open) noexcept
 {
