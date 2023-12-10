@@ -59,7 +59,10 @@ void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexc
 		for (size_t iMesh = 0U; iMesh < meshesPtrs.size(); iMesh++)
 		{
 			std::string hash = modelName + std::to_string(iMesh);
-			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
+			if (auto pMat = Gfx.GetMaterialSystem().GetMaterialAt(meshesPtrs[iMesh]->GetMaterialIndex()); pMat->HasAnyMaps())
+				meshesPtrs[iMesh]->ShowMeshGUI<Mesh::MeshDesc>(Gfx, std::move(hash));
+			else
+				meshesPtrs[iMesh]->ShowMeshGUI<Mesh::MeshDescNotex>(Gfx, std::move(hash));
 		}
 	}
 	ImGui::End();
@@ -109,10 +112,14 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t materialIndx)
 {
 	std::vector<std::unique_ptr<IBindable>> bindablePtrs;
+	std::unique_ptr<VertexShaderCommon> vertexShader = nullptr;
+	DynamicVertex::VertexBuffer vertexBuffer;
 
+	// Get material index from material system in gfx (or create new and get index)
 	Material* pMat = Gfx.GetMaterialSystem().GetMaterialAt(materialIndx);
 	assert(pMat);
 	
+	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
 	bindablePtrs.push_back(std::make_unique<Material>(*pMat));
 
 	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
@@ -124,31 +131,64 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 	if (HasAnyMaps)
 		bindablePtrs.push_back(std::make_unique<Sampler>(Gfx));
 
-	DynamicVertex::VertexBuffer vb(std::move(
-		DynamicVertex::VertexLayout{}
-		.Append(DynamicVertex::VertexLayout::Position3D)
-		.Append(DynamicVertex::VertexLayout::Normal)
-		.Append(DynamicVertex::VertexLayout::Texture2D)
-		.Append(DynamicVertex::VertexLayout::Tangent)
-		.Append(DynamicVertex::VertexLayout::Bitangent)
-	));
-
-	for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
+	if (!HasAnyMaps)
 	{
-		vb.EmplaceBack(
-			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mVertices[i])),
-			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i])),
-			*(reinterpret_cast<DirectX::XMFLOAT2*>(&pMesh->mTextureCoords[0][i])),
-			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mTangents[i])),
-			*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mBitangents[i]))
-		);
+		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
+			DynamicVertex::VertexLayout{}
+			.Append(DynamicVertex::VertexLayout::Position3D)
+			.Append(DynamicVertex::VertexLayout::Normal)
+		));
+		for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
+		{
+			vertexBuffer.EmplaceBack(
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mVertices[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i]))
+			);
+		}
+
+		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NotextureVS.cso");
+		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NotexturePS.cso"));
+		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, Mesh::MeshDescNotex{}, 0U));
+	}
+	else
+	{
+		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
+			DynamicVertex::VertexLayout{}
+			.Append(DynamicVertex::VertexLayout::Position3D)
+			.Append(DynamicVertex::VertexLayout::Normal)
+			.Append(DynamicVertex::VertexLayout::Texture2D)
+			.Append(DynamicVertex::VertexLayout::Tangent)
+			.Append(DynamicVertex::VertexLayout::Bitangent)
+		));
+
+		for (unsigned int i = 0; i < pMesh->mNumVertices; i++)
+		{
+			vertexBuffer.EmplaceBack(
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mVertices[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mNormals[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT2*>(&pMesh->mTextureCoords[0][i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mTangents[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&pMesh->mBitangents[i]))
+			);
+		}
+
+		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
+		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
+
+		// Fill initial meshDesc
+		Mesh::MeshDesc meshDesc{};
+		meshDesc.useDiffuseMap	= pMat->GetMapLayout().hasDiffuseMap;
+		meshDesc.useNormalMap	= pMat->GetMapLayout().hasNormalMap;
+		meshDesc.useSpecularMap	= pMat->GetMapLayout().hasSpecularMap;
+		meshDesc.matId			= static_cast<int>(materialIndx);
+		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDesc>>(Gfx, meshDesc, 0U));
 	}
 
-	auto VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
-	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vb));
-	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vb.GetLayout().GetD3DLayout(), (IShader*)VS.get()));
-	bindablePtrs.push_back(std::move(VS));
-	bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
+
+	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vertexBuffer));
+	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vertexBuffer.GetLayout().GetD3DLayout(), (IShader*)vertexShader.get()));
+	bindablePtrs.push_back(std::move(vertexShader));
+
 
 	// Fill index buffer
 	std::vector<unsigned short> indices;

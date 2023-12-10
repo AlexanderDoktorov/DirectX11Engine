@@ -38,6 +38,10 @@ Game::Game()
 	);
 	Tree2.Translate(10, 0, 0);
 
+	Lamp.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\bulb\bulb.obj)", 
+		aiProcess_Triangulate
+	);
+
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
 
@@ -119,6 +123,7 @@ void Game::UpdateFrame()
 		}
 		Tree.Draw(*gfx);
 		Tree2.Draw(*gfx);
+		Lamp.Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -142,6 +147,7 @@ void Game::UpdateFrame()
 	cam.ShowControlWindow();
 	Tree.ShowControlWindow(*gfx, "Tree controls");
 	Tree2.ShowControlWindow(*gfx, "Tree2 controls");
+	Lamp.ShowControlWindow(*gfx, "Lamp controls");
 	gfx->GetMaterialSystem().ShowMaterialsWindow();
 #endif
 	gfx->EndFrame();

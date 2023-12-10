@@ -242,6 +242,7 @@ namespace DynamicVertex
 	{
 	public:
 		VertexBuffer( VertexLayout layout,size_t size = 0u );
+		VertexBuffer() = default;
 		const char* GetData() const;
 		const VertexLayout& GetLayout() const noexcept;
 		void Resize( size_t newSize );

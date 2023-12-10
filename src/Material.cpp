@@ -66,6 +66,11 @@ MapLayout Material::GetMapLayout() const noexcept
 	return mapLayout;
 }
 
+bool Material::HasAnyMaps() const noexcept
+{
+	return mapLayout.hasDiffuseMap || mapLayout.hasHeightMap || mapLayout.hasNormalMap || mapLayout.hasSpecularMap;
+}
+
 std::string Material::GetName() const noexcept
 {
 	return materialName;
