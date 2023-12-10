@@ -28,7 +28,7 @@
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
 
-#define MAX_MATERIALS (size_t)20
+#define MAX_MATERIALS (size_t)30
 
 class Graphics
 {

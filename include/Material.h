@@ -45,6 +45,7 @@ public:
 	virtual void Bind(Graphics& Gfx) noexcept override;
 	
 	MapLayout	 GetMapLayout() const noexcept;
+	bool		 HasAnyMaps() const noexcept;
 	std::string  GetName() const noexcept;
 	std::string  GetDirectory() const noexcept;
 	MaterialPropertiesDesc  GetPropertiesDesc() const noexcept;

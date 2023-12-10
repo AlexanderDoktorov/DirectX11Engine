@@ -514,6 +514,9 @@
     <None Include="game.config">
       <Filter>Файлы ресурсов</Filter>
     </None>
+    <None Include="shaders\DefaultValues.hlsli">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\CombinePS.hlsl">
@@ -559,6 +562,12 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\PS_DNS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NotextureVS.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NotexturePS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>

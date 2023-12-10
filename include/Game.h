@@ -42,6 +42,7 @@ private:
 
 	Model Tree;
 	Model Tree2;
+	Model Lamp;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;
