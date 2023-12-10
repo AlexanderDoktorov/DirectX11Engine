@@ -3,15 +3,20 @@
 
 RenderTexture::RenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
-    CreateRenderTexture(Gfx, textureFormat, TextureHeight, TextureWidth);
+    CreateRenderTextureImpl(GetDevice(Gfx), textureFormat, TextureHeight, TextureWidth);
 }
 
 RenderTexture::RenderTexture(Graphics& Gfx, const RenderTexture& otherTexture)
 {
-    CreateRenderTexture(Gfx, otherTexture.GetDesc().Format, otherTexture.GetDesc().Height, otherTexture.GetDesc().Width);
+    CreateRenderTextureImpl(GetDevice(Gfx), otherTexture.GetDesc().Format, otherTexture.GetDesc().Height, otherTexture.GetDesc().Width);
 }
 
 void RenderTexture::CreateRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
+{
+    CreateRenderTextureImpl(GetDevice(Gfx), textureFormat, TextureHeight, TextureWidth);
+}
+
+void RenderTexture::CreateRenderTextureImpl(ID3D11Device* pDevice, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
     D3D11_TEXTURE2D_DESC textureDesc;
     ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -25,7 +30,7 @@ void RenderTexture::CreateRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
-    CHECK_HR( GetDevice(Gfx)->CreateTexture2D(&textureDesc, nullptr, &p_Texture) );
+    CHECK_HR( pDevice->CreateTexture2D(&textureDesc, nullptr, &p_Texture) );
 
     D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
     SRVDesc.Format = textureFormat;
@@ -33,7 +38,7 @@ void RenderTexture::CreateRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat
     SRVDesc.Texture2D.MostDetailedMip = 0U;
     SRVDesc.Texture2D.MipLevels = ~0U;
 
-    CHECK_HR ( GetDevice(Gfx)->CreateShaderResourceView(p_Texture.Get(), &SRVDesc, &p_ShaderResourseView) );
+    CHECK_HR ( pDevice->CreateShaderResourceView(p_Texture.Get(), &SRVDesc, &p_ShaderResourseView) );
 }
 
 void RenderTexture::Reset()

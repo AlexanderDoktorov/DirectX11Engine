@@ -328,19 +328,9 @@ void Graphics::RenderToImGui(const bool& state)
     IsRenderingToImGui = state;
 }
 
-size_t Graphics::GetMaterialIndex(Material& material) noexcept(!_DEBUG)
+Graphics::MaterialSystem& Graphics::GetMaterialSystem() noexcept
 {
-    return materialSystem.GetMaterialIndex(*this, material);
-}
-
-bool Graphics::UpdateMaterialAt(size_t indx) noexcept
-{
-    return materialSystem.UpdateMaterialAt(*this, indx);
-}
-
-Material* Graphics::GetMaterialAt(size_t indx) noexcept
-{
-    return materialSystem.GetMaterialAt(indx);
+    return materialSystem;
 }
 
 Graphics::~Graphics()
@@ -458,7 +448,7 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     return result;
 }
 
-wrl::ComPtr<ID3D11RenderTargetView> Graphics::RTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture)
+wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture)
 {
     assert(texture->GetDesc().BindFlags | D3D11_BIND_RENDER_TARGET);
 
@@ -481,7 +471,7 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
     {
         RecreateMainViews(w, h);
         RecreateGBufferViews(w, h);
-        materialSystem.OnResize(*this, w, h);
+        materialSystem.OnResize(w, h);
         pWnd->ZeroResizeInfo();
         RECT rc;
         GetClientRect(pWnd->GetWnd(), &rc);
@@ -560,40 +550,39 @@ Camera Graphics::GetCamera() const
 //                                                               //
 void Graphics::MaterialSystem::Initilize(Graphics& Gfx, const RECT& rc) noexcept
 {
-    MaterialIDTexture = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R32_SINT, rc.bottom - rc.top, rc.right - rc.left);
-    pMaterialBuffer = std::make_unique<MaterialBuffer>(Gfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
-    rtvMaterialID = Graphics::RTVFromTexture(Gfx.p_Device.Get(), MaterialIDTexture.get());
+    pGfx = &Gfx;
+    MaterialIDTexture   = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R32_SINT, rc.bottom - rc.top, rc.right - rc.left);
+    pMaterialBuffer     = std::make_unique<MaterialBuffer>(*pGfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
+    rtvMaterialID       = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
 }
 
-void Graphics::MaterialSystem::OnResize(Graphics& Gfx, UINT resizeWidth, UINT resizeHeight) noexcept
+void Graphics::MaterialSystem::OnResize(UINT resizeWidth, UINT resizeHeight) noexcept
 {
-    MaterialIDTexture->Resize(Gfx, resizeHeight, resizeWidth);
-    rtvMaterialID = Graphics::RTVFromTexture(Gfx.p_Device.Get(), MaterialIDTexture.get());
+    MaterialIDTexture->Resize(*pGfx, resizeHeight, resizeWidth);
+    rtvMaterialID = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
 }
 
-size_t Graphics::MaterialSystem::GetMaterialIndex(Graphics& Gfx, Material& material) noexcept(!_DEBUG)
+size_t Graphics::MaterialSystem::GetMaterialIndex(Material& material) noxnd
 {
     if (std::optional<size_t> indx = IsLoaded(material))
-    {
         return indx.value();
-    }
     else
     {
         auto newIndex = loadedMaterials.size();
         assert(loadedMaterials.size() <= MAX_MATERIALS);
-        pMaterialBuffer->Update(Gfx, material.GetMaterialDesc(), newIndex);
+        pMaterialBuffer->Update(*pGfx, material.GetMaterialDesc(), newIndex);
         loadedMaterials.push_back(std::make_unique<Material>(std::move(material)));
         return newIndex;
     }
 }
 
-bool Graphics::MaterialSystem::UpdateMaterialAt(Graphics& Gfx, size_t indx) noexcept
+bool Graphics::MaterialSystem::UpdateMaterialAt(size_t indx) noexcept
 {
     if (indx >= MAX_MATERIALS || !pMaterialBuffer.get())
         return false;
     if (auto pMat = GetMaterialAt(indx))
     {
-        pMaterialBuffer->Update(Gfx, pMat->GetMaterialDesc(), indx);
+        pMaterialBuffer->Update(*pGfx, pMat->GetMaterialDesc(), indx);
         return true;
     }
     return false;
@@ -615,6 +604,18 @@ std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const Material& materia
     }
     return std::nullopt;
 
+}
+void Graphics::MaterialSystem::ShowMaterialsWindow(bool* p_open) noexcept
+{
+    if (ImGui::Begin("Loaded materials", p_open))
+    {
+        for (size_t i = 0; i < loadedMaterials.size(); i++)
+        {
+            if (loadedMaterials[i]->ShowMaterialGUI())
+                UpdateMaterialAt(i);
+        }
+    }
+    ImGui::End();
 }
 //                                                               //
 //***************************************************************//

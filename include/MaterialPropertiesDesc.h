@@ -10,7 +10,9 @@ public:
 
 	void AddProperty(const MaterialProperty& property);
 	std::optional<MaterialProperty> GetProperty(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept;
-	void ShowGUI() noexcept;
+
+	// return true if any properties has been changed
+	bool ShowGUI(const char* label) noexcept;
 
 	template<class ...Types>
 	void EmplaceProperty(Types&&... args)
@@ -18,7 +20,7 @@ public:
 		properties.emplace_back(args...);
 	}
 	template<class T>
-	std::optional<T> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept(!_DEBUG)
+	std::optional<T> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int = 0, [[maybe_unused]] unsigned int = 0) const noexcept(!_DEBUG_EN)
 	{
 		static_assert(HasValueMember<PMap<T>>::value, "Trying to get property type with unknown type");
 		if constexpr (HasValueMember<PMap<T>>::value)

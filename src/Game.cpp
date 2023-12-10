@@ -30,6 +30,14 @@ Game::Game()
 		aiProcess_ConvertToLeftHanded
 	);
 
+	Tree2.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	);
+	Tree2.Translate(10, 0, 0);
+
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
 
@@ -113,6 +121,7 @@ void Game::UpdateFrame()
 			ball->Draw(*gfx);
 		}
 		Tree.Draw(*gfx);
+		Tree2.Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -134,7 +143,9 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
-	Tree.ShowControlWindow(*gfx);
+	Tree.ShowControlWindow(*gfx, "Tree controls");
+	Tree2.ShowControlWindow(*gfx, "Tree2 controls");
+	gfx->GetMaterialSystem().ShowMaterialsWindow();
 #endif
 	gfx->EndFrame();
 }

@@ -26,10 +26,11 @@ public:
 	Mesh() = default;
 	Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx);
 
-	void ShowMeshControls(Graphics& Gfx) noexcept;
+	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept;
 	int  GetMaterialIndex() const noexcept;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 	Mesh& Translate(float dx, float dy, float dz) noexcept;
+	Mesh& SetPosition(float x, float y, float z)  noexcept;
 private:
 	dx::XMFLOAT3 worldTranslation{};
 	dx::XMFLOAT3 worldRotation{};

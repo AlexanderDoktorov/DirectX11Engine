@@ -23,6 +23,7 @@
 #include "Interfaces.h"
 #include "Material.h"
 #include "Sampler.h"
+#include "noxnd.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
@@ -36,22 +37,25 @@ public:
 	using MaterialBuffer = StructuredBuffer<MaterialDesc, MAX_MATERIALS, PSResourse>;
 private:
 	friend class GraphicsChild;
-	struct MaterialSystem
+	class MaterialSystem
 	{
+		friend class Graphics;
 	public:
 		MaterialSystem() = default;
 		void Initilize(Graphics& Gfx, const RECT& rc) noexcept;
-		void OnResize(Graphics& Gfx, UINT resizeWidth, UINT resizeHeight) noexcept;
-		size_t GetMaterialIndex(Graphics& Gfx, Material& material) noexcept(!_DEBUG);
-		bool UpdateMaterialAt(Graphics& Gfx, size_t indx) noexcept;
+		void OnResize(UINT resizeWidth, UINT resizeHeight) noexcept;
+		size_t GetMaterialIndex(Material& material) noxnd;
+		bool UpdateMaterialAt(size_t indx) noexcept;
 		Material* GetMaterialAt(size_t indx) noexcept;
 		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
+		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
 
-	public:
+	private:
 		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
 		std::unique_ptr<MaterialBuffer>			pMaterialBuffer;
 		std::unique_ptr<RenderTexture>			MaterialIDTexture;
 		std::vector<std::unique_ptr<Material>>	loadedMaterials;
+		Graphics* pGfx = nullptr;
 	};
 public:
 	Graphics(HWND hwnd);
@@ -80,13 +84,11 @@ public:
 	void			RenderToImGui(const bool& state);
 
 	// Materials
-	size_t GetMaterialIndex(Material& material) noexcept(!_DEBUG);
-	bool UpdateMaterialAt(size_t indx) noexcept;
-	Material* GetMaterialAt(size_t indx) noexcept;
+	MaterialSystem& GetMaterialSystem() noexcept;
 
 	// Render targets
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
-	static wrl::ComPtr<ID3D11RenderTargetView> RTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture);
+	static wrl::ComPtr<ID3D11RenderTargetView> MakeRTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture);
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;

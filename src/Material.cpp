@@ -14,10 +14,10 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
-	LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
-	LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
-	LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,	SLOT_TEXTURE_SPECULAR);
-	LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
+	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
+	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
+	mapLayout.hasNormalMap	 = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,	SLOT_TEXTURE_SPECULAR);
+	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
 	LoadMaterialProperties(pMaterial);
 }
 
@@ -26,13 +26,16 @@ const std::vector<std::shared_ptr<MaterialTexture>>& Material::GetTextures() con
 	return materialTextures;
 }
 
-void Material::ShowMaterialControls(const char* label, bool* p_open)
+bool Material::ShowMaterialGUI(bool* p_open)
 {
-	if (ImGui::Begin(label, p_open))
-	{
-		matDesc.ShowGUI();
-	}
-	ImGui::End();
+	static constexpr ImVec4 red = {1.f,0.f,0.f,1.f};
+	static constexpr ImVec4 yellow = {1.f,1.f,0.f,1.f};
+	bool changed = matDesc.ShowGUI(materialName.c_str());
+	ImGui::TextColored(mapLayout.hasDiffuseMap ? yellow : red, "Diffuse map");
+	ImGui::TextColored(mapLayout.hasHeightMap ? yellow : red, "Height map");
+	ImGui::TextColored(mapLayout.hasNormalMap ? yellow : red, "Normal map");
+	ImGui::TextColored(mapLayout.hasSpecularMap ? yellow : red, "Specular map");
+	return changed;
 }
 
 void Material::Bind(Graphics& Gfx) noexcept
@@ -58,12 +61,9 @@ int Material::IsLoaded(const std::string& textureFileName, aiTextureType texture
 	return -1;
 }
 
-bool Material::HasMap(aiTextureType mapType) const noexcept
+MapLayout Material::GetMapLayout() const noexcept
 {
-	for (const auto& materialTex : materialTextures)
-		if (materialTex->GetTextureAiType() == mapType)
-			return true;
-	return false;
+	return mapLayout;
 }
 
 std::string Material::GetName() const noexcept
@@ -81,13 +81,14 @@ MaterialPropertiesDesc Material::GetPropertiesDesc() const noexcept
 MaterialDesc Material::GetMaterialDesc() const noexcept
 {
 	MaterialDesc materialDesc_{};
-	materialDesc_.hasDiffuseMap = HasMap(aiTextureType_DIFFUSE);
-	materialDesc_.hasHeightMap = HasMap(aiTextureType_HEIGHT);
-	materialDesc_.hasNormalMap = HasMap(aiTextureType_NORMALS);
-	materialDesc_.hasSpecularMap = HasMap(aiTextureType_SPECULAR);
+	materialDesc_.hasDiffuseMap  = mapLayout.hasDiffuseMap;
+	materialDesc_.hasHeightMap	 = mapLayout.hasHeightMap;
+	materialDesc_.hasNormalMap	 = mapLayout.hasNormalMap;
+	materialDesc_.hasSpecularMap = mapLayout.hasSpecularMap;
 	materialDesc_.Ka = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_AMBIENT).value());
 	materialDesc_.Kd = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_DIFFUSE).value());
 	materialDesc_.Ks = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_SPECULAR).value());
+	materialDesc_.Ns = matDesc.GetPropertyAs<float>(AI_MATKEY_SHININESS).value();
 	return materialDesc_;
 }
 bool Material::operator==(const Material& rhs) const noexcept
@@ -109,10 +110,12 @@ std::shared_ptr<MaterialTexture> Material::PushTexture(Graphics& Gfx, const std:
 	}
 }
 
-void Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot)
+bool Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot)
 {
+	bool hasSuchMap = false;
 	for (unsigned int i = 0u; i < pMaterial->GetTextureCount(textureType); i++)
 	{
+		hasSuchMap = true;
 		aiString textureFileName;
 		if (pMaterial->GetTexture(textureType, i, &textureFileName) == aiReturn_SUCCESS)
 		{
@@ -121,6 +124,7 @@ void Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiText
 			materialTextures.push_back(pTexture);
 		}
 	}
+	return hasSuchMap;
 }
 
 void Material::LoadMaterialProperties(aiMaterial* pMaterial)

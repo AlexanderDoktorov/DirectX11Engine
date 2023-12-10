@@ -16,9 +16,9 @@ std::optional<MaterialProperty> MaterialPropertiesDesc::GetProperty(std::string 
 	return std::nullopt;
 }
 
-void MaterialPropertiesDesc::ShowGUI() noexcept
+bool MaterialPropertiesDesc::ShowGUI(const char* label) noexcept
 {
-	if (ImGui::BeginCombo("Select a property", properties.empty() ? "No properties" : properties[selectedPropertyIndex].GetKey().c_str())) {
+	if (ImGui::BeginCombo(label, properties.empty() ? "No properties" : properties[selectedPropertyIndex].GetKey().c_str())) {
 		for (size_t i = 0; i < properties.size(); i++) {
 			// Check if the current item is selected
 			const bool isSelected = (selectedPropertyIndex == i);
@@ -35,5 +35,9 @@ void MaterialPropertiesDesc::ShowGUI() noexcept
 		}
 		ImGui::EndCombo();
 	}
-	properties[selectedPropertyIndex].ShowGUI();
+	if (bool changed = properties[selectedPropertyIndex].ShowGUI())
+	{
+		return changed;
+	}
+	return false;
 }

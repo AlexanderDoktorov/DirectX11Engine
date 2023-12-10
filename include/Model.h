@@ -15,7 +15,7 @@ public:
 	Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags);
 	void Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept;
 	void ClearData() noexcept;
-	void ShowControlWindow(Graphics& Gfx) noexcept;
+	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
 	virtual void Draw(Graphics& Gfx) override;
 	Model& Translate(float dx, float dy, float dz) noexcept;
 private:

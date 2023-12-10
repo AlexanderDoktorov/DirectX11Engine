@@ -13,37 +13,42 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, si
 		AddBindable(std::move(pBindables[i]));
 	}
 
-	auto pMeshMaterial = Gfx.GetMaterialAt(matIndx);
-	meshDesc.useDiffuseMap = pMeshMaterial->HasMap(aiTextureType_DIFFUSE);
-	meshDesc.useNormalMap = pMeshMaterial->HasMap(aiTextureType_NORMALS);
-	meshDesc.useSpecularMap = pMeshMaterial->HasMap(aiTextureType_SPECULAR);
+	auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(matIndx);
+	meshDesc.useDiffuseMap = pMeshMaterial->GetMapLayout().hasDiffuseMap;
+	meshDesc.useNormalMap = pMeshMaterial->GetMapLayout().hasNormalMap;
+	meshDesc.useSpecularMap = pMeshMaterial->GetMapLayout().hasSpecularMap;
 	meshDesc.matId = (int)matIndx;
 
 	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
 	AddBindable( std::make_unique<PixelConstantBuffer<MeshDesc>>(Gfx, meshDesc, 0U));
 }
 
-void Mesh::ShowMeshControls(Graphics& Gfx) noexcept
+bool Mesh::ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 {
 	typedef PixelConstantBuffer<MeshDesc> meshBuffer;
-	static constexpr ImVec4 redColor	  = ImVec4(1.f, 0.f, 0.f, 1.f);
-	static constexpr ImVec4 yellowColor   = ImVec4(1.f, 1.f, 0.f, 1.f);
-	auto makeStr = [&](const char* text) -> std::string
-	{
-		return text + std::string("##") + std::to_string(meshDesc.matId);
-	};
+	Material* pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(meshDesc.matId);
+	MapLayout mapLayout = pMeshMaterial->GetMapLayout();
 
-	ImGui::Text("Mesh with material id = %d", meshDesc.matId);
-		
+	auto makeHased = [](std::string str, std::string hash) -> std::string
+		{
+			return str.append("##").append(hash);
+		};
+
 	bool changed = false;
-	ImGui::TextColored(meshDesc.useSpecularMap ? yellowColor : redColor , "Use specular map: %s", meshDesc.useSpecularMap ? "True" : "False");
-	ImGui::TextColored(meshDesc.useNormalMap ? yellowColor : redColor , "Use normal map: %s", meshDesc.useNormalMap ? "True" : "False");
-	ImGui::TextColored(meshDesc.useDiffuseMap ? yellowColor : redColor , "Use diffuse map: %s", meshDesc.useDiffuseMap ? "True" : "False");
+	if(mapLayout.hasDiffuseMap)
+		changed |= ImGui::Checkbox(makeHased("Use diffuse map", hash).c_str(), &meshDesc.useDiffuseMap);
 	if(!meshDesc.useDiffuseMap)
-		changed |= ImGui::ColorEdit3(makeStr("Albedo color").c_str(), &meshDesc.albedoColor.x);
+		changed |= ImGui::ColorEdit3(makeHased("Material albedo color", hash).c_str(), &meshDesc.albedoColor.x);
+	if(mapLayout.hasNormalMap)
+		changed |= ImGui::Checkbox(makeHased("Use normal map", hash).c_str(), &meshDesc.useNormalMap);
+	if(mapLayout.hasSpecularMap)
+		changed |= ImGui::Checkbox(makeHased("Use specular map", hash).c_str(), &meshDesc.useSpecularMap);
+	
 
 	if (auto pMeshBuffer = QueryBindable<meshBuffer>(); changed && pMeshBuffer)
 		pMeshBuffer->Update(Gfx, meshDesc);
+
+	return changed;
 }
 
 int Mesh::GetMaterialIndex() const noexcept
@@ -61,6 +66,14 @@ Mesh& Mesh::Translate(float dx, float dy, float dz) noexcept
 	worldTranslation.x += dx;
 	worldTranslation.y += dy;
 	worldTranslation.z += dz;
+	return *this;
+}
+
+Mesh& Mesh::SetPosition(float x, float y, float z) noexcept
+{
+	worldTranslation.x = x;
+	worldTranslation.y = y;
+	worldTranslation.z = z;
 	return *this;
 }
 

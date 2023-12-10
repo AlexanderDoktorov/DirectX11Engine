@@ -30,7 +30,7 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
 	{
 		auto mat = Material(Gfx, pScene->mMaterials[i], directory);
-		materialsIndices.push_back(Gfx.GetMaterialIndex(mat));
+		materialsIndices.push_back(Gfx.GetMaterialSystem().GetMaterialIndex(mat));
 	}
 
 	// Fill meshesPtrs array with all scene meshes
@@ -53,15 +53,17 @@ void Model::ClearData() noexcept
 	directory.clear();
 }
 
-void Model::ShowControlWindow(Graphics& Gfx) noexcept
+void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept
 {
-	for (size_t i = 0; i < materialsIndices.size(); i++)
+	if(ImGui::Begin(modelName.c_str()))
 	{
-		if (auto pMaterial = Gfx.GetMaterialAt(i))
-			pMaterial->ShowMaterialControls(("Material constrols " + std::to_string(i)).c_str());
-		else
-			OutputDebugStringA("Wanna get null material\n");
+		for (size_t iMesh = 0U; iMesh < meshesPtrs.size(); iMesh++)
+		{
+			std::string hash = modelName + std::to_string(iMesh);
+			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
+		}
 	}
+	ImGui::End();
 }
 
 void Model::Draw(Graphics& Gfx)
@@ -109,15 +111,15 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 {
 	std::vector<std::unique_ptr<IBindable>> bindablePtrs;
 
-	Material* pMat = Gfx.GetMaterialAt(materialIndx);
+	Material* pMat = Gfx.GetMaterialSystem().GetMaterialAt(materialIndx);
 	assert(pMat);
 	
 	bindablePtrs.push_back(std::make_unique<Material>(*pMat));
 
-	const bool HasDiffuseMaps		= pMat->HasMap(aiTextureType_DIFFUSE);
-	const bool HasNormalMaps		= pMat->HasMap(aiTextureType_NORMALS);
-	const bool HasSpecularMaps		= pMat->HasMap(aiTextureType_SPECULAR);
-	const bool HasHeightMaps		= pMat->HasMap(aiTextureType_HEIGHT);
+	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
+	const bool HasNormalMaps		= pMat->GetMapLayout().hasNormalMap;
+	const bool HasSpecularMaps		= pMat->GetMapLayout().hasSpecularMap;
+	const bool HasHeightMaps		= pMat->GetMapLayout().hasHeightMap;
 	const bool HasAnyMaps			= HasDiffuseMaps || HasNormalMaps || HasSpecularMaps || HasHeightMaps;
 
 	if (HasAnyMaps)

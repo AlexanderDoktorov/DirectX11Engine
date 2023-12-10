@@ -30,7 +30,7 @@ public:
 
 private:
 	void Reserve(size_t cap);
-	void AddChild(std::unique_ptr<Node> pNode) noexcept(!_DEBUG);
+	void AddChild(std::unique_ptr<Node> pNode) noxnd;
 private:
 	int id;
 	std::string nodeTag;

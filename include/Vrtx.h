@@ -4,12 +4,7 @@
 #include <vector>
 #include <assert.h>
 #include <iostream>
-
-#ifdef _NDEBUG
-#define debugnoexcept noexcept
-#else
-#define debugnoexcept noexcept(!_DEBUG)
-#endif // _NDEBUG
+#include "noxnd.h"
 
 namespace dx = DirectX;
 
@@ -233,7 +228,7 @@ namespace CustomVertex
 		}
 
 		template<VrtxAttribute attr>
-		Map<attr>::type& GetAttribute() const debugnoexcept
+		Map<attr>::type& GetAttribute() const noxnd
 		{
 			auto offset = GetOffset(attr);
 			using DXType = Map<attr>::type;
@@ -241,7 +236,7 @@ namespace CustomVertex
 		}
 
 		template<VrtxAttribute attr> 
-		void SetAttribute(Map<attr>::type new_data) const debugnoexcept
+		void SetAttribute(Map<attr>::type new_data) const noxnd
 		{
 			auto offset = GetOffset(attr);
 			using DXType = Map<attr>::type;
@@ -267,7 +262,7 @@ namespace CustomVertex
 
 	private:
 
-		UINT GetOffset(VrtxAttribute attr) const debugnoexcept
+		UINT GetOffset(VrtxAttribute attr) const noxnd
 		{
 			auto layout_elements = layout.GetElements();
 			UINT offset = 0U;

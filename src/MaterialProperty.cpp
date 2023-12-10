@@ -51,27 +51,29 @@ std::string MaterialProperty::GetKey() const noexcept
 	return pKey;
 }
 
-void MaterialProperty::ShowGUI() noexcept
+bool MaterialProperty::ShowGUI() noexcept
 {
+	bool updated = false;
 	switch (propertyType)
 	{
 	case aiPTI_Float:
 		if (data.size() == sizeof(float))
-			ImGui::SliderFloat(pKey.c_str(), reinterpret_cast<float*>(data.data()), 0.f, 10.f);
+			updated |= ImGui::InputFloat(pKey.c_str(), reinterpret_cast<float*>(data.data()));
 		if (data.size() == 3 * sizeof(float))
 		{
 			if (pKey.substr(0, 4) == "$clr")
-				ImGui::ColorEdit3(pKey.c_str(), reinterpret_cast<float*>(data.data()));
+				updated |= ImGui::ColorEdit3(pKey.c_str(), reinterpret_cast<float*>(data.data()));
 			else
-				ImGui::SliderFloat3(pKey.c_str(), reinterpret_cast<float*>(data.data()), -10.f, 10.f);
+				updated |= ImGui::SliderFloat3(pKey.c_str(), reinterpret_cast<float*>(data.data()), -10.f, 10.f);
 		}
 		break;
 	case aiPTI_Integer:
 		if (data.size() == sizeof(int))
-			ImGui::SliderInt(pKey.c_str(), reinterpret_cast<int*>(data.data()), 0, 100);
+			updated |= ImGui::SliderInt(pKey.c_str(), reinterpret_cast<int*>(data.data()), 0, 100);
 		break;
 	case aiPTI_String:
 		ImGui::Text((const char*)data.data());
 		break;
 	}
+	return updated;
 }

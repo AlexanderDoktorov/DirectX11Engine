@@ -22,17 +22,29 @@ struct MaterialDesc
 	float  Ns; // shininess
 };
 
+struct MapLayout
+{
+	// Assuming a 32-bit integer for simplicity
+	uint32_t hasNormalMap   : 1 = 0;  // 1 bit for NormalMap
+	uint32_t hasDiffuseMap  : 1 = 0;  // 1 bit for DiffuseMap
+	uint32_t hasSpecularMap : 1 = 0;  // 1 bit for SpecularMap
+	uint32_t hasHeightMap	: 1 = 0;  // 1 bit for HeightMap
+	// may add more maps
+};
+
 class Material : public IBindable
 {
 public:
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
 	const std::vector<std::shared_ptr<MaterialTexture>>& GetTextures() const noexcept;
-	void ShowMaterialControls(const char* label, bool* p_open = (bool*)0);
+
+	// Returns true if any property has been changed
+	bool ShowMaterialGUI(bool* p_open = (bool*)0);
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
 	
-	bool HasMap(aiTextureType mapType) const noexcept;
+	MapLayout	 GetMapLayout() const noexcept;
 	std::string  GetName() const noexcept;
 	std::string  GetDirectory() const noexcept;
 	MaterialPropertiesDesc  GetPropertiesDesc() const noexcept;
@@ -40,9 +52,10 @@ public:
 	bool operator==(const Material& rhs) const noexcept;
 private:
 	void ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial);
-	void LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot);
+	bool LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot);
 	void LoadMaterialProperties(aiMaterial* pMaterial);
-private: 
+private:
+	MapLayout   mapLayout;
 	std::string materialName;
 	std::string materialDirectory;
 	std::vector<std::shared_ptr<MaterialTexture>>		   materialTextures;

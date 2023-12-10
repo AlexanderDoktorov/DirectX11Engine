@@ -497,6 +497,9 @@
     <ClInclude Include="include\SolidTexturedBall.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
+    <ClInclude Include="include\noxnd.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
