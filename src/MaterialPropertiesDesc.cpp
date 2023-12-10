@@ -35,7 +35,7 @@ bool MaterialPropertiesDesc::ShowGUI(const char* label) noexcept
 		}
 		ImGui::EndCombo();
 	}
-	if (bool changed = properties[selectedPropertyIndex].ShowGUI())
+	if (bool changed = properties[selectedPropertyIndex].ShowGUI(label)) // material name (label) is hash for property gui
 	{
 		return changed;
 	}

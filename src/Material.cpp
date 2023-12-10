@@ -16,7 +16,7 @@ void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
 	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
 	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
-	mapLayout.hasNormalMap	 = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,	SLOT_TEXTURE_SPECULAR);
+	mapLayout.hasNormalMap	 = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,		SLOT_TEXTURE_SPECULAR);
 	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
 	LoadMaterialProperties(pMaterial);
 }

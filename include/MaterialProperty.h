@@ -24,7 +24,7 @@ public:
 	const size_t GetSize() const;
 	aiPropertyTypeInfo GetType() const noexcept;
 	std::string GetKey() const noexcept;
-	bool ShowGUI() noexcept;
+	bool ShowGUI(std::string hash) noexcept;
 private:
 	std::string pKey;
 	aiPropertyTypeInfo propertyType;
