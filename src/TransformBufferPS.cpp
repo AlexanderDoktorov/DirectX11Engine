@@ -1,4 +1,5 @@
 #include "TransformBufferPS.h"
+#include "Graphics.h"
 
 std::unique_ptr<PixelConstantBuffer<TransformBufferPS::Transformations>> TransformBufferPS::pPSConstantBuffer{};
 
@@ -18,7 +19,7 @@ void TransformBufferPS::Bind(Graphics & Gfx) noexcept
 	auto View		= Gfx.GetCamera().GetCameraMatrix();
 	auto Projection = Gfx.GetProjection();
 
-	pPSConstantBuffer->Update(Gfx, Transformations(dx::XMMatrixTranspose(World), dx::XMMatrixTranspose(View), dx::XMMatrixTranspose(Projection)));
+	pPSConstantBuffer->Update(Gfx, Transformations(DirectX::XMMatrixTranspose(World), DirectX::XMMatrixTranspose(View), DirectX::XMMatrixTranspose(Projection)));
 	pPSConstantBuffer->Bind(Gfx);
 }
 

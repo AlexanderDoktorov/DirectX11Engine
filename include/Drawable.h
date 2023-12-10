@@ -1,9 +1,7 @@
 #pragma once
-#include "Interfaces.h"
-#include "DOK_assert.h"
 #include "IndexBuffer.h"
-#include "Topology.h"
 #include "IBindable.h"
+#include "IObject.h"
 #include <memory>
 
 class Drawable : virtual public IObject
@@ -11,33 +9,11 @@ class Drawable : virtual public IObject
 public:
 	~Drawable() = default;
 
-	virtual void Draw(Graphics& Gfx)
-	{
-		DOK_assert(pIndexBuffer != nullptr, L"IndexBuffer hasn't been set before drawing object, add it with AddBindable()");
-
-		for (auto& el : PipelineElements)
-		{
-			el->Bind(Gfx);
-		}
-		if (pIndexBuffer)
-			Gfx.DrawIndexed(pIndexBuffer->GetCount());
-	}
-
-	virtual DirectX::XMMATRIX GetTransform() const noexcept override
-	{
-		return DirectX::XMMatrixIdentity();
-	}
+	virtual void Draw(Graphics& Gfx);
+	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 
 protected:
-
-	void AddBindable(std::unique_ptr<IBindable> element) noexcept {
-		if (auto p = dynamic_cast<IndexBuffer*>(element.get()))
-		{
-			DOK_assert(pIndexBuffer == nullptr, L"Trying to add [NonStatic] IndexBuffer twice");
-			pIndexBuffer = p;
-		}
-		PipelineElements.push_back(std::move(element));
-	}
+	void AddBindable(std::unique_ptr<IBindable> element) noexcept;
 
 	template <class T>
 	static void RemoveBindable()

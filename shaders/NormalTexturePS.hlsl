@@ -7,10 +7,10 @@ cbuffer meshDescBuffer : register(b0)
     float3 albedo;
 }
 
-Texture2DArray DiffuseMaps  : register(t0);
-Texture2DArray NormalMaps   : register(t1);
-Texture2DArray SpecularMaps : register(t2);
-Texture2DArray HeightMaps   : register(t3);
+Texture2D DiffuseMap  : register(t0);
+Texture2D NormalMap   : register(t1);
+Texture2D SpecularMap : register(t2);
+Texture2D HeightMap : register(t3);
 
 SamplerState Sampler : register(s0);
 
@@ -47,7 +47,7 @@ PSOutput main(VS_OUT ps_input)
             normalize(ps_input.wNormal)
         );
         // unpack the normal from map into tangent space                           --> textID
-        const float3 normalSample = NormalMaps.Sample(Sampler, float3(ps_input.textCoord, 0)).xyz;
+        const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
         float3 worldNormal = normalSample * 2.0f - 1.0f;
         // bring normal from tanspace into world space
         worldNormal = normalize(mul(worldNormal, tanToWorld));
@@ -60,13 +60,16 @@ PSOutput main(VS_OUT ps_input)
     
     // Diffuse map //
     if(useDiffuseMap)
-        output.Albedo = DiffuseMaps.Sample(Sampler, float3(ps_input.textCoord, 0));
+        output.Albedo = DiffuseMap.Sample(Sampler, ps_input.textCoord);
     else
-        output.Albedo = float4(albedo, 0.f);
+        output.Albedo = float4(albedo, 1.f);
+    
+    // Alpha testing { Pixel discarded if alpha is too small }
+    clip(output.Albedo.a < 0.1f ? -1 : 1);
     
     // Specular map //
     if (useSpecularMap)
-        output.Specular = SpecularMaps.Sample(Sampler, float3(ps_input.textCoord, 0));
+        output.Specular = SpecularMap.Sample(Sampler, ps_input.textCoord);
     
     output.wPosition    = ps_input.wPosition;
     output.materialID   = materialID;

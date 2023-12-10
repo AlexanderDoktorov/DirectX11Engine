@@ -1,6 +1,7 @@
 #pragma once
 #include "IBindable.h"
 #include "IBlob.h"
+#include <vector>
 
 struct IShader : virtual public IBindable, virtual public IUnbindable, virtual  public IBlob
 {

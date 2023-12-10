@@ -1,4 +1,5 @@
 #include "TransformBuffer.h"
+#include "Graphics.h"
 
 std::unique_ptr<VertexConstantBuffer<TransformBuffer::Transformations>> TransformBuffer::Cbuff;
 
@@ -14,6 +15,6 @@ void TransformBuffer::Bind(Graphics& Gfx) noexcept
 	auto View		= Gfx.GetCamera().GetCameraMatrix();
 	auto Projection = Gfx.GetProjection();
 
-	Cbuff->Update(Gfx, Transformations(dx::XMMatrixTranspose(World), dx::XMMatrixTranspose(View), dx::XMMatrixTranspose(Projection)));
+	Cbuff->Update(Gfx, Transformations(DirectX::XMMatrixTranspose(World), DirectX::XMMatrixTranspose(View), DirectX::XMMatrixTranspose(Projection)));
 	Cbuff->Bind(Gfx);
 }

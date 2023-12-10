@@ -1,6 +1,7 @@
 #pragma once
 #include "DOK_assert.h"
 #include "Drawable.h"
+#include "Graphics.h"
 
 template <class T>
 class DrawableBase : public Drawable

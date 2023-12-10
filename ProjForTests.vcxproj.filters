@@ -66,16 +66,10 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Blob.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Character.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ColorBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\ComputeShader.cpp">
@@ -96,40 +90,19 @@
     <ClCompile Include="src\Graphics.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsChild.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HullShader.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\LightSource.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Mouse.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\PictureTexture.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PixelShader.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PixelShaderCommon.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ShaderResoursesPS.cpp">
+    <ClCompile Include="src\WICTexture.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Player.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderTexture.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Sampler.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Sheet.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Shift.cpp">
@@ -144,25 +117,10 @@
     <ClCompile Include="src\StringHelper.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\TransformBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vertex.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VertexShaderCommon.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\wWinMain.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TransformBufferPS.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture2D.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Model.cpp">
@@ -174,9 +132,6 @@
     <ClCompile Include="src\WICTextureLoader11.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\ISlot.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\Node.cpp">
       <Filter>Файлы заголовков\Assimp</Filter>
     </ClCompile>
@@ -185,6 +140,60 @@
     </ClCompile>
     <ClCompile Include="src\MaterialProperty.cpp">
       <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialPropertiesDesc.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureBase.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialTexture.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sheet.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XSResourse.cpp">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IBindable.cpp">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Drawable.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ISlot.cpp">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixelShaderCommon.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderTexture.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixelShader.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HullShader.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexShaderCommon.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformBufferPS.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Blob.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,9 +317,6 @@
     <ClInclude Include="include\DrawableBase.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicsChild.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\HPipelineElements.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -320,13 +326,10 @@
     <ClInclude Include="include\InputLayout.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\PictureTexture.h">
+    <ClInclude Include="include\WICTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\PixelConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ShaderResoursesPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\ResourseBuffer.h">
@@ -368,18 +371,6 @@
     <ClInclude Include="include\LightSource.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
-    <ClInclude Include="include\Sheet.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SolidBall.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SolidTexturedBall.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Tank.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
     <ClInclude Include="include\IAnimated.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -410,7 +401,7 @@
     <ClInclude Include="include\ISlot.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\ITexture.h">
+    <ClInclude Include="include\ITexture2D.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\IToString.h">
@@ -449,19 +440,13 @@
     <ClInclude Include="include\FlatRect.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
     </ClInclude>
-    <ClInclude Include="include\Texture2D.h">
+    <ClInclude Include="include\MaterialTexture.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IRotatable.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\TexturedBox.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
     <ClInclude Include="include\StructuredBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\StructuredBufferPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IShaderResourse.h">
@@ -491,8 +476,26 @@
     <ClInclude Include="include\Numerated.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\MaterialSystem.h">
+    <ClInclude Include="include\MaterialPropertiesDesc.h">
       <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DOK_traits.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SlotLayout.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextureBase.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XSResourse.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sheet.h">
+      <Filter>Файлы заголовков\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolidTexturedBall.h">
+      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

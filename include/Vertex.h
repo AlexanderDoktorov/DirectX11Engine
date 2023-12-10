@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include <type_traits>
-#include "Graphics.h"
+#include <string>
+#include <DirectXMath.h>
+#include <d3d11.h>
 
 namespace DynamicVertex
 {

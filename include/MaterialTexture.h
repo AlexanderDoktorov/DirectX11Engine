@@ -1,14 +1,17 @@
 #pragma once
-#include "PictureTexture.h"
+#include "WICTexture.h"
+#include "IBindable.h"
+#include "ISlot.h"
 #include <DirectXMath.h>
 #include <string>
 #include "assimp\material.h"
 
-class Texture2D : public PictureTexture
+class MaterialTexture : public WICTexture
 {
 public:
-	Texture2D() = default;
-	Texture2D(Graphics& Gfx, const aiTextureType& textureType, const std::string& path);
+	MaterialTexture() = default;
+	MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path);
+	MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path, UINT bindSlot);
 
 	void SetFileName(std::string fileName) noexcept;
 	void SetFilePath(std::string filePath) noexcept;

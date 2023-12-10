@@ -1,12 +1,18 @@
 #pragma once
 #include "IBindable.h"
 #include "ISlot.h"
-#include "IShaderResourse.h"
+#include "XSResourse.h"
+#include <wrl.h>
 #include <array>
 
-template <class T, size_t numStructs>
-class StructuredBuffer : public IBindable, public Slotted, public IShaderResourse
+namespace wrl = Microsoft::WRL;
+
+template <class T, size_t numStructs, class ...Shaders>
+class StructuredBuffer : public ComboSResrouse<Shaders...>
 {
+    using ISlot::SetBindSlot;
+    using GraphicsChild::GetDevice;
+    using GraphicsChild::GetContext;
 public:
     StructuredBuffer(Graphics& Gfx, const std::array<T, numStructs>& SBData) : Slotted()
     {

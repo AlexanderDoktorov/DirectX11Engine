@@ -5,6 +5,7 @@
 #include <d3d11.h>
 #include <memory>
 #include <array>
+#include <optional>
 #include "assimp\material.h"
 #include "DirectXWindow.h"
 #include "Camera.h"
@@ -13,28 +14,45 @@
 #include "imgui_impl_win32.h"
 #include "imgui.h"
 
+#include "IBindable.h"
+#include "StructuredBuffer.h"
+#include "VertexShaderCommon.h"
+#include "PixelShaderCommon.h"
+#include "PixelConstantBuffer.h"
+#include "RenderTexture.h"
+#include "Interfaces.h"
+#include "Material.h"
+#include "Sampler.h"
+
 namespace wrl = Microsoft::WRL;
-namespace dx = DirectX;
-
-#pragma region forward_declarations
-
-class Sampler;
-class VertexShaderCommon;
-class PixelShaderCommon;
-class RenderTexture;
-template <class T> class PixelConstantBuffer;
-template<class T, size_t numStructs> class StructuredBufferPS;
-struct MaterialDesc;
-class Material;
-interface ITexture;
-
-#pragma endregion forward_declarations
+namespace dx  = DirectX;
 
 #define MAX_MATERIALS (size_t)20
 
 class Graphics
 {
+public:
+	// Meta info
+	using MaterialBuffer = StructuredBuffer<MaterialDesc, MAX_MATERIALS, PSResourse>;
+private:
 	friend class GraphicsChild;
+	struct MaterialSystem
+	{
+	public:
+		MaterialSystem() = default;
+		void Initilize(Graphics& Gfx, const RECT& rc) noexcept;
+		void OnResize(Graphics& Gfx, UINT resizeWidth, UINT resizeHeight) noexcept;
+		size_t GetMaterialIndex(Graphics& Gfx, Material& material) noexcept(!_DEBUG);
+		bool UpdateMaterialAt(Graphics& Gfx, size_t indx) noexcept;
+		Material* GetMaterialAt(size_t indx) noexcept;
+		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
+
+	public:
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
+		std::unique_ptr<MaterialBuffer>			pMaterialBuffer;
+		std::unique_ptr<RenderTexture>			MaterialIDTexture;
+		std::vector<std::unique_ptr<Material>>	loadedMaterials;
+	};
 public:
 	Graphics(HWND hwnd);
 
@@ -61,15 +79,14 @@ public:
 	void			Draw(UINT vertex_count);
 	void			RenderToImGui(const bool& state);
 
+	// Materials
+	size_t GetMaterialIndex(Material& material) noexcept(!_DEBUG);
+	bool UpdateMaterialAt(size_t indx) noexcept;
+	Material* GetMaterialAt(size_t indx) noexcept;
+
 	// Render targets
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
-	
-	// Materials
-	std::shared_ptr<Material>	PushMaterial(aiMaterial* pAiMaterial, std::string materialDirectory) noexcept(!_DEBUG); // returns position of pushed material
-	int							HasMaterial(const std::string& materialName, const std::string& directory) const noexcept;
-	std::shared_ptr<Material>	GetMaterialAt(size_t indx) noexcept;
-	void						UpdateMaterialAt(MaterialDesc matDesc, size_t indx) noexcept;
-	static consteval size_t		GetMaterialsCount() noexcept { return MAX_MATERIALS; }
+	static wrl::ComPtr<ID3D11RenderTargetView> RTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture);
 
 	Camera			GetCamera()		const;
 	dx::XMMATRIX	GetProjection() const noexcept;
@@ -84,12 +101,12 @@ private:
 	void			RecreateGBufferViews(const UINT& width, const UINT& height);
 	void			CreateDepthStencilView();
 	void			CreateBackBufferView();
-	void			CreateRTVForTexture(const ITexture* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
+	void			CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
 
 	// ImGuiStuff
 	void			ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open = (bool*)0);
-	bool			IsRenderingToImGui = false;
-	bool			ImGuiEnabled = false;
+	bool			IsRenderingToImGui	= false;
+	bool			ImGuiEnabled		= false;
 
 
 	wrl::ComPtr<ID3D11Device>			p_Device;
@@ -109,22 +126,20 @@ private:
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvSpecular;
 	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
 
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
-	std::unique_ptr<StructuredBufferPS<MaterialDesc, MAX_MATERIALS>> pMaterialStructuredBuffer;
-	std::vector<std::shared_ptr<Material>>			 materialPtrs;
-
 	std::unique_ptr<RenderTexture>			PositionTexture;
 	std::unique_ptr<RenderTexture>			NormalTexture;
 	std::unique_ptr<RenderTexture>			AlbedoTexture;
 	std::unique_ptr<RenderTexture>			SpecularTexture;
 	std::unique_ptr<RenderTexture>			LightTexture;
-	std::unique_ptr<RenderTexture>			MaterialIDTexture;
 
 	std::unique_ptr<PixelShaderCommon>										   pCombinePS;
 	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;
 	std::unique_ptr<VertexShaderCommon>										   pScreenSpaceVS;
 	std::unique_ptr<Sampler>												   pLinearSampler;
 	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
+
+	// Material system
+	MaterialSystem materialSystem;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

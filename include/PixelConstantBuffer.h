@@ -2,7 +2,7 @@
 #include "ConstantBuffer.h"
 #include <DirectXMath.h>
 
-template <class T = dx::XMFLOAT4>
+template <class T = DirectX::XMFLOAT4>
 class PixelConstantBuffer : public ConstantBuffer<T>
 {
 	using IBindable::GetContext;

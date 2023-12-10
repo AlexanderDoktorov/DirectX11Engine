@@ -24,7 +24,7 @@ public:
 	};
 public:
 	Mesh() = default;
-	Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique_ptr<IBindable>> pBindables);
+	Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx);
 
 	void ShowMeshControls(Graphics& Gfx) noexcept;
 	int  GetMaterialIndex() const noexcept;

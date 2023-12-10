@@ -1,4 +1,5 @@
 #include "ComputeShader.h"
+#include "Exceptions.h"
 #include <d3dcompiler.h>
 
 ComputeShader::ComputeShader(Graphics& Gfx, const wchar_t* fileName)

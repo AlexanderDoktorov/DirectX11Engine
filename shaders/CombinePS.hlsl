@@ -12,7 +12,7 @@ struct PS_INPUT
 float4 main(PS_INPUT input) : SV_TARGET0
 {
     // Sample G-buffer data
-    float4 albedo = gBufferAlbedo.Sample(linearSampler, input.TexCoord).rgba;
+    float4 albedo = gBufferAlbedo.Sample(linearSampler, input.TexCoord);
 
     // Sample accumulated lighting
     float3 lightImpact = gBufferLight.Sample(linearSampler, input.TexCoord).rgb;

@@ -2,6 +2,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <vector>
+#include "Exceptions.h"
 #include "IBindable.h"
 
 class IndexBuffer : public IBindable
@@ -32,5 +33,5 @@ public:
 
 protected:
 	UINT Count;
-	wrl::ComPtr<ID3D11Buffer> p_IndexBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> p_IndexBuffer;
 };

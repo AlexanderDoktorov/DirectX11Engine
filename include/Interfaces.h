@@ -12,6 +12,6 @@
 #include "IScalable.h"
 #include "IShader.h"
 #include "ISlot.h"
-#include "ITexture.h"
+#include "ITexture2D.h"
 #include "IToString.h"
 #include "IShaderResourse.h"

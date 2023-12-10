@@ -1,15 +1,24 @@
 #pragma once
-#include "Exceptions.h"
-#include "GraphicsChild.h"
+#include <d3d11.h>
 
-class IBindable : virtual public GraphicsChild
+class Graphics;
+
+class GraphicsChild
+{
+protected:
+	virtual ~GraphicsChild() = default;
+	ID3D11Device* GetDevice(Graphics& Gfx);
+	ID3D11DeviceContext* GetContext(Graphics& Gfx);
+};
+
+struct IBindable : virtual public GraphicsChild
 {
 public:
 	virtual ~IBindable() = default;
 	virtual void Bind(Graphics& Gfx) noexcept = 0;
 };
 
-class IUnbindable : virtual public GraphicsChild
+struct IUnbindable : virtual public GraphicsChild
 {
 public:
 	virtual ~IUnbindable() = default;

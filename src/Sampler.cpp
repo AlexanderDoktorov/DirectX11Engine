@@ -1,4 +1,5 @@
 #include "Sampler.h"
+#include "Exceptions.h"
 
 Sampler::Sampler(Graphics& Gfx, UINT bindSlot) : Slotted(bindSlot)
 {

@@ -2,6 +2,7 @@
 #include "IBindable.h"
 #include "Vertex.h"
 #include "Exceptions.h"
+#include <wrl.h>
 
 class VertexBuffer : public IBindable
 {

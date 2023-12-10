@@ -3,7 +3,7 @@
 
 // ********** Mesh **********
 
-Mesh::Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique_ptr<IBindable>> pBindables) 
+Mesh::Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx) 
 {
 	AddBindable( std::make_unique<Topology>( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
@@ -13,13 +13,14 @@ Mesh::Mesh(Graphics& Gfx, const Material* pMeshMaterial, std::vector<std::unique
 		AddBindable(std::move(pBindables[i]));
 	}
 
-	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
+	auto pMeshMaterial = Gfx.GetMaterialAt(matIndx);
+	meshDesc.useDiffuseMap = pMeshMaterial->HasMap(aiTextureType_DIFFUSE);
+	meshDesc.useNormalMap = pMeshMaterial->HasMap(aiTextureType_NORMALS);
+	meshDesc.useSpecularMap = pMeshMaterial->HasMap(aiTextureType_SPECULAR);
+	meshDesc.matId = (int)matIndx;
 
-	meshDesc.matId			= (int)pMeshMaterial->GetIndex();
-	meshDesc.useDiffuseMap	= pMeshMaterial->HasDiffuseMaps();
-	meshDesc.useNormalMap	= pMeshMaterial->HasNormalMaps();
-	meshDesc.useSpecularMap = pMeshMaterial->HasSpecularMaps();
-	AddBindable (std::make_unique<PixelConstantBuffer<MeshDesc>>(Gfx, meshDesc, 0U));
+	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
+	AddBindable( std::make_unique<PixelConstantBuffer<MeshDesc>>(Gfx, meshDesc, 0U));
 }
 
 void Mesh::ShowMeshControls(Graphics& Gfx) noexcept

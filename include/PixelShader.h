@@ -1,4 +1,5 @@
 #pragma once
+#include <wrl.h>
 #include "IBindable.h"
 
 class PixelShader : public IBindable

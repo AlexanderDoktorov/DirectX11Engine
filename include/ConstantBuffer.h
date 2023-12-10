@@ -1,6 +1,8 @@
 #pragma once
 #include "IBindable.h"
 #include "ISlot.h"
+#include <wrl.h>
+#include <assert.h>
 
 template <class T>
 class ConstantBuffer : public IBindable, public IUnbindable, public Slotted
@@ -59,5 +61,5 @@ public:
 
 protected:
     UINT bindSlot = 0U;
-    wrl::ComPtr<ID3D11Buffer> p_ConstantBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> p_ConstantBuffer;
 };

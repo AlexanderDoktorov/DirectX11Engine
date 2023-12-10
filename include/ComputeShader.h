@@ -1,5 +1,6 @@
 #pragma once
 #include "IBindable.h"
+#include "Graphics.h"
 
 class ComputeShader : public IBindable
 {

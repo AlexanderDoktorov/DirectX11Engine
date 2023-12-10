@@ -2,6 +2,10 @@
 #include "IBindable.h"
 #include "PixelConstantBuffer.h"
 #include "IColored.h"
+#include <DirectXMath.h>
+#include <memory>
+
+namespace dx = DirectX;
 
 class ColorBuffer : public IBindable
 {

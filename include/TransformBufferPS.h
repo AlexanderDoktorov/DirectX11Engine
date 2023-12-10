@@ -1,16 +1,17 @@
 #pragma once
 #include "Drawable.h"
 #include "PixelConstantBuffer.h"
+#include <DirectXMath.h>
 
 class TransformBufferPS : public IBindable
 {
 	struct Transformations
 	{
-		dx::XMMATRIX World;
-		dx::XMMATRIX View;
-		dx::XMMATRIX Projection;
+		DirectX::XMMATRIX World;
+		DirectX::XMMATRIX View;
+		DirectX::XMMATRIX Projection;
 
-		Transformations(const dx::XMMATRIX& World, const dx::XMMATRIX& View, const dx::XMMATRIX& Projection)
+		Transformations(const DirectX::XMMATRIX& World, const DirectX::XMMATRIX& View, const DirectX::XMMATRIX& Projection)
 			: World(World), View(View), Projection(Projection)
 		{
 		}

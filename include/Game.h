@@ -8,6 +8,7 @@
 #include "LightSource.h"
 #include "Interfaces.h"
 #include "Model.h"
+#include "XSResourse.h"
 
 class Game
 {
@@ -39,9 +40,7 @@ private:
 	std::unique_ptr<Sheet> sheet;
 	std::unique_ptr<Sheet> nmSheet;
 
-	std::unique_ptr<Model> pModel;
-	std::unique_ptr<Model> pModel2;
-	Model myModel;
+	Model Tree;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;

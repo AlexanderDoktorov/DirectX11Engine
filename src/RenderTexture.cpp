@@ -44,27 +44,7 @@ void RenderTexture::Reset()
 
 void RenderTexture::Resize(Graphics& Gfx, UINT TextureHeight, UINT TextureWidth)
 {
+    // Recreate with new format
     CreateRenderTexture(Gfx, GetDesc().Format, TextureHeight, TextureWidth);
-}
-
-ID3D11Texture2D* RenderTexture::GetTexture() const noexcept
-{
-    return p_Texture.Get();
-}
-
-ID3D11ShaderResourceView* RenderTexture::GetSRV() const noexcept
-{
-    return p_ShaderResourseView.Get();
-}
-
-D3D11_TEXTURE2D_DESC RenderTexture::GetDesc() const noexcept
-{
-    assert(p_Texture != nullptr && L"Trying to get desc from null RenderTexture");
-
-    D3D11_TEXTURE2D_DESC desc{};
-    if(p_Texture)
-        p_Texture->GetDesc(&desc);
-
-    return desc;
 }
 

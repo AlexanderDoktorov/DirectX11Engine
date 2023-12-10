@@ -26,25 +26,18 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 	directory = fileName.substr(0, fileName.find_last_of('\\'));
 
 	// Fill materialPtrs array with all scene materials and push them to structured buffer
-	materialsPtrs.reserve(pScene->mNumMaterials);
+	materialsIndices.reserve(pScene->mNumMaterials);
 	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
 	{
-		std::string NewMaterialName = std::string(pScene->mMaterials[i]->GetName().C_Str());
-		if (int matId = Gfx.HasMaterial(NewMaterialName, directory); matId >= 0)
-		{
-			materialsPtrs.push_back( Gfx.GetMaterialAt(matId) );
-		}
-		else
-		{
-			materialsPtrs.push_back( Gfx.PushMaterial(pScene->mMaterials[i], directory) );
-		}
+		auto mat = Material(Gfx, pScene->mMaterials[i], directory);
+		materialsIndices.push_back(Gfx.GetMaterialIndex(mat));
 	}
 
 	// Fill meshesPtrs array with all scene meshes
 	meshesPtrs.reserve(pScene->mNumMeshes);
 	for( size_t i = 0; i < pScene->mNumMeshes; i++ )
 	{
-		meshesPtrs.push_back( ProccesMesh(Gfx, pScene->mMeshes[i], pScene) );
+		meshesPtrs.push_back( ProccesMesh(Gfx, pScene->mMeshes[i], materialsIndices[pScene->mMeshes[i]->mMaterialIndex] ) );
 	}
 
 	int StartId = 0;
@@ -54,7 +47,7 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 void Model::ClearData() noexcept
 {
 	meshesPtrs.clear();
-	materialsPtrs.clear();
+	materialsIndices.clear();
 	if(pRootNode)
 		pRootNode->Clear();
 	directory.clear();
@@ -62,16 +55,12 @@ void Model::ClearData() noexcept
 
 void Model::ShowControlWindow(Graphics& Gfx) noexcept
 {
-	// Meshes options
-	for (size_t i = 0; i < meshesPtrs.size(); i++)
+	for (size_t i = 0; i < materialsIndices.size(); i++)
 	{
-		if (ImGui::Begin( ( std::string("Model ") + std::to_string(modelNum) + " control window").c_str()))
-		{
-			meshesPtrs[i]->ShowMeshControls(Gfx);
-			if (auto meshMaterialIndex = meshesPtrs[i]->GetMaterialIndex(); meshMaterialIndex < materialsPtrs.size())
-				materialsPtrs[meshMaterialIndex]->ShowMaterialControls(Gfx);
-		}
-		ImGui::End();
+		if (auto pMaterial = Gfx.GetMaterialAt(i))
+			pMaterial->ShowMaterialControls(("Material constrols " + std::to_string(i)).c_str());
+		else
+			OutputDebugStringA("Wanna get null material\n");
 	}
 }
 
@@ -116,57 +105,23 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 	return pMyNode;
 }
 
-std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiScene* pScene)
+std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t materialIndx)
 {
 	std::vector<std::unique_ptr<IBindable>> bindablePtrs;
 
-	auto& pMat = materialsPtrs.at(pMesh->mMaterialIndex);
+	Material* pMat = Gfx.GetMaterialAt(materialIndx);
+	assert(pMat);
+	
+	bindablePtrs.push_back(std::make_unique<Material>(*pMat));
 
-	// Load materials into arrays for each mesh
-	std::unique_ptr<TextureArrayPS> diffuseMapsPS	= std::make_unique<TextureArrayPS>(Gfx,  SLOT_TEXTURE_ARRAY_DIFFUSE);
-	std::unique_ptr<TextureArrayPS> normalMapsPS	= std::make_unique<TextureArrayPS>(Gfx,  SLOT_TEXTURE_ARRAY_NORMALMAP);
-	std::unique_ptr<TextureArrayPS> specularMapsPS	= std::make_unique<TextureArrayPS>(Gfx,  SLOT_TEXTURE_ARRAY_SPECULAR);
-	std::unique_ptr<TextureArrayPS> heightMapsPS	= std::make_unique<TextureArrayPS>(Gfx,  SLOT_TEXTURE_ARRAY_HEIGHT);
-
-	for (const auto& text : pMat->GetTextures())
-	{
-		const char* textureFilePath = text->GetFilePath_C_str();
-		switch (text->GetTextureAiType())
-		{
-		case aiTextureType_DIFFUSE:
-			diffuseMapsPS->PushBack(Gfx, textureFilePath);
-			break;
-		case aiTextureType_SPECULAR:
-			specularMapsPS->PushBack(Gfx, textureFilePath);
-			break;
-		case aiTextureType_HEIGHT:
-			heightMapsPS->PushBack(Gfx, textureFilePath);
-			break;
-		case aiTextureType_NORMALS:
-			normalMapsPS->PushBack(Gfx, textureFilePath, DirectX::WIC_LOADER_IGNORE_SRGB);
-			break;
-		default:
-			break;
-		}
-	}
-
-	const bool HasDiffuseMaps		= !diffuseMapsPS->Empty();
-	const bool HasNormalMaps		= !normalMapsPS->Empty();
-	const bool HasSpecularMaps		= !specularMapsPS->Empty();
-	const bool HasHeightMaps		= !heightMapsPS->Empty();
+	const bool HasDiffuseMaps		= pMat->HasMap(aiTextureType_DIFFUSE);
+	const bool HasNormalMaps		= pMat->HasMap(aiTextureType_NORMALS);
+	const bool HasSpecularMaps		= pMat->HasMap(aiTextureType_SPECULAR);
+	const bool HasHeightMaps		= pMat->HasMap(aiTextureType_HEIGHT);
 	const bool HasAnyMaps			= HasDiffuseMaps || HasNormalMaps || HasSpecularMaps || HasHeightMaps;
 
-	if (HasDiffuseMaps)
-		bindablePtrs.push_back(std::move(diffuseMapsPS));
-	if (HasNormalMaps)
-		bindablePtrs.push_back(std::move(normalMapsPS));
-	if (HasSpecularMaps)
-		bindablePtrs.push_back(std::move(specularMapsPS));
-	if (HasHeightMaps)
-		bindablePtrs.push_back(std::move(heightMapsPS));
 	if (HasAnyMaps)
 		bindablePtrs.push_back(std::make_unique<Sampler>(Gfx));
-
 
 	DynamicVertex::VertexBuffer vb(std::move(
 		DynamicVertex::VertexLayout{}
@@ -208,5 +163,5 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, const aiS
 	bindablePtrs.push_back( std::make_unique<IndexBuffer>(Gfx, indices));
 
 
-	return std::make_unique<Mesh>(Gfx, pMat.get(), std::move(bindablePtrs));
+	return std::make_unique<Mesh>(Gfx,std::move(bindablePtrs), materialIndx);
 }

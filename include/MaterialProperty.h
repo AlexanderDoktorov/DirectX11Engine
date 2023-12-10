@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include "imgui.h"
 #include "assimp\material.h"
 #include <string>
 #include <vector>
@@ -19,11 +20,11 @@ class MaterialProperty
 {
 public: 
 	MaterialProperty(std::string pKey, unsigned int indx, const aiPropertyTypeInfo& propertyType, const char* data_, unsigned int dataSize);
-
 	const std::vector<unsigned char>& GetData() const;
 	const size_t GetSize() const;
 	aiPropertyTypeInfo GetType() const noexcept;
 	std::string GetKey() const noexcept;
+	void ShowGUI() noexcept;
 private:
 	std::string pKey;
 	aiPropertyTypeInfo propertyType;

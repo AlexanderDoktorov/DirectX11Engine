@@ -5,6 +5,7 @@
 
 Game::Game()
 {
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
 	// Graphics and window
 	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);
 	gfx				= std::make_unique<Graphics>(window->GetWnd());
@@ -21,6 +22,14 @@ Game::Game()
 
 	sheet->Scale(20.f, 20.f, 20.f);
 
+	// Models
+	Tree.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	);
+
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
 
@@ -30,35 +39,13 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-	pModel = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.obj)",
-		aiProcess_Triangulate			|
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_CalcTangentSpace		
-	);
-	pModel->Translate(10, 0, 0);
-
-	pModel2 = std::make_unique<Model>(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.obj)",
-		aiProcess_Triangulate			|
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_CalcTangentSpace		
-	);
-
-	myModel.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\brick_wall\brick_wall.obj)",
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_CalcTangentSpace | 
-		aiProcess_GenNormals
-	);
-
-	objects.push_back(pModel.get());
-
 	LoadConfigurationFile("./game.config");
 }
 
 Game::~Game()
 {
 	UpdateConfigurationFile("./game.config");
+	CoUninitialize();
 }
 
 int Game::Start(int nCmdShow)
@@ -121,13 +108,11 @@ void Game::UpdateFrame()
 			light_source->Draw(*gfx);
 		}
 
-		pModel->Draw(*gfx);
-		pModel2->Draw(*gfx);
-		myModel.Draw(*gfx);
 		for (auto& ball : balls)
 		{
 			ball->Draw(*gfx);
 		}
+		Tree.Draw(*gfx);
 	}
 	gfx->EndGeometryPass();
 
@@ -149,9 +134,7 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowControlWindow();
 	cam.ShowControlWindow();
-	pModel->ShowControlWindow(*gfx);
-	pModel2->ShowControlWindow(*gfx);
-	myModel.ShowControlWindow(*gfx);
+	Tree.ShowControlWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }

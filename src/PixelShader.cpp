@@ -1,4 +1,5 @@
 #include "PixelShader.h"
+#include "Exceptions.h"
 #include <d3dcompiler.h>
 
 PixelShader::PixelShader(Graphics& Gfx, const wchar_t* fileName)
