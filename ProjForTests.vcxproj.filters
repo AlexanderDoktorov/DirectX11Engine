@@ -52,6 +52,9 @@
     <Filter Include="WIC">
       <UniqueIdentifier>{a176a080-941e-4cfd-8e21-954d6f78e22e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы указаний">
+      <UniqueIdentifier>{165dc27f-44d5-4895-84d3-4713cb009ebc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -516,6 +519,9 @@
     </None>
     <None Include="shaders\DefaultValues.hlsli">
       <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="cpp.hint">
+      <Filter>Файлы указаний</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

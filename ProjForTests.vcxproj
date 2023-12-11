@@ -379,6 +379,7 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cpp.hint" />
     <None Include="game.config" />
     <None Include="shaders\DefaultValues.hlsli" />
   </ItemGroup>
