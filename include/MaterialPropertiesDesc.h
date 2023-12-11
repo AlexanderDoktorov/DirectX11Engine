@@ -3,6 +3,7 @@
 #include "DOK_traits.h"
 #include "MaterialProperty.h"
 #include "noxnd.h"
+#include <DirectXMath.h>
 
 class MaterialPropertiesDesc
 {
@@ -32,6 +33,19 @@ public:
 				{
 					return *reinterpret_cast<const T*>(p.GetData().data());
 				}
+			}
+		}
+		assert(false && "Property was not found");
+		return std::nullopt;
+	}
+	template<>
+	std::optional<DirectX::XMFLOAT3> GetPropertyAs(std::string pKey, [[maybe_unused]] unsigned int, [[maybe_unused]] unsigned int) const noxnd
+	{
+		for (auto& p : properties)
+		{
+			if (p.GetKey() == pKey && aiPTI_Float == p.GetType() && p.GetSize() == sizeof(DirectX::XMFLOAT3))
+			{
+				return *reinterpret_cast<const DirectX::XMFLOAT3*>(p.GetData().data());
 			}
 		}
 		assert(false && "Property was not found");

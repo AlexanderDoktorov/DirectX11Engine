@@ -19,6 +19,7 @@ struct MaterialDesc
 	dx::XMFLOAT3 Kd; // reflected color diffuse
 	dx::XMFLOAT3 Ks; // reflected color specular
 	dx::XMFLOAT3 Ka; // reflected color ambient
+	dx::XMFLOAT3 Ke; //		      color emissive 
 	float  Ns; // shininess
 };
 

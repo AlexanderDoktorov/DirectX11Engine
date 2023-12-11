@@ -11,7 +11,7 @@ class Mesh : public Drawable
 	friend class Model;
 	friend class Node;
 public:
-	struct MeshDesc
+	struct alignas(16) MeshDesc
 	{
 		bool useNormalMap	= false;
 		bool pad1[3];

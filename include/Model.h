@@ -8,7 +8,7 @@
 #include "Material.h"
 #include "Numerated.h"
 
-class Model : public Drawable, public Numerated<Model>
+class Model : public Drawable
 {
 public:
 	Model() = default;
@@ -18,6 +18,7 @@ public:
 	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
 	virtual void Draw(Graphics& Gfx) override;
 	Model& Translate(float dx, float dy, float dz) noexcept;
+	Model& SetPostion(float x, float y, float z) noexcept;
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t materialIndx);
@@ -26,6 +27,4 @@ private:
 	std::vector<size_t>						materialsIndices;
 	std::unique_ptr<Node>			        pRootNode;
 	std::string directory;
-private:
-	size_t modelNum = GetCount();
 };

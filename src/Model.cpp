@@ -3,8 +3,6 @@
 // ********** Model **********
 
 Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
-	:
-	modelNum(GetCount())
 {
 	Load(Gfx, fileName, aippFlags);
 }
@@ -85,6 +83,15 @@ Model& Model::Translate(float dx, float dy, float dz) noexcept
 	return *this;
 }
 
+Model& Model::SetPostion(float x, float y, float z) noexcept
+{
+	for (auto& pMesh : meshesPtrs)
+	{
+		pMesh->SetPosition(x, y, z);
+	}
+	return *this;
+}
+
 std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode)
 {
 	// fill nodeMeshes pointers for building a node
@@ -148,7 +155,9 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 
 		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NotextureVS.cso");
 		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NotexturePS.cso"));
-		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, Mesh::MeshDescNotex{}, 0U));
+		Mesh::MeshDescNotex meshDescNoTex{};
+		meshDescNoTex.matId = (int)materialIndx;
+		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, meshDescNoTex, 0U));
 	}
 	else
 	{

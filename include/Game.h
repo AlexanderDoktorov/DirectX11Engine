@@ -9,6 +9,7 @@
 #include "Interfaces.h"
 #include "Model.h"
 #include "XSResourse.h"
+#include "SolidBall.h"
 
 class Game
 {

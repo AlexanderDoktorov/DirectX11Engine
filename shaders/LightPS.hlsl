@@ -37,6 +37,7 @@ struct MaterialDesc
     float3 Kd; // reflected color diffuse
     float3 Ks; // reflected color specular
     float3 Ka; // reflected color ambient
+    float3 Ke; //           color emmisive
     float  Ns; // shininess
 };
 
@@ -61,8 +62,10 @@ float4 CalulateLightImpactForMaterial(float att, float lambertian, float specAng
     const float3 diffuseLightImpact = matDesc.Kd * (ligthParams.diffuseIntensity * ligthParams.diffuseColor) * att * lambertian;
     // Specular
     const float3 specularLightImpact = matDesc.Ks * ligthParams.diffuseColor * pow(specAngle, matDesc.Ns);
+    // Emissive
+    const float3 emissiveLightImpact = matDesc.Ke;
     
-    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact), 1.f);
+    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact + emissiveLightImpact), 1.f);
 }
 
 float4 CalulateLightImpact(float att, float lambertian, float specAngle, float shininess)
@@ -94,7 +97,6 @@ float4 main(in PS_INPUT input) : SV_Target0
     const float3 viewDir    = normalize(worldCameraPosition - worldPosition);
     const float3 reflectDir = reflect(-dirToL, worldNormal);
     const float  specAngle  = saturate(dot(viewDir, reflectDir));
-    
     // Get material id from texture
     uint textureWidth;
     uint textureHeight;

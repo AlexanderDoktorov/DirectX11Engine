@@ -1,11 +1,11 @@
 #pragma once
 #include "imgui.h"
-#include "SolidBall.h"
 #include "PixelConstantBuffer.h"
 #include "ILight.h"
 #include "IAnimated.h"
+#include "Model.h"
 
-class LightSource : public SolidBall, public IBindable, public ILight, public IAnimated
+class LightSource : public IBindable, public ILight, public IAnimated, public Model, public IMovable, public IToString
 {
 public:
 	LightSource(Graphics& Gfx);

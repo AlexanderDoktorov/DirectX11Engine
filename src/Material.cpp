@@ -90,10 +90,11 @@ MaterialDesc Material::GetMaterialDesc() const noexcept
 	materialDesc_.hasHeightMap	 = mapLayout.hasHeightMap;
 	materialDesc_.hasNormalMap	 = mapLayout.hasNormalMap;
 	materialDesc_.hasSpecularMap = mapLayout.hasSpecularMap;
-	materialDesc_.Ka = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_AMBIENT).value());
-	materialDesc_.Kd = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_DIFFUSE).value());
-	materialDesc_.Ks = reinterpret_cast<dx::XMFLOAT3&&>(matDesc.GetPropertyAs<aiColor3D>(AI_MATKEY_COLOR_SPECULAR).value());
-	materialDesc_.Ns = matDesc.GetPropertyAs<float>(AI_MATKEY_SHININESS).value();
+	materialDesc_.Ka = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
+	materialDesc_.Kd = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();
+	materialDesc_.Ks = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
+	materialDesc_.Ke = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_EMISSIVE).value();
+	materialDesc_.Ns = matDesc.GetPropertyAs<float>(AI_MATKEY_SHININESS).value_or(1.f);
 	return materialDesc_;
 }
 bool Material::operator==(const Material& rhs) const noexcept
