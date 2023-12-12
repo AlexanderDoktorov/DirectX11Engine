@@ -5,6 +5,7 @@
 #include "imgui.h"
 #include <DirectXMath.h>
 #include <vector>
+#include <variant>
 
 class Mesh : public Drawable
 {
@@ -33,7 +34,6 @@ public:
 	Mesh() = default;
 	Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx);
 
-	template<class T>
 	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 	{
 		auto makeHashed = [](std::string str, const std::string& hash) -> std::string
@@ -43,28 +43,28 @@ public:
 
 		bool changed = false;
 
-		if constexpr (std::is_same_v<T, MeshDesc>)
+		if (auto pDesc = std::get_if<MeshDesc>(&meshDesc))
 		{
-			Material* pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(meshDesc.matId);
+			Material* pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);
 			MapLayout mapLayout = pMeshMaterial->GetMapLayout();
 
 			if(mapLayout.hasDiffuseMap)
-				changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &meshDesc.useDiffuseMap);
-			if(!meshDesc.useDiffuseMap)
-				changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &meshDesc.albedoColor.x);
+				changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &pDesc->useDiffuseMap);
+			if(!pDesc->useDiffuseMap)
+				changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pDesc->albedoColor.x);
 			if(mapLayout.hasNormalMap)
-				changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &meshDesc.useNormalMap);
+				changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &pDesc->useNormalMap);
 			if(mapLayout.hasSpecularMap)
-				changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &meshDesc.useSpecularMap);
+				changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &pDesc->useSpecularMap);
 
 			if(auto pMeshBuffer = QueryBindable<meshBufferTextured>(); changed && pMeshBuffer)
-				pMeshBuffer->Update(Gfx, meshDesc);
+				pMeshBuffer->Update(Gfx, *pDesc);
 		}
-		if constexpr (std::is_same_v<T, MeshDescNotex>)
+		if (auto pNoTexDesc = std::get_if<MeshDescNotex>(&meshDesc))
 		{
-			changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &meshDesc.albedoColor.x);
+			changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pNoTexDesc->albedoColor.x);
 			if (auto pMeshBufferNoTex = QueryBindable<meshBufferNoTex>(); changed && pMeshBufferNoTex)
-				pMeshBufferNoTex->Update(Gfx, MeshDescNotex{ meshDesc.albedoColor, meshDesc.matId });
+				pMeshBufferNoTex->Update(Gfx, *pNoTexDesc);
 		}
 		return changed;
 	}
@@ -72,8 +72,9 @@ public:
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 	Mesh& Translate(float dx, float dy, float dz) noexcept;
 	Mesh& SetPosition(float x, float y, float z)  noexcept;
+	Mesh& SetRotatin(float roll, float pitch, float yaw)  noexcept;
 private:
 	dx::XMFLOAT3 worldTranslation{};
 	dx::XMFLOAT3 worldRotation{};
-	MeshDesc meshDesc{};
+	std::variant<MeshDesc, MeshDescNotex> meshDesc;
 };

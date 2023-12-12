@@ -24,6 +24,7 @@
 #include "Material.h"
 #include "Sampler.h"
 #include "noxnd.h"
+#include "DOK_traits.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
@@ -34,7 +35,8 @@ class Graphics
 {
 public:
 	// Meta info
-	using MaterialBuffer = StructuredBuffer<MaterialDesc, MAX_MATERIALS, PSResourse>;
+	using material_buffer_type = StructuredBuffer<MaterialDesc, MAX_MATERIALS, shader_type_pixel>;
+	using window_type = DirectXWindow;
 private:
 	friend class GraphicsChild;
 	class MaterialSystem
@@ -51,10 +53,9 @@ private:
 		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
 		std::optional<size_t> IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept;
 		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
-
 	private:
 		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
-		std::unique_ptr<MaterialBuffer>			pMaterialBuffer;
+		std::unique_ptr<material_buffer_type>			pMaterialBuffer;
 		std::unique_ptr<RenderTexture>			MaterialIDTexture;
 		std::vector<std::unique_ptr<Material>>	loadedMaterials;
 		Graphics* pGfx = nullptr;

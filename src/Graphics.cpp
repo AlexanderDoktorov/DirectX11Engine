@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "Material.h"
 #include "XSResourse.h"
+#include <algorithm>
 #include <assert.h>
 
 #pragma comment(lib, "d3d11")
@@ -552,7 +553,7 @@ void Graphics::MaterialSystem::Initilize(Graphics& Gfx, const RECT& rc) noexcept
 {
     pGfx = &Gfx;
     MaterialIDTexture   = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R32_SINT, rc.bottom - rc.top, rc.right - rc.left);
-    pMaterialBuffer     = std::make_unique<MaterialBuffer>(*pGfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
+    pMaterialBuffer     = std::make_unique<material_buffer_type>(*pGfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
     rtvMaterialID       = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
 }
 

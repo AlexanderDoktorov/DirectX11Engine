@@ -273,7 +273,6 @@
     <ClCompile Include="src\VertexShaderCommon.cpp" />
     <ClCompile Include="src\WICTextureLoader11.cpp" />
     <ClCompile Include="src\wWinMain.cpp" />
-    <ClCompile Include="src\XSResourse.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseWindow.h" />

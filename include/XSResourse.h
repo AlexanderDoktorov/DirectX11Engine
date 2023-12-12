@@ -2,38 +2,79 @@
 #include "IShaderResourse.h"
 #include "ISlot.h"
 #include "IBindable.h"
+#include "DOK_traits.h"
 
-struct ShaderResourse : public Slotted, public IShaderResourse, public IBindable
+class ShaderResourseBase : public Slotted, virtual public IShaderResourse, public IBindable {};
+
+template<class T>
+struct ShaderResourse : public ShaderResourseBase {};
+
+template<>
+struct ShaderResourse<shader_type_vertex> : public ShaderResourseBase
 {
-	ShaderResourse() = default;
-	ShaderResourse(UINT bindSlot);
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		ID3D11ShaderResourceView* pSRV = GetSRV();
+		GetContext(Gfx)->VSSetShaderResources(GetBindSlot(), 1U, &pSRV);
+	}
 };
 
-struct PSResourse : public ShaderResourse
+
+template<>
+struct ShaderResourse<shader_type_pixel> : public ShaderResourseBase
 {
-	virtual void Bind(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		ID3D11ShaderResourceView* pSRV = GetSRV();
+		GetContext(Gfx)->PSSetShaderResources(GetBindSlot(), 1U, &pSRV);
+	}
 };
 
-struct VSResourse : public ShaderResourse
+
+template<>
+struct ShaderResourse<shader_type_compute> : public ShaderResourseBase
 {
-	virtual void Bind(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		ID3D11ShaderResourceView* pSRV = GetSRV();
+		GetContext(Gfx)->CSSetShaderResources(GetBindSlot(), 1U, &pSRV);
+	}
 };
 
-struct HSResourse : public ShaderResourse
+template<>
+struct ShaderResourse<shader_type_geometry> : public ShaderResourseBase
 {
-	virtual void Bind(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		ID3D11ShaderResourceView* pSRV = GetSRV();
+		GetContext(Gfx)->GSSetShaderResources(GetBindSlot(), 1U, &pSRV);
+	}
 };
 
-struct CSResourse : public ShaderResourse
+template<>
+struct ShaderResourse<shader_type_hull> : public ShaderResourseBase
 {
-	virtual void Bind(Graphics& Gfx) noexcept override;
+	void Bind(Graphics& Gfx) noexcept override
+	{
+		ID3D11ShaderResourceView* pSRV = GetSRV();
+		GetContext(Gfx)->HSSetShaderResources(GetBindSlot(), 1U, &pSRV);
+	}
 };
 
-template<class... XSResourses>
-struct ComboSResrouse : public XSResourses...
+template<class... ShaderTypes>
+struct ComboSResrouse : public ShaderResourse<ShaderTypes>...
 {
+	ComboSResrouse() = default;
+
+	template<class ShaderType>
+	void SetShaderBindSlot(UINT bindSlot) noexcept
+	{
+		ShaderResourse<ShaderType>::SetBindSlot(bindSlot);
+	}
+
 	virtual void Bind(Graphics& Gfx) noexcept override
 	{
-		(void)(XSResourses::Bind(Gfx), ...);
+		(ShaderResourse<ShaderTypes>::Bind(Gfx), ...);
 	}
+	virtual ~ComboSResrouse() = default;
 };

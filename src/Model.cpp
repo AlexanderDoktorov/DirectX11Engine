@@ -14,7 +14,7 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 	Assimp::Importer imp;
 	const aiScene* pScene = imp.ReadFile(fileName.c_str(), aippFlags);
 
-	if(!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) // if is Not Zero
+	if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) // if is Not Zero
 	{
 		OutputDebugStringA("ERROR ASSIMP: ");
 		OutputDebugStringA(imp.GetErrorString());
@@ -25,16 +25,16 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 
 	// Fill materialPtrs array with all scene materials and push them to structured buffer
 	materialsIndices.reserve(pScene->mNumMaterials);
-	for( size_t i = 0; i < pScene->mNumMaterials; i++ )
+	for (size_t i = 0; i < pScene->mNumMaterials; i++)
 	{
 		materialsIndices.push_back(Gfx.GetMaterialSystem().GetMaterialIndex(pScene->mMaterials[i], directory));
 	}
 
 	// Fill meshesPtrs array with all scene meshes
 	meshesPtrs.reserve(pScene->mNumMeshes);
-	for( size_t i = 0; i < pScene->mNumMeshes; i++ )
+	for (size_t i = 0; i < pScene->mNumMeshes; i++)
 	{
-		meshesPtrs.push_back( ProccesMesh(Gfx, pScene->mMeshes[i], materialsIndices[pScene->mMeshes[i]->mMaterialIndex] ) );
+		meshesPtrs.push_back(ProccesMesh(Gfx, pScene->mMeshes[i], materialsIndices[pScene->mMeshes[i]->mMaterialIndex]));
 	}
 
 	int StartId = 0;
@@ -45,23 +45,28 @@ void Model::ClearData() noexcept
 {
 	meshesPtrs.clear();
 	materialsIndices.clear();
-	if(pRootNode)
+	if (pRootNode)
 		pRootNode->Clear();
 	directory.clear();
 }
 
 void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept
 {
-	if(ImGui::Begin(modelName.c_str()))
+	if (ImGui::Begin(modelName.c_str()))
 	{
+		using namespace std::string_literals;
 		for (size_t iMesh = 0U; iMesh < meshesPtrs.size(); iMesh++)
 		{
 			std::string hash = modelName + std::to_string(iMesh);
-			if (auto pMat = Gfx.GetMaterialSystem().GetMaterialAt(meshesPtrs[iMesh]->GetMaterialIndex()); pMat->HasAnyMaps())
-				meshesPtrs[iMesh]->ShowMeshGUI<Mesh::MeshDesc>(Gfx, std::move(hash));
-			else
-				meshesPtrs[iMesh]->ShowMeshGUI<Mesh::MeshDescNotex>(Gfx, std::move(hash));
+			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
 		}
+
+		bool rotated = false;
+		rotated |= ImGui::SliderAngle(("Roll"s + modelName).c_str(), &modelRotation.x);
+		rotated |= ImGui::SliderAngle(("Pirch"s + modelName).c_str(), &modelRotation.y);
+		rotated |= ImGui::SliderAngle(("Yaw"s + modelName).c_str(), &modelRotation.z);
+		if(rotated)
+			std::for_each(meshesPtrs.begin(), meshesPtrs.end(), [&](const std::shared_ptr<Mesh>& pMesh) { pMesh->SetRotatin(modelRotation.x, modelRotation.y, modelRotation.z); });
 	}
 	ImGui::End();
 }
@@ -88,6 +93,15 @@ Model& Model::SetPostion(float x, float y, float z) noexcept
 	for (auto& pMesh : meshesPtrs)
 	{
 		pMesh->SetPosition(x, y, z);
+	}
+	return *this;
+}
+
+Model& Model::SetRotation(float roll, float pitch, float yaw) noexcept
+{
+	for (auto& pMesh : meshesPtrs)
+	{
+		pMesh->SetRotatin(roll, pitch, yaw);
 	}
 	return *this;
 }
@@ -155,9 +169,6 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 
 		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NotextureVS.cso");
 		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NotexturePS.cso"));
-		Mesh::MeshDescNotex meshDescNoTex{};
-		meshDescNoTex.matId = (int)materialIndx;
-		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, meshDescNoTex, 0U));
 	}
 	else
 	{
@@ -183,14 +194,6 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 
 		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
 		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
-
-		// Fill initial meshDesc
-		Mesh::MeshDesc meshDesc{};
-		meshDesc.useDiffuseMap	= pMat->GetMapLayout().hasDiffuseMap;
-		meshDesc.useNormalMap	= pMat->GetMapLayout().hasNormalMap;
-		meshDesc.useSpecularMap	= pMat->GetMapLayout().hasSpecularMap;
-		meshDesc.matId			= static_cast<int>(materialIndx);
-		bindablePtrs.push_back(std::make_unique<PixelConstantBuffer<Mesh::MeshDesc>>(Gfx, meshDesc, 0U));
 	}
 
 

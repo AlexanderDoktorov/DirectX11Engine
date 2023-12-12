@@ -14,6 +14,7 @@ protected:
 struct IBindable : virtual public GraphicsChild
 {
 public:
+	IBindable() = default;
 	virtual ~IBindable() = default;
 	virtual void Bind(Graphics& Gfx) noexcept = 0;
 };
