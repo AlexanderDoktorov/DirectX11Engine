@@ -32,7 +32,7 @@ public:
 	typedef PixelConstantBuffer<MeshDescNotex> meshBufferNoTex;
 public:
 	Mesh() = default;
-	Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx);
+	Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, size_t mId);
 
 	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 	{
@@ -43,7 +43,7 @@ public:
 		bool changed = false;
 		if (auto pDesc = std::get_if<MeshDesc>(&meshDesc))
 		{
-			Material* pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);
+			auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);
 			MapLayout mapLayout = pMeshMaterial->GetMapLayout();
 
 			if(mapLayout.hasDiffuseMap)

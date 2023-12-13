@@ -9,12 +9,6 @@ struct HasValueMember : std::false_type {};
 template <typename T>
 struct HasValueMember<T, std::void_t<decltype(T::value)>> : std::true_type {};
 
-struct shader_type_pixel {};
-struct shader_type_vertex {};
-struct shader_type_hull {};
-struct shader_type_compute {};
-struct shader_type_geometry {};
-
 template<class T, class A = void>
 struct has_type_using
 {

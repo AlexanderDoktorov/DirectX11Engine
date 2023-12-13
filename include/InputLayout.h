@@ -18,6 +18,6 @@ public:
 	static std::string GenerateID(const DynamicVertex::VertexLayout& vl, [[maybe_unused]] IShader* = nullptr);
 	static std::shared_ptr<InputLayout> Resolve(Graphics& Gfx,const DynamicVertex::VertexLayout& vl, IShader* pShader);
 private:
-	DynamicVertex::VertexLayout layout;
+	std::string layoutID;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> p_IL;
 };

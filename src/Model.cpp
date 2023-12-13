@@ -130,18 +130,20 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 	return pMyNode;
 }
 
-std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t materialIndx)
+std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId)
 {
-	std::vector<std::unique_ptr<IBindable>> bindablePtrs;
+	std::vector<std::shared_ptr<IBindable>> bindablePtrs;
 	std::unique_ptr<VertexShaderCommon> vertexShader = nullptr;
 	DynamicVertex::VertexBuffer vertexBuffer;
 
 	// Get material index from material system in gfx (or create new and get index)
-	Material* pMat = Gfx.GetMaterialSystem().GetMaterialAt(materialIndx);
+	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
 	assert(pMat);
+
+	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
 	
 	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
-	bindablePtrs.push_back(std::make_unique<Material>(*pMat));
+	bindablePtrs.push_back(pMat);
 
 	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
 	const bool HasNormalMaps		= pMat->GetMapLayout().hasNormalMap;
@@ -198,7 +200,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 
 
 	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vertexBuffer));
-	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vertexBuffer.GetLayout(), (IShader*)vertexShader.get()));
+	bindablePtrs.push_back(InputLayout::Resolve(Gfx, vertexBuffer.GetLayout(), (IShader*)vertexShader.get()));
 	bindablePtrs.push_back(std::move(vertexShader));
 
 
@@ -213,8 +215,8 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 		for (size_t k = 0; k < pMesh->mFaces[i].mNumIndices; k++)
 			indices.push_back(pMesh->mFaces[i].mIndices[k]);
 	}
-	bindablePtrs.push_back( std::make_unique<IndexBuffer>(Gfx, indices));
+	bindablePtrs.push_back( IndexBuffer::Resolve(Gfx, meshTag, indices) );
 
 
-	return std::make_unique<Mesh>(Gfx,std::move(bindablePtrs), materialIndx);
+	return std::make_unique<Mesh>(Gfx, std::move(bindablePtrs), mId);
 }

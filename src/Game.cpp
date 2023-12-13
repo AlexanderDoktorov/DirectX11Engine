@@ -53,17 +53,8 @@ Game::Game()
 	for (auto& light : lights)
 		objects.push_back(light.get());
 
-#pragma region BIND_TEST
-	DynamicVertex::VertexLayout vl{};
-	std::vector<unsigned short> indxs = { 1,2,3,4 };
-	std::vector<unsigned short> indxs2 = { 1,2,3,4,12, 15 };
-	vl.Append(DynamicVertex::VertexLayout::Position2D).Append(DynamicVertex::VertexLayout::Normal);
-	IShader* pShader = new VertexShaderCommon(*gfx, L"shaders\\NotextureVS.cso");
-	auto IL = BindableSystem::Resolve<InputLayout>(*gfx, vl, pShader);
-	auto IL2 = InputLayout::Resolve(*gfx, vl, pShader);
-	auto indxBuff = BindableSystem::Resolve<IndexBuffer>(*gfx, "SomeName", indxs);
-	auto indxBuff2 = IndexBuffer::Resolve(*gfx, "SomeName2", indxs2);
-#pragma endregion BIND_TEST
+#pragma region TEST
+#pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
 }

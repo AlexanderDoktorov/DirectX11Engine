@@ -3,7 +3,7 @@
 
 InputLayout::InputLayout(Graphics& Gfx, const DynamicVertex::VertexLayout& vl, IShader* pShader) 
 	:
-	layout(vl)
+	layoutID(vl.GetCode())
 {
 	DOK_assert(pShader->GetBlob() != nullptr, L"Unable to create layout with null shader bytecode");
 	CHECK_HR ( GetDevice(Gfx)->CreateInputLayout(vl.GetD3DLayout().data(), (UINT)vl.GetElementCount(), pShader->GetBlob()->GetBufferPointer(), pShader->GetBlob()->GetBufferSize(), &p_IL));
@@ -16,7 +16,7 @@ void InputLayout::Bind(Graphics& Gfx) noexcept
 
 std::string InputLayout::GetID() const noexcept
 {
-	return GenerateID(layout);
+	return layoutID;
 }
 
 std::string InputLayout::GenerateID(const DynamicVertex::VertexLayout& vl, IShader*)

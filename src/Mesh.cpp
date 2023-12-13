@@ -3,9 +3,9 @@
 
 // ********** Mesh **********
 
-Mesh::Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, size_t matIndx)
+Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, size_t mId)
 {
-	const Material* pMat = Gfx.GetMaterialSystem().GetMaterialAt(matIndx);
+	const auto pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
 	if (pMat->HasAnyMaps())
 	{
 		MapLayout ml = pMat->GetMapLayout();
@@ -13,26 +13,26 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::unique_ptr<IBindable>> pBindables, si
 		temp.useDiffuseMap = ml.hasDiffuseMap;
 		temp.useNormalMap = ml.hasNormalMap;
 		temp.useSpecularMap = ml.hasSpecularMap;
-		temp.matId = (int)matIndx;
+		temp.matId = (int)mId;
 		meshDesc = std::move(temp);
-		AddBindable(std::make_unique<PixelConstantBuffer<Mesh::MeshDesc>>(Gfx, std::get<MeshDesc>(meshDesc), 0U));
+		AddBindable(std::make_shared<PixelConstantBuffer<Mesh::MeshDesc>>(Gfx, std::get<MeshDesc>(meshDesc), 0U));
 	}
 	else
 	{
 		MeshDescNotex temp{};
-		temp.matId = (int)matIndx;
+		temp.matId = (int)mId;
 		meshDesc = std::move(temp);
-		AddBindable(std::make_unique<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, std::get<MeshDescNotex>(meshDesc), 0U));
+		AddBindable(std::make_shared<PixelConstantBuffer<Mesh::MeshDescNotex>>(Gfx, std::get<MeshDescNotex>(meshDesc), 0U));
 	}
 
-	AddBindable( std::make_unique<Topology>( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
+	AddBindable( std::make_shared<Topology>( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
 	for (size_t i = 0; i < pBindables.size(); i++)
 	{
 		AddBindable(std::move(pBindables[i]));
 	}
 
-	AddBindable( std::make_unique<TransformBuffer>( Gfx,*this ) );
+	AddBindable( std::make_shared<TransformBuffer>( Gfx,*this ) );
 }
 
 int Mesh::GetMaterialIndex() const noexcept

@@ -1,12 +1,15 @@
 #pragma once
-#include "IBindable.h"
-#include "ISlot.h"
+#include "XSResourse.h"
 #include <wrl.h>
 #include <assert.h>
+#include <string>
 
-template <class T>
-class ConstantBuffer : public IBindable, public IUnbindable, public Slotted
+template <class T, class... ShaderTypes>
+class ConstantBuffer : public ComboBuffer<ShaderTypes...>
 {
+    using ISlot::SetBindSlot;
+    using GraphicsChild::GetDevice;
+    using GraphicsChild::GetContext;
 public:
     ConstantBuffer(Graphics& Gfx, const T& CBData)
     {
@@ -27,6 +30,12 @@ public:
         SetBindSlot(bindSlot);
     }
 
+    template<class... Unused>
+    static std::string GenerateID(Unused&&... args) noexcept
+    {
+        return std::string(typeid(ConstantBuffer).name());
+    }
+
     ConstantBuffer(Graphics& Gfx)
     {
         D3D11_BUFFER_DESC CBDesc = {};
@@ -36,6 +45,11 @@ public:
         CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, nullptr, &p_ConstantBuffer); assert(SUCCEEDED(hr));
+    }
+
+    virtual ID3D11Buffer* GetBuffer() const noexcept override
+    {
+        return p_ConstantBuffer.Get();
     }
 
     void Update(Graphics& Gfx, const T& NewData)
@@ -48,18 +62,8 @@ public:
         GetContext(Gfx)->Unmap(p_ConstantBuffer.Get(), 0U);
     }
 
-    void SetBindSlot(UINT slot) noexcept override
-    {
-        bindSlot = slot;
-    }
-    UINT GetBindSlot() const noexcept override
-    {
-        return bindSlot;
-    }
-
     ~ConstantBuffer() = default;
 
 protected:
-    UINT bindSlot = 0U;
     Microsoft::WRL::ComPtr<ID3D11Buffer> p_ConstantBuffer;
 };

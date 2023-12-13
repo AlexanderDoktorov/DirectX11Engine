@@ -3,20 +3,15 @@
 #include <DirectXMath.h>
 
 template <class T = DirectX::XMFLOAT4>
-class PixelConstantBuffer : public ConstantBuffer<T>
+class PixelConstantBuffer : public ConstantBuffer<T, shader_type_pixel>
 {
 	using IBindable::GetContext;
-	using ConstantBuffer<T>::p_ConstantBuffer;
-	using ConstantBuffer<T>::ISlot::GetBindSlot;
+	using ConstantBuffer<T, shader_type_pixel>::p_ConstantBuffer;
+	using ConstantBuffer<T, shader_type_pixel>::ISlot::GetBindSlot;
 public:
-	using ConstantBuffer<T>::ConstantBuffer;
+	using ConstantBuffer<T, shader_type_pixel>::ConstantBuffer;
 
-	virtual void Bind(Graphics& Gfx) noexcept override
-	{
-		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, p_ConstantBuffer.GetAddressOf()); // : register(bindSlot)
-	}
-
-	virtual void Unbind(Graphics& Gfx) noexcept override
+	virtual void Unbind(Graphics& Gfx) noexcept
 	{
 		ID3D11Buffer* pNullPSBuffer[1] = { nullptr };
 		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pNullPSBuffer); // Unbind register(bindSlot)

@@ -49,7 +49,7 @@ private:
 		size_t GetMaterialIndex(Material& material) noxnd;
 		size_t GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd;
 		bool UpdateMaterialAt(size_t indx) noexcept;
-		Material* GetMaterialAt(size_t indx) noexcept;
+		std::shared_ptr<Material> GetMaterialAt(size_t indx) noexcept;
 		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
 		std::optional<size_t> IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept;
 		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
@@ -57,7 +57,7 @@ private:
 		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
 		std::unique_ptr<material_buffer_type>	pMaterialBuffer;
 		std::unique_ptr<RenderTexture>			MaterialIDTexture;
-		std::vector<std::unique_ptr<Material>>	loadedMaterials;
+		std::vector<std::shared_ptr<Material>>	loadedMaterials;
 		Graphics* pGfx = nullptr;
 	};
 public:

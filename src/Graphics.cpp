@@ -603,10 +603,10 @@ bool Graphics::MaterialSystem::UpdateMaterialAt(size_t indx) noexcept
     return false;
 }
 
-Material* Graphics::MaterialSystem::GetMaterialAt(size_t indx) noexcept
+std::shared_ptr<Material> Graphics::MaterialSystem::GetMaterialAt(size_t indx) noexcept
 {
     if (indx < loadedMaterials.size())
-        return loadedMaterials.at(indx).get();
+        return loadedMaterials.at(indx);
     return nullptr;
 }
 
