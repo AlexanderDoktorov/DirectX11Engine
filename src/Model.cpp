@@ -198,7 +198,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t ma
 
 
 	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vertexBuffer));
-	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vertexBuffer.GetLayout().GetD3DLayout(), (IShader*)vertexShader.get()));
+	bindablePtrs.push_back(std::make_unique<InputLayout>(Gfx, vertexBuffer.GetLayout(), (IShader*)vertexShader.get()));
 	bindablePtrs.push_back(std::move(vertexShader));
 
 

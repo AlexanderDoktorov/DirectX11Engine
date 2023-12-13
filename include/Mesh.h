@@ -40,9 +40,7 @@ public:
 		{
 			return str.append("##").append(hash);
 		};
-
 		bool changed = false;
-
 		if (auto pDesc = std::get_if<MeshDesc>(&meshDesc))
 		{
 			Material* pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);

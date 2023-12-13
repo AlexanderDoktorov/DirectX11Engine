@@ -244,6 +244,8 @@
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\HullShader.cpp" />
     <ClCompile Include="src\IBindable.cpp" />
+    <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\ISlot.cpp" />
     <ClCompile Include="src\LightSource.cpp" />
     <ClCompile Include="src\Material.cpp" />
@@ -276,6 +278,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseWindow.h" />
+    <ClInclude Include="include\BindableSystem.h" />
     <ClInclude Include="include\Blob.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Character.h" />
@@ -284,6 +287,7 @@
     <ClInclude Include="include\ComputeShader.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
     <ClInclude Include="include\DOK_traits.h" />
+    <ClInclude Include="include\IGetID.h" />
     <ClInclude Include="include\MaterialPropertiesDesc.h" />
     <ClInclude Include="include\noxnd.h" />
     <ClInclude Include="include\Numerated.h" />

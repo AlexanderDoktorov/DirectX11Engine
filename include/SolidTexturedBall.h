@@ -20,7 +20,7 @@ public:
 
             AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
             AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\GeometryTexturedPS.cso"));
-            AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
+            AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout, VS.get()));
             AddStaticBindable(std::move(VS));
             AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
             AddStaticBindable(std::make_unique<WICTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\globus_texture.jpeg", 3U));

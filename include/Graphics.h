@@ -55,7 +55,7 @@ private:
 		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
 	private:
 		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
-		std::unique_ptr<material_buffer_type>			pMaterialBuffer;
+		std::unique_ptr<material_buffer_type>	pMaterialBuffer;
 		std::unique_ptr<RenderTexture>			MaterialIDTexture;
 		std::vector<std::unique_ptr<Material>>	loadedMaterials;
 		Graphics* pGfx = nullptr;

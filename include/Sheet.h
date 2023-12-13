@@ -23,7 +23,7 @@ public:
 
 			AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
 			AddStaticBindable(std::make_unique<PixelShader>(Gfx, L"shaders\\NormalTexturePS.cso"));
-			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
+			AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout, VS.get()));
 			AddStaticBindable(std::move(VS));
 			AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 			AddStaticBindable(std::make_unique<WICTexture>(Gfx,  L"Models\\brick_wall\\brick_wall_diffuse.jpg", SLOT_TEXTURE_DIFFUSE));

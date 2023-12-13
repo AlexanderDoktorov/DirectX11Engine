@@ -20,7 +20,7 @@ public:
             std::unique_ptr<VertexShaderCommon> VS = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\GeometryVS.cso");
             AddStaticBindable(std::make_unique<VertexBuffer>(Gfx, model.vertices));
             AddStaticBindable(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\GeometryPS.cso"));
-            AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout.GetD3DLayout(), VS.get()));
+            AddStaticBindable(std::make_unique<InputLayout>(Gfx, vertexLayout, VS.get()));
             AddStaticBindable(std::move(VS));
             AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
             AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));

@@ -204,6 +204,12 @@
     <ClCompile Include="src\Vertex.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="src\IndexBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputLayout.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -508,6 +514,12 @@
     </ClInclude>
     <ClInclude Include="include\WICTextureLoader11.h">
       <Filter>WIC</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BindableSystem.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IGetID.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
