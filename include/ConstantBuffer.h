@@ -1,17 +1,19 @@
 #pragma once
-#include "XSResourse.h"
 #include <wrl.h>
 #include <assert.h>
 #include <string>
+#include "ISlot.h"
+#include "IBuffer.h"
+#include "IBindable.h"
 
-template <class T, class... ShaderTypes>
-class ConstantBuffer : public ComboBuffer<ShaderTypes...>
+template <class T>
+class ConstantBuffer : public IBindable, public IBuffer, public Slotted
 {
-    using ISlot::SetBindSlot;
     using GraphicsChild::GetDevice;
     using GraphicsChild::GetContext;
 public:
-    ConstantBuffer(Graphics& Gfx, const T& CBData)
+    using ISlot::SetBindSlot;
+    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot = 0U)
     {
         D3D11_BUFFER_DESC CBDesc = {};
         CBDesc.ByteWidth = sizeof(CBData);
@@ -23,20 +25,11 @@ public:
         CBSubData.pSysMem = &CBData;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &p_ConstantBuffer); assert(SUCCEEDED(hr));
-    }
 
-    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot) : ConstantBuffer(Gfx, CBData)
-    {
         SetBindSlot(bindSlot);
     }
 
-    template<class... Unused>
-    static std::string GenerateID(Unused&&... args) noexcept
-    {
-        return std::string(typeid(ConstantBuffer).name());
-    }
-
-    ConstantBuffer(Graphics& Gfx)
+    ConstantBuffer(Graphics& Gfx, UINT bindSlot = 0U)
     {
         D3D11_BUFFER_DESC CBDesc = {};
         CBDesc.ByteWidth = sizeof(T);
@@ -45,6 +38,8 @@ public:
         CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, nullptr, &p_ConstantBuffer); assert(SUCCEEDED(hr));
+
+        SetBindSlot(bindSlot);
     }
 
     virtual ID3D11Buffer* GetBuffer() const noexcept override

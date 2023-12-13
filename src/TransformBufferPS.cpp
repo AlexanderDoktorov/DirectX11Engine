@@ -8,7 +8,7 @@ TransformBufferPS::TransformBufferPS(Graphics& gfx, Drawable& parent) : parent(p
 	if (!pPSConstantBuffer)
 	{
 		pPSConstantBuffer = std::make_unique<bufferType>(gfx);
-		pPSConstantBuffer->SetShaderBindSlot<shader_type_pixel>(1U);
+		pPSConstantBuffer->SetBindSlot(1U);
 	}
 }
 

@@ -9,7 +9,7 @@ LightSource::LightSource(Graphics& Gfx)
 	if (!pLightBuffer)
 	{
 		pLightBuffer = std::make_unique<PixelConstantBuffer<LightDesc>>(Gfx);
-		pLightBuffer->SetShaderBindSlot<shader_type_pixel>(1U);
+		pLightBuffer->SetBindSlot(1U);
 	}
 
 	Reset();

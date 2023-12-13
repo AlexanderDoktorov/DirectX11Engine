@@ -3,16 +3,16 @@
 #include <DirectXMath.h>
 
 template<class T>
-class DataBufferPS : public ConstantBuffer<T, shader_type_pixel>
+class DataBufferPS : public ConstantBuffer<T>
 {
 	using IBindable::GetContext;
-	using ConstantBuffer<T, shader_type_pixel>::p_ConstantBuffer;
-	using ConstantBuffer<T, shader_type_pixel>::ISlot::GetBindSlot;
-	using ConstantBuffer<T, shader_type_pixel>::ISlot::SetBindSlot;
-	using ConstantBuffer<T, shader_type_pixel>::ConstantBuffer;
-	using ConstantBuffer<T, shader_type_pixel>::Update;
+	using ConstantBuffer<T>::p_ConstantBuffer;
+	using ConstantBuffer<T>::ISlot::GetBindSlot;
+	using ConstantBuffer<T>::ISlot::SetBindSlot;
+	using ConstantBuffer<T>::ConstantBuffer;
+	using ConstantBuffer<T>::Update;
 public:
-	DataBufferPS(Graphics& gfx, T& dataRef, UINT bindSlot = 0U) : ConstantBuffer<T, shader_type_pixel>(gfx), dataRef(dataRef)
+	DataBufferPS(Graphics& Gfx, T& dataRef, UINT bindSlot = 0U) : ConstantBuffer<T>(Gfx), dataRef(dataRef)
 	{
 		SetBindSlot(bindSlot);
 	}
