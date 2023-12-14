@@ -3,7 +3,7 @@
 #include "IBlob.h"
 #include <vector>
 
-struct IShader : virtual public IBindable, virtual public IUnbindable, virtual  public IBlob
+struct IShader : public IBindable, public IUnbindable, public IBlob
 {
 	virtual ~IShader() = default;
 	virtual void LoadFromFile(Graphics& Gfx, const wchar_t* FileName) = 0;

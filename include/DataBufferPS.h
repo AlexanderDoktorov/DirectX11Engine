@@ -12,7 +12,7 @@ class DataBufferPS : public ConstantBuffer<T>
 	using ConstantBuffer<T>::ConstantBuffer;
 	using ConstantBuffer<T>::Update;
 public:
-	DataBufferPS(Graphics& gfx, T& dataRef, UINT bindSlot = 0U) : ConstantBuffer<T>::ConstantBuffer(gfx), dataRef(dataRef)
+	DataBufferPS(Graphics& Gfx, T& dataRef, UINT bindSlot = 0U) : ConstantBuffer<T>(Gfx), dataRef(dataRef)
 	{
 		SetBindSlot(bindSlot);
 	}
@@ -23,7 +23,7 @@ public:
 		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, p_ConstantBuffer.GetAddressOf()); // : register(bindSlot)
 	}
 
-	virtual void Unbind(Graphics& Gfx) noexcept override
+	virtual void Unbind(Graphics& Gfx) noexcept
 	{
 		ID3D11Buffer* pNullPSDataBuffer[1] = { nullptr };
 		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pNullPSDataBuffer); // Unbind register(bindSlot)

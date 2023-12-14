@@ -18,7 +18,7 @@ DirectX::XMMATRIX Drawable::GetTransform() const noexcept
 	return DirectX::XMMatrixIdentity();
 }
 
-void Drawable::AddBindable(std::unique_ptr<IBindable> element) noexcept
+void Drawable::AddBindable(std::shared_ptr<IBindable> element) noexcept
 {
 	if (auto p = dynamic_cast<IndexBuffer*>(element.get()))
 	{

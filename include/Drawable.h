@@ -13,7 +13,7 @@ public:
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 
 protected:
-	void AddBindable(std::unique_ptr<IBindable> element) noexcept;
+	void AddBindable(std::shared_ptr<IBindable> element) noexcept;
 
 	template <class T>
 	static void RemoveBindable()
@@ -42,6 +42,6 @@ protected:
 		return nullptr;
 	}
 
-	std::vector<std::unique_ptr<IBindable>> PipelineElements;
+	std::vector<std::shared_ptr<IBindable>> PipelineElements;
 	IndexBuffer* pIndexBuffer = nullptr;
 };

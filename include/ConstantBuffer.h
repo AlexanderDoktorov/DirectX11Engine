@@ -1,14 +1,19 @@
 #pragma once
-#include "IBindable.h"
-#include "ISlot.h"
 #include <wrl.h>
 #include <assert.h>
+#include <string>
+#include "ISlot.h"
+#include "IBuffer.h"
+#include "IBindable.h"
 
 template <class T>
-class ConstantBuffer : public IBindable, public IUnbindable, public Slotted
+class ConstantBuffer : public IBindable, public IBuffer, public Slotted
 {
+    using GraphicsChild::GetDevice;
+    using GraphicsChild::GetContext;
 public:
-    ConstantBuffer(Graphics& Gfx, const T& CBData)
+    using ISlot::SetBindSlot;
+    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot = 0U)
     {
         D3D11_BUFFER_DESC CBDesc = {};
         CBDesc.ByteWidth = sizeof(CBData);
@@ -20,14 +25,11 @@ public:
         CBSubData.pSysMem = &CBData;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &p_ConstantBuffer); assert(SUCCEEDED(hr));
-    }
 
-    ConstantBuffer(Graphics& Gfx, const T& CBData, UINT bindSlot) : ConstantBuffer(Gfx, CBData)
-    {
         SetBindSlot(bindSlot);
     }
 
-    ConstantBuffer(Graphics& Gfx)
+    ConstantBuffer(Graphics& Gfx, UINT bindSlot = 0U)
     {
         D3D11_BUFFER_DESC CBDesc = {};
         CBDesc.ByteWidth = sizeof(T);
@@ -36,6 +38,13 @@ public:
         CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
         HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, nullptr, &p_ConstantBuffer); assert(SUCCEEDED(hr));
+
+        SetBindSlot(bindSlot);
+    }
+
+    virtual ID3D11Buffer* GetBuffer() const noexcept override
+    {
+        return p_ConstantBuffer.Get();
     }
 
     void Update(Graphics& Gfx, const T& NewData)
@@ -48,18 +57,8 @@ public:
         GetContext(Gfx)->Unmap(p_ConstantBuffer.Get(), 0U);
     }
 
-    void SetBindSlot(UINT slot) noexcept override
-    {
-        bindSlot = slot;
-    }
-    UINT GetBindSlot() const noexcept override
-    {
-        return bindSlot;
-    }
-
     ~ConstantBuffer() = default;
 
 protected:
-    UINT bindSlot = 0U;
     Microsoft::WRL::ComPtr<ID3D11Buffer> p_ConstantBuffer;
 };

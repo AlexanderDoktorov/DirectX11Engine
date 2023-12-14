@@ -7,8 +7,8 @@
 
 namespace wrl = Microsoft::WRL;
 
-template <class T, size_t numStructs, class ...Shaders>
-class StructuredBuffer : public ComboSResrouse<Shaders...>
+template <class T, size_t numStructs, class ...ShaderTypes>
+class StructuredBuffer : public ComboSResrouse<ShaderTypes...>
 {
     using ISlot::SetBindSlot;
     using GraphicsChild::GetDevice;

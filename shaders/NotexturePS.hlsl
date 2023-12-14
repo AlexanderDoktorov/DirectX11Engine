@@ -1,6 +1,6 @@
 #include "DefaultValues.hlsli"
 
-cbuffer solidColorBuffer : register(b0)
+cbuffer MeshBuffer : register(b0)
 {
     float4 albedo;
     int matID;

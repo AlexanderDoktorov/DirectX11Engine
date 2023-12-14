@@ -2,8 +2,9 @@
 
 std::unique_ptr<PixelConstantBuffer<LightDesc>> LightSource::pLightBuffer{};
 
-LightSource::LightSource(Graphics& Gfx) :
-	SolidBall(Gfx)
+LightSource::LightSource(Graphics& Gfx) 
+	:
+	Model(Gfx, R"(.\Models\bulb\bulb.obj)", aiProcess_Triangulate)
 {
 	if (!pLightBuffer)
 	{
@@ -11,7 +12,6 @@ LightSource::LightSource(Graphics& Gfx) :
 		pLightBuffer->SetBindSlot(1U);
 	}
 
-	SolidBall::SetScale(dx::XMFLOAT3(0.5, 0.5, 0.5));
 	Reset();
 }
 
@@ -37,25 +37,25 @@ void LightSource::ShowControlChildWindow()
 
 void LightSource::SetPosition(float _x, float _y, float _z)
 {
-	world_position = dx::XMFLOAT3(_x,_y,_z);
+	Model::SetPostion(_x, _y, _z);
+	lightDesc.pos = { _x,_y,_z };
 }
 
 DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
 {
-	DirectX::XMVECTOR vCenter = DirectX::XMVectorSet(0.f,0.f,0.f,0.f);
-	vCenter = DirectX::XMVector3Transform(vCenter, GetTransform());
-	DirectX::XMFLOAT3 Position3D;
-	DirectX::XMStoreFloat3(&Position3D, vCenter);
-	return Position3D;
+	//DirectX::XMVECTOR vCenter = DirectX::XMVectorSet(0.f,0.f,0.f,0.f);
+	//vCenter = DirectX::XMVector3Transform(vCenter, GetTransform());
+	//DirectX::XMFLOAT3 Position3D;
+	//DirectX::XMStoreFloat3(&Position3D, vCenter);
+	return lightDesc.pos;
 }
 
 void LightSource::Reset()
 {
-	world_position = { 0.f, 0.f, -10.f };
+	Model::SetPostion(0.f, 0.f, -10.f);
 	lightDesc =
 	{
-
-		GetPosition(),
+		{ 0.f, 0.f, -10.f },
 		{ 1.0f,1.0f,1.0f },
 		62.0f,
 		34.0f,
@@ -74,7 +74,7 @@ void LightSource::Bind(Graphics& Gfx) noexcept
 
 void LightSource::Draw(Graphics& Gfx)
 {
-	SolidBall::Draw(Gfx);
+	Model::Draw(Gfx);
 }
 
 const char* LightSource::ToString() const noexcept
@@ -109,13 +109,12 @@ void LightSource::SetQuadAttenuation(const float& Qatt) noexcept
 
 void LightSource::Update(float dt) noexcept
 {
-	yaw += dyaw * dt;
+	// TO DO
 }
 
 DirectX::XMMATRIX LightSource::GetTransform() const noexcept
 {
-	// world position - точка, вокруг которой вращается SolidBall
-	return  DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * DirectX::XMMatrixTranslation(world_position.x, world_position.y, world_position.z) * DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw,  roll);
+	return  DirectX::XMMatrixTranslation(lightDesc.pos.x, lightDesc.pos.y, lightDesc.pos.z);
 }
 
 LightDesc LightSource::GetDesc() const noexcept

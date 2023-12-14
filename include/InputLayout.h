@@ -2,29 +2,22 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <vector>
+#include "Vertex.h"
 #include "DOK_assert.h"
-#include "IBindable.h"
 #include "IShader.h"
+#include "BindableSystem.h"
 
-class InputLayout : virtual public IBindable
+
+class InputLayout : public IBindable, public IGetID
 {
 public:
-	InputLayout(Graphics& Gfx, const std::vector<D3D11_INPUT_ELEMENT_DESC>& pInputElementDescs, IShader* pShader)
-	{
-		SetLayoutForShader(Gfx, pInputElementDescs, pShader);
-	}
+	InputLayout(Graphics& Gfx, const DynamicVertex::VertexLayout& vl, IShader* pShader);
 
-	void SetLayoutForShader(Graphics& Gfx, const std::vector<D3D11_INPUT_ELEMENT_DESC>& pInputElementDescs, IShader* pShader)
-	{
-		DOK_assert(pShader->GetBlob() != nullptr, L"Unable to create layout with null shader bytecode");
-		CHECK_HR ( GetDevice(Gfx)->CreateInputLayout(pInputElementDescs.data(), (UINT)pInputElementDescs.size(), pShader->GetBlob()->GetBufferPointer(), pShader->GetBlob()->GetBufferSize(), &p_IL));
-	}
-
-	void Bind(Graphics& Gfx) noexcept override
-	{
-		GetContext(Gfx)->IASetInputLayout(p_IL.Get());
-	}
-
+	void Bind(Graphics& Gfx) noexcept override;
+	std::string GetID() const noexcept override;
+	static std::string GenerateID(const DynamicVertex::VertexLayout& vl, [[maybe_unused]] IShader* = nullptr);
+	static std::shared_ptr<InputLayout> Resolve(Graphics& Gfx,const DynamicVertex::VertexLayout& vl, IShader* pShader);
 private:
+	std::string layoutID;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> p_IL;
 };

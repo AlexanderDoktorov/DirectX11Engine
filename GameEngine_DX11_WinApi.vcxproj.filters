@@ -52,6 +52,9 @@
     <Filter Include="WIC">
       <UniqueIdentifier>{a176a080-941e-4cfd-8e21-954d6f78e22e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы указаний">
+      <UniqueIdentifier>{165dc27f-44d5-4895-84d3-4713cb009ebc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -144,9 +147,6 @@
     <ClCompile Include="src\Sheet.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\XSResourse.cpp">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClCompile>
     <ClCompile Include="src\IBindable.cpp">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClCompile>
@@ -202,6 +202,12 @@
       <Filter>WIC</Filter>
     </ClCompile>
     <ClCompile Include="src\Vertex.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexBuffer.cpp">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InputLayout.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
@@ -509,6 +515,15 @@
     <ClInclude Include="include\WICTextureLoader11.h">
       <Filter>WIC</Filter>
     </ClInclude>
+    <ClInclude Include="include\BindableSystem.h">
+      <Filter>Файлы заголовков\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IGetID.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IBuffer.h">
+      <Filter>Файлы заголовков\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
@@ -516,6 +531,9 @@
     </None>
     <None Include="shaders\DefaultValues.hlsli">
       <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="cpp.hint">
+      <Filter>Файлы указаний</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

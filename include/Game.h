@@ -3,12 +3,14 @@
 #include "Graphics.h"
 #include "ImGuiManager.h"
 #include "Camera.h"
-#include "Items.h"
 #include "Timer.h"
 #include "LightSource.h"
 #include "Interfaces.h"
 #include "Model.h"
 #include "XSResourse.h"
+#include "SolidBall.h"
+#include "Sheet.h"
+#include "SolidTexturedBall.h"
 
 class Game
 {
