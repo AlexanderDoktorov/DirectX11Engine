@@ -34,38 +34,7 @@ public:
 	Mesh() = default;
 	Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, size_t mId);
 
-	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
-	{
-		auto makeHashed = [](std::string str, const std::string& hash) -> std::string
-		{
-			return str.append("##").append(hash);
-		};
-		bool changed = false;
-		if (auto pDesc = std::get_if<MeshDesc>(&meshDesc))
-		{
-			auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);
-			MapLayout mapLayout = pMeshMaterial->GetMapLayout();
-
-			if(mapLayout.hasDiffuseMap)
-				changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &pDesc->useDiffuseMap);
-			if(!pDesc->useDiffuseMap)
-				changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pDesc->albedoColor.x);
-			if(mapLayout.hasNormalMap)
-				changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &pDesc->useNormalMap);
-			if(mapLayout.hasSpecularMap)
-				changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &pDesc->useSpecularMap);
-
-			if(auto pMeshBuffer = QueryBindable<meshBufferTextured>(); changed && pMeshBuffer)
-				pMeshBuffer->Update(Gfx, *pDesc);
-		}
-		if (auto pNoTexDesc = std::get_if<MeshDescNotex>(&meshDesc))
-		{
-			changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pNoTexDesc->albedoColor.x);
-			if (auto pMeshBufferNoTex = QueryBindable<meshBufferNoTex>(); changed && pMeshBufferNoTex)
-				pMeshBufferNoTex->Update(Gfx, *pNoTexDesc);
-		}
-		return changed;
-	}
+	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept;
 	int  GetMaterialIndex() const noexcept;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 	Mesh& Translate(float dx, float dy, float dz) noexcept;
