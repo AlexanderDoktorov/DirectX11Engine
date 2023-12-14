@@ -133,7 +133,7 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId)
 {
 	std::vector<std::shared_ptr<IBindable>> bindablePtrs;
-	std::unique_ptr<VertexShaderCommon> vertexShader = nullptr;
+	std::shared_ptr<VertexShaderCommon> vertexShader = nullptr;
 	DynamicVertex::VertexBuffer vertexBuffer;
 
 	// Get material index from material system in gfx (or create new and get index)
@@ -169,8 +169,8 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 			);
 		}
 
-		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NotextureVS.cso");
-		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NotexturePS.cso"));
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NotextureVS.cso");
+		bindablePtrs.push_back(PixelShaderCommon::Resolve(Gfx, L"shaders\\NotexturePS.cso"));
 	}
 	else
 	{
@@ -194,15 +194,13 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 			);
 		}
 
-		vertexShader = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\NormalTextureVS.cso");
-		bindablePtrs.push_back(std::make_unique<PixelShaderCommon>(Gfx, L"shaders\\NormalTexturePS.cso"));
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NormalTextureVS.cso");
+		bindablePtrs.push_back(PixelShaderCommon::Resolve(Gfx, L"shaders\\NormalTexturePS.cso"));
 	}
-
 
 	bindablePtrs.push_back(std::make_unique<VertexBuffer>(Gfx, vertexBuffer));
 	bindablePtrs.push_back(InputLayout::Resolve(Gfx, vertexBuffer.GetLayout(), (IShader*)vertexShader.get()));
 	bindablePtrs.push_back(std::move(vertexShader));
-
 
 	// Fill index buffer
 	std::vector<unsigned short> indices;
