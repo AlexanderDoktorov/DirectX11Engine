@@ -4,7 +4,7 @@ std::unique_ptr<PixelConstantBuffer<LightDesc>> LightSource::pLightBuffer{};
 
 LightSource::LightSource(Graphics& Gfx) 
 	:
-	Model(Gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\bulb\bulb.obj)", aiProcess_Triangulate)
+	Model(Gfx, R"(.\Models\bulb\bulb.obj)", aiProcess_Triangulate)
 {
 	if (!pLightBuffer)
 	{

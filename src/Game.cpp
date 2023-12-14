@@ -25,14 +25,14 @@ Game::Game()
 	sheet->Scale(20.f, 20.f, 20.f);
 
 	// Models
-	Tree.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.fbx)",
+	Tree.Load(*gfx, R"(.\Models\Tree\Tree.fbx)",
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenNormals |
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded
 	);
 
-	Tree2.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\Tree\Tree.fbx)",
+	Tree2.Load(*gfx, R"(.\Models\Tree\Tree.fbx)",
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenNormals |
 		aiProcess_Triangulate |
@@ -40,7 +40,7 @@ Game::Game()
 	);
 	Tree2.Translate(10, 0, 0);
 
-	Lamp.Load(*gfx, R"(G:\Visual Studio Projects\ProjForTests\Models\bulb\bulb.obj)", 
+	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
 		aiProcess_Triangulate
 	);
 

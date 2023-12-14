@@ -30,9 +30,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{d3a67ec7-2563-42c5-9a17-2506b81cdb8d}</ProjectGuid>
-    <RootNamespace>ProjForTests</RootNamespace>
+    <RootNamespace>GameEngine_DX11_WinApi</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Game Engine</ProjectName>
+    <ProjectName>GameEngine_DX11_WinApi</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -108,17 +108,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>G:\Visual Studio Projects\ProjForTests\include;G:\Visual Studio Projects\ProjForTests\ImGui;G:\Visual Studio Projects\ProjForTests\assimp\include;$(IncludePath);G:\Visual Studio Projects\ProjForTests\ImGui\backend</IncludePath>
-    <SourcePath>G:\Visual Studio Projects\ProjForTests\src;$(SourcePath)</SourcePath>
+    <IncludePath>.\include;.\ImGui;.\assimp\include;$(IncludePath);.\ImGui\backend</IncludePath>
+    <SourcePath>.\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoGUI|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>G:\Visual Studio Projects\ProjForTests\ImGui;G:\Visual Studio Projects\ProjForTests\assimp\include;$(IncludePath);G:\Visual Studio Projects\ProjForTests\ImGui\backend</IncludePath>
+    <IncludePath>.\ImGui;.\assimp\include;$(IncludePath);.\ImGui\backend</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>G:\Visual Studio Projects\ProjForTests\ImGui;G:\Visual Studio Projects\ProjForTests\assimp\include;G:\Visual Studio Projects\ProjForTests\include;$(IncludePath);G:\Visual Studio Projects\ProjForTests\ImGui\backend</IncludePath>
-    <SourcePath>G:\Visual Studio Projects\ProjForTests\src;$(SourcePath)</SourcePath>
+    <IncludePath>.\ImGui;.\assimp\include;.\include;$(IncludePath);.\ImGui\backend</IncludePath>
+    <SourcePath>.\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
