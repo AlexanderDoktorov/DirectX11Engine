@@ -15,14 +15,10 @@
 class Game
 {
 public:
-
 	Game();
 	~Game();
-
 	int Start(int nCmdShow);
-
 private:
-
 	void UpdateFrame();
 	void ShowControlWindow();
 	void ShowItemsSubMenu();
@@ -45,6 +41,7 @@ private:
 	Model Tree;
 	Model Tree2;
 	Model Lamp;
+	Model Sponza;
 
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;

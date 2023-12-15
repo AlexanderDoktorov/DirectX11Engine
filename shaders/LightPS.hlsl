@@ -49,35 +49,46 @@ struct PS_INPUT
     float4 Position : SV_Position;
 };
 
-float GetLambertian(const float3 dirToL, const float3 worldNormal)
-{
-    return max(0.0f, dot(dirToL, worldNormal));
-}
-
-float4 CalulateLightImpactForMaterial(float att, float lambertian, float specAngle, MaterialDesc matDesc)
+float4 ApplyLightForMaterial(float4 albedo, float3 dirToL, float3 worldNormal, float att, float specAngle, MaterialDesc matDesc)
 {
     // Ambient
-    const float3 ambientLightImpact = matDesc.Ka;
+    const float3 ambientColor = matDesc.Ka;
     // Diffuse
-    const float3 diffuseLightImpact = matDesc.Kd * (ligthParams.diffuseIntensity * ligthParams.diffuseColor) * att * lambertian;
+    const float3 diffuseIntensity = max(0.0f, dot(dirToL, worldNormal)) * ligthParams.diffuseIntensity;
+    const float3 diffuseColor = matDesc.Kd * ligthParams.diffuseColor * att * diffuseIntensity;
     // Specular
-    const float3 specularLightImpact = matDesc.Ks * ligthParams.diffuseColor * pow(specAngle, matDesc.Ns);
+    const float3 specularIntensity = pow(specAngle, matDesc.Ns) * att * diffuseIntensity;
+    const float3 specularColor = matDesc.Ks * specularIntensity;
     // Emissive
-    const float3 emissiveLightImpact = matDesc.Ke;
+    const float3 emissiveColor = matDesc.Ke;
     
-    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact + emissiveLightImpact), 1.f);
+    // Combine diffuse and specular
+    float3 lightingImpact = diffuseColor + specularColor;
+    
+    // Final color
+    float3 finalColor = (ambientColor + emissiveColor + diffuseColor) * albedo.rgb + specularColor;
+    
+    return float4(finalColor, albedo.a);
 }
 
-float4 CalulateLightImpact(float att, float lambertian, float specAngle, float shininess)
+float4 ApplyLight(float4 albedo, float3 dirToL, float3 worldNormal, float att, float specAngle, float shininess)
 {
-    // Ambient
-    const float3 ambientLightImpact = { 0.1f, 0.1f, 0.1f };
+     // Ambient
+    const float3 ambientColor = { 0.05f, 0.05f, 0.05f };
     // Diffuse
-    const float3 diffuseLightImpact = ligthParams.diffuseIntensity * ligthParams.diffuseColor * att * lambertian;
+    const float3 diffuseIntensity = max(0.0f, dot(dirToL, worldNormal)) * ligthParams.diffuseIntensity * att;
+    const float3 diffuseColor = ligthParams.diffuseColor * diffuseIntensity;
     // Specular
-    const float3 specularLightImpact = ligthParams.diffuseColor * pow(specAngle, shininess);
+    const float3 specularIntensity = pow(specAngle, shininess) * att * diffuseIntensity;
+    const float3 specularColor = ligthParams.diffuseColor * specularIntensity;
     
-    return float4((ambientLightImpact + diffuseLightImpact + specularLightImpact), 1.f);
+    // Combine diffuse and specular
+    float3 lightingImpact = diffuseColor + specularColor;
+    
+    // Final color
+    float3 finalColor = (ambientColor + diffuseColor) * albedo.rgb + specularColor;
+    
+    return float4(finalColor, albedo.a);
 }
 
 // Shader that calculates light impact that will be later multiplied by material color
@@ -85,6 +96,8 @@ float4 main(in PS_INPUT input) : SV_Target0
 {
     float3 worldPosition    = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 worldNormal      = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
+    float4 albedo           = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    
     
     // Directions
     const float3    vToL    = ligthParams.pos - worldPosition;
@@ -108,7 +121,7 @@ float4 main(in PS_INPUT input) : SV_Target0
     
     if (materialID < 0)
     {
-        return CalulateLightImpact(att, lambertian, specAngle, 256);
+        return ApplyLight(albedo, dirToL, worldNormal, att, specAngle, 256);
     }
     else
     {
@@ -118,6 +131,6 @@ float4 main(in PS_INPUT input) : SV_Target0
             matDesc.Ns = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
             matDesc.Ks *= GBufferSpecular.Sample(sampleState, input.TexCoord).rgb; // or should we multiply Ks * SpecularColor ?
         }
-        return CalulateLightImpactForMaterial(att, lambertian, specAngle, matDesc);
+        return ApplyLightForMaterial(albedo, dirToL, worldNormal, att, specAngle, matDesc);
     }
 }

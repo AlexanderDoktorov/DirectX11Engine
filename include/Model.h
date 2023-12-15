@@ -20,6 +20,7 @@ public:
 	Model& Translate(float dx, float dy, float dz) noexcept;
 	Model& SetPostion(float x, float y, float z) noexcept;
 	Model& SetRotation(float roll, float pitch, float yaw) noexcept;
+	Model& Scale(float scaleXYZ) noexcept;
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId);

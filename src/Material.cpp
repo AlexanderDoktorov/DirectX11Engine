@@ -15,9 +15,9 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
 	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
-	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
-	mapLayout.hasNormalMap	 = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,		SLOT_TEXTURE_SPECULAR);
-	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
+	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
+	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,		SLOT_TEXTURE_SPECULAR);
+	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
 	LoadMaterialProperties(pMaterial);
 }
 
@@ -102,20 +102,6 @@ bool Material::operator==(const Material& rhs) const noexcept
 	return materialName == rhs.materialName && materialDirectory == rhs.materialDirectory;
 }
 
-std::shared_ptr<MaterialTexture> Material::PushTexture(Graphics& Gfx, const std::string& textureFilePath, aiTextureType textureType, UINT bindSlot) noexcept
-{
-	std::string textureFileName = std::filesystem::path(textureFilePath).filename().string();
-	int indx = IsLoaded(textureFileName, textureType);
-	if (indx >= 0)
-		return loadedTextures[indx];
-	else
-	{
-		std::shared_ptr<MaterialTexture> pTexure = std::make_shared<MaterialTexture>(Gfx, textureType, textureFilePath, bindSlot);
-		loadedTextures.push_back(pTexure);
-		return pTexure;
-	}
-}
-
 bool Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot)
 {
 	bool hasSuchMap = false;
@@ -131,6 +117,20 @@ bool Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiText
 		}
 	}
 	return hasSuchMap;
+}
+
+std::shared_ptr<MaterialTexture> Material::PushTexture(Graphics& Gfx, const std::string& textureFilePath, aiTextureType textureType, UINT bindSlot) noexcept
+{
+	std::string textureFileName = std::filesystem::path(textureFilePath).filename().string();
+	int indx = IsLoaded(textureFileName, textureType);
+	if (indx >= 0)
+		return loadedTextures[indx];
+	else
+	{
+		std::shared_ptr<MaterialTexture> pTexure = std::make_shared<MaterialTexture>(Gfx, textureType, textureFilePath, bindSlot);
+		loadedTextures.push_back(pTexure);
+		return pTexure;
+	}
 }
 
 void Material::LoadMaterialProperties(aiMaterial* pMaterial)

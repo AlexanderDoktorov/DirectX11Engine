@@ -23,6 +23,7 @@ public:
 	void SetPosY(float y);
 	void SetPosZ(float z);
 	void SetRotation(float pitch, float yaw);
+	void Accelerate(float dv);
 
 	DirectX::XMFLOAT3	GetPos()				const noexcept;
 	float				GetPitch()				const noexcept;
@@ -33,6 +34,6 @@ private:
 	DirectX::XMFLOAT3 pos;
 	float pitch;
 	float yaw;
-	static constexpr float travelSpeed = 10.0f;
-	static constexpr float rotationSpeed = 0.001f;
+	float travelSpeed = 10.0f;
+	float rotationSpeed = 0.001f;
 };

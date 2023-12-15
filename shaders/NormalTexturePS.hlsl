@@ -9,8 +9,9 @@ cbuffer meshDescBuffer : register(b0)
 
 Texture2D DiffuseMap  : register(t0);
 Texture2D NormalMap   : register(t1);
-Texture2D SpecularMap : register(t2);
+Texture2D SpecularMap: register(t2);
 Texture2D HeightMap   : register(t3);
+Texture2D SpecularMapSingleChannel : register(t4);
 
 SamplerState Sampler : register(s0);
 
@@ -69,7 +70,13 @@ PSOutput main(VS_OUT ps_input)
     
     // Specular map //
     if (useSpecularMap)
-        output.Specular = SpecularMap.Sample(Sampler, ps_input.textCoord);
+    {
+        float4 specularSample = SpecularMap.Sample(Sampler, ps_input.textCoord);
+        if (specularSample.r != 0 && specularSample.g == 0 && specularSample.b == 0)
+            output.Specular.a = specularSample.r;
+        else
+            output.Specular = specularSample;
+    }
     
     output.wPosition    = ps_input.wPosition;
     output.materialID   = materialID;

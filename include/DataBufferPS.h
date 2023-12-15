@@ -1,34 +1,34 @@
 #pragma once
-#include "ConstantBuffer.h"
+#include "PixelConstantBuffer.h"
+#include <memory>
 #include <DirectXMath.h>
 
-template<class T>
-class DataBufferPS : public ConstantBuffer<T>
+template<class T, UINT bindSlot>
+class DataBufferPS : public IBindable
 {
-	using IBindable::GetContext;
-	using ConstantBuffer<T>::p_ConstantBuffer;
-	using ConstantBuffer<T>::ISlot::GetBindSlot;
-	using ConstantBuffer<T>::ISlot::SetBindSlot;
-	using ConstantBuffer<T>::ConstantBuffer;
-	using ConstantBuffer<T>::Update;
 public:
-	DataBufferPS(Graphics& Gfx, T& dataRef, UINT bindSlot = 0U) : ConstantBuffer<T>(Gfx), dataRef(dataRef)
+	DataBufferPS(Graphics& Gfx, T& dataRef) : dataRef(dataRef)
 	{
-		SetBindSlot(bindSlot);
+		if (!pPixelConstantBuffer)
+			pPixelConstantBuffer = std::make_unique<PixelConstantBuffer<T>>(Gfx,bindSlot);
 	}
 
-	virtual void Bind(Graphics& Gfx) noexcept override
+	void Bind(Graphics& Gfx) noexcept override
 	{
-		Update(Gfx, dataRef);
-		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, p_ConstantBuffer.GetAddressOf()); // : register(bindSlot)
+		pPixelConstantBuffer->Update(Gfx, dataRef);
+		pPixelConstantBuffer->Bind(Gfx);
 	}
 
-	virtual void Unbind(Graphics& Gfx) noexcept
+	void Unbind(Graphics& Gfx) noexcept
 	{
 		ID3D11Buffer* pNullPSDataBuffer[1] = { nullptr };
-		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pNullPSDataBuffer); // Unbind register(bindSlot)
+		GetContext(Gfx)->PSSetConstantBuffers(bindSlot, 1U, pNullPSDataBuffer); // Unbind register(bindSlot)
 	}
 
 private:
+	static std::unique_ptr<PixelConstantBuffer<T>> pPixelConstantBuffer;
 	T& dataRef;
 };
+
+template<class T, UINT bindSlot>
+std::unique_ptr<PixelConstantBuffer<T>> DataBufferPS<T,bindSlot>::pPixelConstantBuffer {};

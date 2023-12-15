@@ -100,9 +100,14 @@ Model& Model::SetPostion(float x, float y, float z) noexcept
 Model& Model::SetRotation(float roll, float pitch, float yaw) noexcept
 {
 	for (auto& pMesh : meshesPtrs)
-	{
 		pMesh->SetRotatin(roll, pitch, yaw);
-	}
+	return *this;
+}
+
+Model& Model::Scale(float scaleXYZ) noexcept
+{
+	for (auto& pMesh : meshesPtrs)
+		pMesh->Scale(scaleXYZ);
 	return *this;
 }
 
@@ -139,7 +144,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 	// Get material index from material system in gfx (or create new and get index)
 	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
 	assert(pMat);
-
+	
 	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
 	
 	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some

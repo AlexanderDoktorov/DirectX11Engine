@@ -3,7 +3,8 @@
 #include <fstream>
 #include <regex>
 
-#include "BindableSystem.h"
+#define NEAR_Z 2
+#define FAR_Z 5000
 
 Game::Game()
 {
@@ -43,6 +44,10 @@ Game::Game()
 	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
 		aiProcess_Triangulate
 	);
+	Sponza.Load(*gfx, R"(.\Models\Sponza\sponza.obj)", 
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -54,6 +59,7 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
+	Sponza.Scale(1 / 20.f);
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
@@ -74,7 +80,7 @@ int Game::Start(int nCmdShow)
 	while (open)
 	{
 		// Messages
-		gfx->SetProjection(dx::XMMatrixPerspectiveLH(1.f, (float)window->GetWidth() / window->GetHeight(), 1.f, 500.f));
+		gfx->SetProjection(dx::XMMatrixPerspectiveLH(1.f, (float)window->GetWidth() / window->GetHeight(), NEAR_Z, FAR_Z));
 		gfx->SetCamera(cam);
 		if (const auto r = window->ProcessMessage())
 		{
@@ -114,8 +120,11 @@ void Game::UpdateFrame()
 				cam.Translate({ 0.0f,dt,0.0f });
 			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
 				cam.Translate({ 0.0f,-dt,0.0f });
+			if (std::optional<int> zDelta = window->ReadZDelta())
+				cam.Accelerate(static_cast<float>(zDelta.value()) / 10.f);
 		}
 
+#pragma region MODELS_DRAW
 		for (auto& light_source : lights)
 		{
 			light_source->Draw(*gfx);
@@ -128,6 +137,8 @@ void Game::UpdateFrame()
 		Tree.Draw(*gfx);
 		Tree2.Draw(*gfx);
 		Lamp.Draw(*gfx);
+		Sponza.Draw(*gfx);
+#pragma endregion MODELS_DRAW
 	}
 	gfx->EndGeometryPass();
 

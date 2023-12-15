@@ -33,7 +33,7 @@ public:
 		}
 		AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
 		AddBindable(std::make_unique<TransformBufferPS>(Gfx, *this));
-		AddBindable(std::make_unique<DataBufferPS<DATA>>(Gfx, data, 2U));
+		AddBindable(std::make_unique<DataBufferPS<DATA, 2U>>(Gfx, data));
 		// AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));
 	}
 

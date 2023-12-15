@@ -96,6 +96,11 @@ void Camera::SetRotation(float pitch, float yaw)
     this->yaw = yaw;
 }
 
+void Camera::Accelerate(float dv)
+{
+    travelSpeed + dv >= 0 ? travelSpeed += dv : travelSpeed;
+}
+
 DirectX::XMFLOAT3 Camera::GetPos() const noexcept
 {
     return pos;
