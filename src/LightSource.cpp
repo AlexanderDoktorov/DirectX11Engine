@@ -55,11 +55,11 @@ void LightSource::Reset()
 	Model::SetPostion(0.f, 0.f, -10.f);
 	lightDesc =
 	{
-		{ 0.f, 0.f, -10.f },
+		{ 0.f, 10.f, 0.f },
 		{ 1.0f,1.0f,1.0f },
-		62.0f,
-		34.0f,
-		6.7f,
+		44.f,
+		19.6f,
+		2.2f,
 		0.0075f,
 	};
 }
