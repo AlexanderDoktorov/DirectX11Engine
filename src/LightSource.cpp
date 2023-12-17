@@ -19,12 +19,16 @@ void LightSource::ShowControlChildWindow()
 {
 	ImGui::BeginChild("Light control", ImVec2(600, 200), true);
 	{
-		ImGui::SliderFloat3("XYZ", &lightDesc.pos.x, -200.f, 200.f, "%.4f");
-		ImGui::SliderFloat3("Diffuse color RGB", &lightDesc.diffuseColor.x, 0.f, 1.f);
+		ImGui::SliderFloat3("XYZ", &lightDesc.worldPosition.x, -200.f, 200.f, "%.4f");
+		ImGui::ColorEdit3("Ambient color RGB", &lightDesc.ambientColor.x);
+		ImGui::ColorEdit3("Diffuse color RGB", &lightDesc.diffuseColor.x);
+		ImGui::ColorEdit3("Specular color RGB", &lightDesc.specularColor.x);
 		ImGui::SliderFloat("Catt", &lightDesc.Catt, 0.f, 1.f, "%.4f");
 		ImGui::SliderFloat("Latt", &lightDesc.Latt, 0.f, 1.f, "%.4f");
 		ImGui::SliderFloat("Qatt", &lightDesc.Qatt, 0.f, 1.f, "%.4f");
-		ImGui::SliderFloat("Diffuse intensity", &lightDesc.diffuseIntensity, 0.f, 10.f), "%.4f";
+		ImGui::SliderFloat("Ambient intensity", &lightDesc.ambientIntensity, 0.f, 100.f, "%.5f");
+		ImGui::SliderFloat("Diffuse intensity", &lightDesc.diffuseIntensity, 0.f, 100.f, "%.5f");
+		ImGui::SliderFloat("Specular intensity", &lightDesc.specularIntensity, 0.f, 100.f, "%.5f");
 
 		ImVec4 button_hovered_color = ImVec4(0.f, 0.f, 1.f, 1.f);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_hovered_color);
@@ -38,7 +42,7 @@ void LightSource::ShowControlChildWindow()
 void LightSource::SetPosition(float _x, float _y, float _z)
 {
 	Model::SetPostion(_x, _y, _z);
-	lightDesc.pos = { _x,_y,_z };
+	lightDesc.worldPosition = { _x,_y,_z };
 }
 
 DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
@@ -47,27 +51,28 @@ DirectX::XMFLOAT3 LightSource::GetPosition() const noexcept
 	//vCenter = DirectX::XMVector3Transform(vCenter, GetTransform());
 	//DirectX::XMFLOAT3 Position3D;
 	//DirectX::XMStoreFloat3(&Position3D, vCenter);
-	return lightDesc.pos;
+	return lightDesc.worldPosition;
 }
 
 void LightSource::Reset()
 {
-	Model::SetPostion(0.f, 0.f, -10.f);
-	lightDesc =
-	{
-		{ 0.f, 10.f, 0.f },
-		{ 1.0f,1.0f,1.0f },
-		44.f,
-		19.6f,
-		2.2f,
-		0.0075f,
-	};
+	LightDesc defaultDesc{};
+	defaultDesc.worldPosition = dx::XMFLOAT3(0.f,10.f,0.f);
+	defaultDesc.ambientColor  = dx::XMFLOAT3(0.05f,0.05f,0.05f);
+	defaultDesc.diffuseColor  = dx::XMFLOAT3(1.f,1.f,1.f); // White
+	defaultDesc.specularColor = dx::XMFLOAT3(1.f,1.f,1.f); // White
+	defaultDesc.ambientIntensity = 0.5f;
+	defaultDesc.diffuseIntensity = 44.f;
+	defaultDesc.specularIntensity = 0.3f;
+	defaultDesc.Catt = 19.6f;
+	defaultDesc.Latt = 2.2f;
+	defaultDesc.Qatt = 0.0075f;
+	lightDesc = std::move(defaultDesc);
+	Model::SetPostion(lightDesc.worldPosition.x, lightDesc.worldPosition.y, lightDesc.worldPosition.z);
 }
 
 void LightSource::Bind(Graphics& Gfx) noexcept
 {
-	// lightDesc.pos - точка в центре шара (светильника)
-	lightDesc.pos = GetPosition();
 	pLightBuffer->Update(Gfx, lightDesc);
 	pLightBuffer->Bind(Gfx);
 }
@@ -114,10 +119,17 @@ void LightSource::Update(float dt) noexcept
 
 DirectX::XMMATRIX LightSource::GetTransform() const noexcept
 {
-	return  DirectX::XMMatrixTranslation(lightDesc.pos.x, lightDesc.pos.y, lightDesc.pos.z);
+	return  DirectX::XMMatrixTranslation(lightDesc.worldPosition.x, lightDesc.worldPosition.y, lightDesc.worldPosition.z);
 }
 
 LightDesc LightSource::GetDesc() const noexcept
 {
 	return lightDesc;
 }
+
+void LightSource::SetDesc(const LightDesc& lightDesc) noexcept
+{
+	this->lightDesc = lightDesc;
+}
+
+

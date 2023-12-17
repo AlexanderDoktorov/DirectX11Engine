@@ -1,16 +1,22 @@
+#include "LightInfo.hlsli"
+
 // Texture resources containing G-buffer data
 Texture2D<float4> GBufferPosition   : register(t0);
 Texture2D<float4> GBufferNormal     : register(t1);
 Texture2D<float4> GBufferAlbedo     : register(t2);
-Texture2D<float4> GBufferSpecular   : register(t3);
+Texture2D<float>  GBufferSpecular   : register(t3);
 Texture2D<int>    GBufferMatID      : register(t4);
 SamplerState      sampleState       : register(s0);
 
 struct PointLightDesc
 {
-    float3 pos;
+    float3 worldPosition;
+    float3 ambientColor;
     float3 diffuseColor;
+    float3 specularColor;
+    float  ambientIntensity;
     float  diffuseIntensity;
+    float  specularIntensity;
     float  Catt;
     float  Latt;
     float  Qatt;
@@ -25,7 +31,7 @@ cbuffer CameraBuffer : register(b0)
 // Constant buffer for lighting parameters
 cbuffer LightingPassPSConstants : register(b1)
 {
-    PointLightDesc ligthParams;
+    PointLightDesc lightParams;
 };
 
 struct MaterialDesc
@@ -39,6 +45,7 @@ struct MaterialDesc
     float3 Ka; // reflected color ambient
     float3 Ke; //           color emmisive
     float  Ns; // shininess
+    int    illum;
 };
 
 StructuredBuffer<MaterialDesc> RenderMaterials : register(t5);
@@ -49,67 +56,19 @@ struct PS_INPUT
     float4 Position : SV_Position;
 };
 
-float4 ApplyLightForMaterial(float4 albedo, float3 dirToL, float3 worldNormal, float att, float specAngle, MaterialDesc matDesc)
-{
-    // Ambient
-    const float3 ambientColor = matDesc.Ka;
-    // Diffuse
-    const float3 diffuseIntensity = max(0.0f, dot(dirToL, worldNormal)) * ligthParams.diffuseIntensity;
-    const float3 diffuseColor = matDesc.Kd * ligthParams.diffuseColor * att * diffuseIntensity;
-    // Specular
-    const float3 specularIntensity = pow(specAngle, matDesc.Ns) * att * diffuseIntensity;
-    const float3 specularColor = matDesc.Ks * specularIntensity;
-    // Emissive
-    const float3 emissiveColor = matDesc.Ke;
-    
-    // Combine diffuse and specular
-    float3 lightingImpact = diffuseColor + specularColor;
-    
-    // Final color
-    float3 finalColor = (ambientColor + emissiveColor + diffuseColor) * albedo.rgb + specularColor;
-    
-    return float4(finalColor, albedo.a);
-}
-
-float4 ApplyLight(float4 albedo, float3 dirToL, float3 worldNormal, float att, float specAngle, float shininess)
-{
-     // Ambient
-    const float3 ambientColor = { 0.05f, 0.05f, 0.05f };
-    // Diffuse
-    const float3 diffuseIntensity = max(0.0f, dot(dirToL, worldNormal)) * ligthParams.diffuseIntensity * att;
-    const float3 diffuseColor = ligthParams.diffuseColor * diffuseIntensity;
-    // Specular
-    const float3 specularIntensity = pow(specAngle, shininess) * att * diffuseIntensity;
-    const float3 specularColor = ligthParams.diffuseColor * specularIntensity;
-    
-    // Combine diffuse and specular
-    float3 lightingImpact = diffuseColor + specularColor;
-    
-    // Final color
-    float3 finalColor = (ambientColor + diffuseColor) * albedo.rgb + specularColor;
-    
-    return float4(finalColor, albedo.a);
-}
-
 // Shader that calculates light impact that will be later multiplied by material color
 float4 main(in PS_INPUT input) : SV_Target0
 {
-    float3 worldPosition    = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
-    float3 worldNormal      = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
-    float4 albedo           = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    float3 fragWorldPos     = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
+    float3 fragWorldNormal  = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
+    float4 fragDiffuseColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
+    float  fragShininess    = GBufferSpecular.Sample(sampleState, input.TexCoord);
     
+    LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
-    // Directions
-    const float3    vToL    = ligthParams.pos - worldPosition;
-    const float     distToL = length(vToL);
-    const float3    dirToL  = normalize(vToL);
-    const float     att     = 1.0f / (ligthParams.Catt + ligthParams.Latt * distToL + ligthParams.Qatt * (distToL * distToL));
-    // Diffuse component
-    const float     lambertian  = max(dot(worldNormal, dirToL), 0.0);
-    // Specular component
-    const float3 viewDir    = normalize(worldCameraPosition - worldPosition);
-    const float3 reflectDir = reflect(-dirToL, worldNormal);
-    const float  specAngle  = saturate(dot(viewDir, reflectDir));
+    float att  = Attenuate(lightParams.Catt, lightParams.Latt, lightParams.Qatt, li.distToL);
+    float diff = Diffusate(fragWorldNormal, li.dirToL);
+    
     // Get material id from texture
     uint textureWidth;
     uint textureHeight;
@@ -121,16 +80,42 @@ float4 main(in PS_INPUT input) : SV_Target0
     
     if (materialID < 0)
     {
-        return ApplyLight(albedo, dirToL, worldNormal, att, specAngle, 256);
+        const float3 ambientColor = { 0.05f, 0.05f, 0.05f };
+        const float  shininess = 128;
+        const float  spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        
+        return float4((ambientColor + lightParams.diffuseColor * lightParams.diffuseIntensity * diff * att) * fragDiffuseColor.rgb + lightParams.diffuseColor * spec * att, fragDiffuseColor.a);
     }
     else
     {
         MaterialDesc matDesc = RenderMaterials.Load(materialID);
+        
+        float3 ambientReflectiveColor = matDesc.Ka;
+        float3 diffuseReflectiveColor = matDesc.Kd;
+        float3 specularReflectiveColor = matDesc.Ks;
+        float  shininess = matDesc.Ns;
+       
         if (matDesc.hasSpecularMap)
+            shininess *= fragShininess;
+        
+        const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        
+        // switch illumination model
+        switch (matDesc.illum)
         {
-            matDesc.Ns = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
-            matDesc.Ks *= GBufferSpecular.Sample(sampleState, input.TexCoord).rgb; // or should we multiply Ks * SpecularColor ?
+            case 1:
+                return float4(diffuseReflectiveColor, fragDiffuseColor.a);
+            case 2:
+                return float4(
+            ambientReflectiveColor +
+            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * att * fragDiffuseColor.rgb, fragDiffuseColor.a); // probably diffColor of light should be here too
+            case 3:
+                return float4(
+            ambientReflectiveColor * lightParams.ambientIntensity * lightParams.ambientColor +
+            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att * fragDiffuseColor.rgb +
+            specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.specularColor * att, fragDiffuseColor.a); // probably diffColor of light should be here too
         }
-        return ApplyLightForMaterial(albedo, dirToL, worldNormal, att, specAngle, matDesc);
+        
+        return float4(1.0, 0.f, 0.f, 1.f); // red color as a sign that material was not used (or illum model isn't [0:2])
     }
 }

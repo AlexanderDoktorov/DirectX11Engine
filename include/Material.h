@@ -21,6 +21,7 @@ struct MaterialDesc
 	dx::XMFLOAT3 Ka; // reflected color ambient
 	dx::XMFLOAT3 Ke; //		      color emissive 
 	float  Ns; // shininess
+	int illum;
 };
 
 struct MapLayout
@@ -61,7 +62,7 @@ private:
 	std::string materialName;
 	std::string materialDirectory;
 	std::vector<std::shared_ptr<MaterialTexture>>		   materialTextures;
-	MaterialPropertiesDesc matDesc;
+	MaterialPropertiesDesc matProps;
 private:
 	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
 	static std::shared_ptr<MaterialTexture> PushTexture(Graphics& Gfx, const std::string& texturePath,  aiTextureType textureType, UINT bindSlot) noexcept;

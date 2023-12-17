@@ -100,7 +100,7 @@ Graphics::Graphics(HWND hwnd) :
     PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8_UNORM,           rc.bottom - rc.top, rc.right - rc.left);
     LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     

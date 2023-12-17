@@ -228,16 +228,18 @@ void Game::ShowItemsSubMenu()
 		if(auto lightSource = dynamic_cast<ILight*>(objects[current_item_selected]))
 		{
 			auto lightDesc = lightSource->GetDesc();
-			if (ImGui::ColorPicker3("Diffuse color", &lightDesc.diffuseColor.x))
-				lightSource->SetDiffuseColor(lightDesc.diffuseColor);
-			if (ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 100.f))
-				lightSource->SetDiffuseIntensity(lightDesc.diffuseIntensity);
-			if (ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 100.f))
-				lightSource->SetConstantAttenuation(lightDesc.Catt);
-			if (ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 100.f))
-				lightSource->SetLinearAttenuation(lightDesc.Latt);
-			if (ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 100.f))
-				lightSource->SetQuadAttenuation(lightDesc.Qatt);
+			bool updated = false;
+			updated |= ImGui::ColorEdit3("Ambient color", &lightDesc.ambientColor.x);
+			updated |= ImGui::ColorEdit3("Diffuse color", &lightDesc.diffuseColor.x);
+			updated |= ImGui::ColorEdit3("Specular color", &lightDesc.specularColor.x);
+			updated |= ImGui::SliderFloat("Ambient Intensity", &lightDesc.ambientIntensity, 0.f, 100.f);
+			updated |= ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 100.f);
+			updated |= ImGui::SliderFloat("Specular Intensity", &lightDesc.specularIntensity, 0.f, 100.f);
+			updated |= ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 100.f);
+			updated |= ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 100.f);
+			updated |= ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 100.f);
+			if (updated)
+				lightSource->SetDesc(lightDesc);
 		}
 	}
 	ImGui::End();

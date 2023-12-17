@@ -55,3 +55,15 @@ private:
 	std::vector<MaterialProperty> properties{};
 	size_t selectedPropertyIndex = 0;
 };
+struct MaterialProperties
+{
+	aiString  materialName;
+	aiShadingMode shadingMode;
+	aiColor3D Kd; // reflected color diffuse
+	aiColor3D Ks; // reflected color specular
+	aiColor3D Ka; // reflected color ambient
+	aiColor3D Ke; // reflected color emmisive
+	aiColor3D Kr; // reflected color reflective
+	aiColor3D Kt; // reflected color transparent
+	float	  Ns; // shininess
+};

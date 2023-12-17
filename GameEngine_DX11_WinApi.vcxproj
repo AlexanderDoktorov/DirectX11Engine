@@ -286,6 +286,7 @@
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
+    <ClInclude Include="include\DOK_assimp.h" />
     <ClInclude Include="include\DOK_traits.h" />
     <ClInclude Include="include\IBuffer.h" />
     <ClInclude Include="include\IGetID.h" />
@@ -386,6 +387,7 @@
     <None Include="cpp.hint" />
     <None Include="game.config" />
     <None Include="shaders\DefaultValues.hlsli" />
+    <None Include="shaders\LightInfo.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\CombinePS.hlsl">

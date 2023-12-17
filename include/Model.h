@@ -23,7 +23,7 @@ public:
 	Model& Scale(float scaleXYZ) noexcept;
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
-	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId);
+	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId) const;
 private:
 	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;
 	std::vector<size_t>						materialsIndices;
