@@ -29,13 +29,13 @@ public:
     }
 
     LPCWSTR ClassName() const noexcept override { return L"DirectX11 Example"; }
-    LRESULT CALLBACK HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+    LRESULT CALLBACK HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     const Mouse&            GetMouse() const { return mouse; }
     const Keyboard&         GetKeyboard() const { return keyboard; }
     const bool              MouseCaptured() const { return captured; }
     std::optional<RawData>  ReadRawDelta();
-
+    std::optional<int>      ReadZDelta();
 private:
 
     void CaptureCursor();
@@ -46,5 +46,6 @@ private:
     Mouse               mouse;
     Keyboard            keyboard;
     std::queue<RawData> rawDeltaQueue;
+    std::queue<int>     zDeltaQueue;
     bool                captured    = false;
 };

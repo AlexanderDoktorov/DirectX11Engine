@@ -5,7 +5,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT DirectXWindow::HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT DirectXWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
@@ -22,6 +22,16 @@ LRESULT DirectXWindow::HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
         }
         break;
+    case WM_MOUSEWHEEL:
+    {
+        // The high-order word indicates the distance the wheel is rotated.
+        // The low-order word is reserved and should be ignored.
+        int zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+        if (zDelta)
+            zDeltaQueue.push(zDelta);
+        break;
+    }
     case WM_INPUT: // manage raw input
     {
         RawData previouspos = mouse.GetRawData();
@@ -65,6 +75,17 @@ std::optional<RawData> DirectXWindow::ReadRawDelta()
         return delta;
     }
     return {};
+}
+
+std::optional<int> DirectXWindow::ReadZDelta()
+{
+    if (!zDeltaQueue.empty())
+    {
+        int zDelta = zDeltaQueue.front();
+        zDeltaQueue.pop();
+        return zDelta;
+    }
+    return std::nullopt;
 }
 
 // USE RAW INPUT TO GET DELTA OF MOUSE

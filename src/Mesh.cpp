@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "Exceptions.h"
+#include "DataBufferPS.h"
 
 // ********** Mesh **********
 
@@ -15,14 +16,14 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, si
 		temp.useSpecularMap = ml.hasSpecularMap;
 		temp.matId = (int)mId;
 		meshDesc = std::move(temp);
-		AddBindable(PixelConstantBuffer<Mesh::MeshDesc>::Resolve(Gfx, std::get<MeshDesc>(meshDesc), 0U));
+		AddBindable( std::make_shared<DataBufferPS<MeshDesc, 0U>>(Gfx, std::get<MeshDesc>(meshDesc)));
 	}
 	else
 	{
 		MeshDescNotex temp{};
 		temp.matId = (int)mId;
 		meshDesc = std::move(temp);
-		AddBindable(PixelConstantBuffer<Mesh::MeshDescNotex>::Resolve(Gfx, std::get<MeshDescNotex>(meshDesc), 0U));
+		AddBindable( std::make_shared<DataBufferPS<MeshDescNotex, 0U>>(Gfx, std::get<MeshDescNotex>(meshDesc)));
 	}
 
 	AddBindable( Topology::Resolve(Gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) );
@@ -78,7 +79,10 @@ int Mesh::GetMaterialIndex() const noexcept
 
 DirectX::XMMATRIX Mesh::GetTransform() const noexcept
 {
-	return DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z) * DirectX::XMMatrixRotationRollPitchYaw(worldRotation.y, worldRotation.z, worldRotation.x);
+	return 
+		DirectX::XMMatrixRotationRollPitchYaw(worldRotation.y, worldRotation.z, worldRotation.x) *
+		DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z) * 
+		DirectX::XMMatrixScaling(scale,scale,scale);
 }
 
 Mesh& Mesh::Translate(float dx, float dy, float dz) noexcept
@@ -102,6 +106,12 @@ Mesh& Mesh::SetRotatin(float roll, float pitch, float yaw) noexcept
 	worldRotation.x = roll;
 	worldRotation.y = pitch;
 	worldRotation.z = yaw;
+	return *this;
+}
+
+Mesh& Mesh::Scale(float scaleXYZ) noexcept
+{
+	scale = scaleXYZ;
 	return *this;
 }
 

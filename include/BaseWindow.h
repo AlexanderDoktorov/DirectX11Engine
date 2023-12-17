@@ -77,7 +77,7 @@ public:
 	}
 
 	virtual LPCWSTR ClassName() const noexcept = 0;
-	virtual LRESULT CALLBACK HandeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+	virtual LRESULT CALLBACK HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
 protected:
 
@@ -98,7 +98,7 @@ protected:
 		{
 			if (T* wnd = (T*)GetWindowLongPtrW(hwnd, GWLP_USERDATA))
 			{
-				return wnd->HandeMessage(uMsg, wParam, lParam);
+				return wnd->HandleMessage(uMsg, wParam, lParam);
 			}
 		}
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);

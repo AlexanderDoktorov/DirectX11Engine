@@ -1,6 +1,9 @@
 #include "WICTexture.h"
 #include "Exceptions.h"
 
+#include <Windows.h>
+#include <wincodec.h>
+
 WICTexture::WICTexture(Graphics& Gfx, const wchar_t* filePath, UINT bindSlot, wicFlg loadFlags) : TextureBase(bindSlot)
 {
     CreateWICTexture(Gfx, filePath, loadFlags);
@@ -11,7 +14,7 @@ WICTexture::WICTexture(Graphics& Gfx, const char* filePath, UINT bindSlot, wicFl
     CreateWICTexture(Gfx, filePath, loadFlags);
 }
 
-void WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, DirectX::WIC_LOADER_FLAGS loadFlags)
+void WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg loadFlags)
 {
     std::string sfilePath(filePath);
     std::wstring wFilePath(sfilePath.begin(), sfilePath.end());
@@ -19,7 +22,7 @@ void WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, DirectX::
     CreateWICTexture(Gfx, wFilePath.c_str(), loadFlags);
 }
 
-void WICTexture::CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, DirectX::WIC_LOADER_FLAGS loadFlags)
+void WICTexture::CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, wicFlg loadFlags)
 {
     if (loadFlags != DirectX::WIC_LOADER_DEFAULT)
     {

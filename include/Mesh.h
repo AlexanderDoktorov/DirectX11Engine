@@ -40,8 +40,10 @@ public:
 	Mesh& Translate(float dx, float dy, float dz) noexcept;
 	Mesh& SetPosition(float x, float y, float z)  noexcept;
 	Mesh& SetRotatin(float roll, float pitch, float yaw)  noexcept;
+	Mesh& Scale(float scaleXYZ)  noexcept;
 private:
 	dx::XMFLOAT3 worldTranslation{};
 	dx::XMFLOAT3 worldRotation{};
+	float		 scale = 1.f;
 	std::variant<MeshDesc, MeshDescNotex> meshDesc;
 };
