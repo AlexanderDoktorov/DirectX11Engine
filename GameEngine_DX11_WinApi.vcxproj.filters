@@ -524,6 +524,9 @@
     <ClInclude Include="include\IBuffer.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\DOK_assimp.h">
+      <Filter>DOK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.config">
@@ -534,6 +537,9 @@
     </None>
     <None Include="cpp.hint">
       <Filter>Файлы указаний</Filter>
+    </None>
+    <None Include="shaders\LightInfo.hlsli">
+      <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

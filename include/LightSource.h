@@ -29,6 +29,8 @@ public:
 	virtual void SetConstantAttenuation(const float& Catt)						noexcept override;
 	virtual void SetLinearAttenuation(const float& Latt)						noexcept override;
 	virtual void SetQuadAttenuation(const float& Qatt)							noexcept override;
+	virtual LightDesc GetDesc() const noexcept override;
+	virtual void SetDesc(const LightDesc& lightDesc) noexcept override;
 
 	// IAnimated
 	void Update(float dt)														noexcept override;
@@ -36,7 +38,7 @@ public:
 	// SolidBall
 	virtual DirectX::XMMATRIX GetTransform()							  const noexcept override;
 
-	virtual LightDesc GetDesc() const noexcept override;
+	
 private:
 
 	const float droll = 1.f;

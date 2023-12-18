@@ -1,6 +1,7 @@
 #include "Material.h"
 #include "SlotLayout.h"
 #include <filesystem>
+#include "DOK_assimp.h"
 
 std::vector<std::shared_ptr<MaterialTexture>>  Material::loadedTextures{};
 
@@ -30,7 +31,7 @@ bool Material::ShowMaterialGUI(bool* p_open)
 {
 	static constexpr ImVec4 red = {1.f,0.f,0.f,1.f};
 	static constexpr ImVec4 yellow = {1.f,1.f,0.f,1.f};
-	bool changed = matDesc.ShowGUI(materialName.c_str());
+	bool changed = matProps.ShowGUI(materialName.c_str());
 	ImGui::TextColored(mapLayout.hasDiffuseMap ? yellow : red, "Diffuse map");
 	ImGui::TextColored(mapLayout.hasHeightMap ? yellow : red, "Height map");
 	ImGui::TextColored(mapLayout.hasNormalMap ? yellow : red, "Normal map");
@@ -81,7 +82,7 @@ std::string Material::GetDirectory() const noexcept
 }
 MaterialPropertiesDesc Material::GetPropertiesDesc() const noexcept
 {
-	return matDesc;
+	return matProps;
 }
 MaterialDesc Material::GetMaterialDesc() const noexcept
 {
@@ -90,11 +91,12 @@ MaterialDesc Material::GetMaterialDesc() const noexcept
 	materialDesc_.hasHeightMap	 = mapLayout.hasHeightMap;
 	materialDesc_.hasNormalMap	 = mapLayout.hasNormalMap;
 	materialDesc_.hasSpecularMap = mapLayout.hasSpecularMap;
-	materialDesc_.Ka = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
-	materialDesc_.Kd = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();
-	materialDesc_.Ks = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
-	materialDesc_.Ke = matDesc.GetPropertyAs<dx::XMFLOAT3>(AI_MATKEY_COLOR_EMISSIVE).value();
-	materialDesc_.Ns = matDesc.GetPropertyAs<float>(AI_MATKEY_SHININESS).value_or(1.f);
+	materialDesc_.Ka = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
+	materialDesc_.Kd = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();
+	materialDesc_.Ks = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
+	materialDesc_.Ke = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
+	materialDesc_.Ns = matProps.GetPropertyAs<float>(AI_MATKEY_SHININESS).value();
+	materialDesc_.illum = *(int*)matProps.GetProperty(AI_MATKEY_SHADING_MODEL)->GetData().data();
 	return materialDesc_;
 }
 bool Material::operator==(const Material& rhs) const noexcept
@@ -138,6 +140,6 @@ void Material::LoadMaterialProperties(aiMaterial* pMaterial)
 	for (size_t i = 0; i < pMaterial->mNumProperties; i++)
 	{
 		auto pProperty = pMaterial->mProperties[i];
-		matDesc.EmplaceProperty(pProperty->mKey.C_Str(), pProperty->mIndex, pProperty->mType, pProperty->mData, pProperty->mDataLength);
+		matProps.EmplaceProperty(pProperty->mKey.C_Str(), pProperty->mIndex, pProperty->mType, pProperty->mData, pProperty->mDataLength);
 	}
 }

@@ -135,7 +135,7 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 	return pMyNode;
 }
 
-std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId)
+std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId) const
 {
 	std::vector<std::shared_ptr<IBindable>> bindablePtrs;
 	std::shared_ptr<VertexShaderCommon> vertexShader = nullptr;
@@ -144,11 +144,10 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 	// Get material index from material system in gfx (or create new and get index)
 	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
 	assert(pMat);
-	
-	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
-	
 	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
 	bindablePtrs.push_back(pMat);
+	
+	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
 
 	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
 	const bool HasNormalMaps		= pMat->GetMapLayout().hasNormalMap;

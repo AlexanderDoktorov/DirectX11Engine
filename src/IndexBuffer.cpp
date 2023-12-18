@@ -1,4 +1,5 @@
 #include "IndexBuffer.h"
+#include <assert.h>
 
 IndexBuffer::IndexBuffer(Graphics& Gfx, const std::string& nameTag, const std::vector<unsigned short>& indicies)
 	:

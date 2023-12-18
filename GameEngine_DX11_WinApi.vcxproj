@@ -175,6 +175,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;assimp\lib\x64\assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
@@ -194,6 +196,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;assimp\lib\x64\assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
@@ -217,6 +221,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;assimp\lib\x64\assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
@@ -286,6 +292,7 @@
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
+    <ClInclude Include="include\DOK_assimp.h" />
     <ClInclude Include="include\DOK_traits.h" />
     <ClInclude Include="include\IBuffer.h" />
     <ClInclude Include="include\IGetID.h" />
@@ -386,6 +393,7 @@
     <None Include="cpp.hint" />
     <None Include="game.config" />
     <None Include="shaders\DefaultValues.hlsli" />
+    <None Include="shaders\LightInfo.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\CombinePS.hlsl">
@@ -514,4 +522,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+     <Exec Command="call AddDLLs.bat &quot;$(SolutionDir)&quot; &quot;$(OutDir)&quot;" />
+   </Target>
 </Project>
