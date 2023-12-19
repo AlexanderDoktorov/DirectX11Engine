@@ -90,30 +90,34 @@ float4 main(in PS_INPUT input) : SV_Target0
     {
         MaterialDesc matDesc = RenderMaterials.Load(materialID);
         
-        float3 ambientReflectiveColor = matDesc.Ka;
-        float3 diffuseReflectiveColor = matDesc.Kd;
-        float3 specularReflectiveColor = matDesc.Ks;
-        float  shininess = matDesc.Ns;
+        float3 ambientReflectiveColor = matDesc.Ka; // ambiemnt color of material if ambeint map not present
+        float3 diffuseReflectiveColor = matDesc.Kd; // diffuse color of material if diffuse map not present
+        float3 specularReflectiveColor = matDesc.Ks; // specular coor of material if specular color map not present
+        float  shininess = matDesc.Ns; // material shininess if R8 spec map not present
        
         if (matDesc.hasSpecularMap)
-            shininess *= fragShininess;
+            shininess = fragShininess;
+        if (matDesc.hasDiffuseMap)
+            diffuseReflectiveColor = fragDiffuseColor;
         
         const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        
+        // depends on: ambient color of material and light ambient intensity
+        const float3 ambient = ambientReflectiveColor * lightParams.ambientIntensity;
+        // depends on: color of light, color of material, intensity of light, att, and lambertian
+        const float3 diffuse = diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att;
+        // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
+        const float3 specular = specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
         
         // switch illumination model
         switch (matDesc.illum)
         {
             case 1:
-                return float4(diffuseReflectiveColor, fragDiffuseColor.a);
+                return float4(diffuse, fragDiffuseColor.a); // Color on and Ambient off
             case 2:
-                return float4(
-            ambientReflectiveColor +
-            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * att * fragDiffuseColor.rgb, fragDiffuseColor.a); // probably diffColor of light should be here too
+                return float4(ambient + diffuse, fragDiffuseColor.a); // Color on and Ambient on
             case 3:
-                return float4(
-            ambientReflectiveColor * lightParams.ambientIntensity * lightParams.ambientColor +
-            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att * fragDiffuseColor.rgb +
-            specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.specularColor * att, fragDiffuseColor.a); // probably diffColor of light should be here too
+                return float4(ambient + diffuse + specular, fragDiffuseColor.a); // Highlight on
         }
         
         return float4(1.0, 0.f, 0.f, 1.f); // red color as a sign that material was not used (or illum model isn't [0:2])
