@@ -16,7 +16,7 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
 	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
-	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP);
+	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, wicFlg::WIC_LOADER_IGNORE_SRGB);
 	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,		SLOT_TEXTURE_SPECULAR);
 	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
 	LoadMaterialProperties(pMaterial);
@@ -104,7 +104,14 @@ bool Material::operator==(const Material& rhs) const noexcept
 	return materialName == rhs.materialName && materialDirectory == rhs.materialDirectory;
 }
 
-bool Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot)
+bool Material::LoadMaterialTextures
+(
+	Graphics& Gfx, 
+	aiMaterial* pMaterial, 
+	aiTextureType textureType, 
+	UINT bindSlot, 
+	wicFlg wicFlags
+)
 {
 	bool hasSuchMap = false;
 	for (unsigned int i = 0u; i < pMaterial->GetTextureCount(textureType); i++)
@@ -114,14 +121,22 @@ bool Material::LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiText
 		if (pMaterial->GetTexture(textureType, i, &textureFileName) == aiReturn_SUCCESS)
 		{
 			const std::string textureFilePath =  materialDirectory + '\\' + std::string(textureFileName.C_Str());
-			auto pTexture = PushTexture(Gfx, textureFilePath, textureType, bindSlot);
+			auto pTexture = PushTexture(Gfx, textureFilePath, textureType, bindSlot, wicFlags);
 			materialTextures.push_back(pTexture);
 		}
 	}
 	return hasSuchMap;
 }
 
-std::shared_ptr<MaterialTexture> Material::PushTexture(Graphics& Gfx, const std::string& textureFilePath, aiTextureType textureType, UINT bindSlot) noexcept
+std::shared_ptr<MaterialTexture> Material::PushTexture
+(
+	Graphics& Gfx, 
+	const std::string& textureFilePath, 
+	aiTextureType textureType, 
+	UINT bindSlot, 
+	wicFlg wicLoadFlags
+) 
+noexcept
 {
 	std::string textureFileName = std::filesystem::path(textureFilePath).filename().string();
 	int indx = IsLoaded(textureFileName, textureType);
@@ -129,7 +144,7 @@ std::shared_ptr<MaterialTexture> Material::PushTexture(Graphics& Gfx, const std:
 		return loadedTextures[indx];
 	else
 	{
-		std::shared_ptr<MaterialTexture> pTexure = std::make_shared<MaterialTexture>(Gfx, textureType, textureFilePath, bindSlot);
+		std::shared_ptr<MaterialTexture> pTexure = std::make_shared<MaterialTexture>(Gfx, textureType, textureFilePath, bindSlot, wicLoadFlags);
 		loadedTextures.push_back(pTexure);
 		return pTexure;
 	}

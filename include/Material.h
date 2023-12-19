@@ -36,6 +36,7 @@ struct MapLayout
 
 class Material : public IBindable
 {
+	typedef DirectX::WIC_LOADER_FLAGS wicFlg;
 public:
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
@@ -55,7 +56,13 @@ public:
 	bool operator==(const Material& rhs) const noexcept;
 private:
 	void ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial);
-	bool LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot);
+	bool LoadMaterialTextures(
+		Graphics& Gfx,
+		aiMaterial* pMaterial, 
+		aiTextureType textureType, 
+		UINT bindSlot, 
+		wicFlg wicLoadFlags = wicFlg::WIC_LOADER_DEFAULT
+	);
 	void LoadMaterialProperties(aiMaterial* pMaterial);
 private:
 	MapLayout   mapLayout;
@@ -65,7 +72,12 @@ private:
 	MaterialPropertiesDesc matProps;
 private:
 	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
-	static std::shared_ptr<MaterialTexture> PushTexture(Graphics& Gfx, const std::string& texturePath,  aiTextureType textureType, UINT bindSlot) noexcept;
+	static std::shared_ptr<MaterialTexture> PushTexture(
+		Graphics& Gfx, 
+		const std::string& texturePath,  
+		aiTextureType textureType, 
+		UINT bindSlot,
+		wicFlg wicLoadFlags) noexcept;
 private:
 	static std::vector<std::shared_ptr<MaterialTexture>> loadedTextures;
 };

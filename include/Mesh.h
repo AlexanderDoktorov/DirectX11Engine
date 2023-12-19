@@ -21,11 +21,11 @@ public:
 		bool useSpecularMap	= false;
 		bool pad3[3];
 		int matId;
-		dx::XMFLOAT4 albedoColor { 1.f,1.f,1.f, 1.f}; // default color if diffuse map is not used is // WHITE //
+		dx::XMFLOAT4 albedoColor { 0.f,1.f,0.f, 1.f}; // default color if diffuse map is not used is // WHITE //
 	};
 	struct alignas(16) MeshDescNotex
 	{
-		dx::XMFLOAT4 albedoColor { 1.f,1.f,1.f,1.f }; // default color if diffuse map is not used is // WHITE //
+		dx::XMFLOAT4 albedoColor { 0.f,1.f,0.f,1.f }; // default color if diffuse map is not used is // WHITE //
 		int matId;
 	};
 	typedef PixelConstantBuffer<MeshDesc> meshBufferTextured;

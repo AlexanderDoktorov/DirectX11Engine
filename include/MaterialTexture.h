@@ -8,10 +8,10 @@
 
 class MaterialTexture : public WICTexture
 {
+	typedef DirectX::WIC_LOADER_FLAGS wicFlg;
 public:
 	MaterialTexture() = default;
-	MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path);
-	MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path, UINT bindSlot);
+	MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path, UINT bindSlot = 0U, wicFlg wicLoaderFlags = wicFlg::WIC_LOADER_DEFAULT);
 
 	void SetFileName(std::string fileName) noexcept;
 	void SetFilePath(std::string filePath) noexcept;

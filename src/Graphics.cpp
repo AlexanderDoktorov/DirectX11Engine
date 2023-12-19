@@ -569,7 +569,7 @@ size_t Graphics::MaterialSystem::GetMaterialIndex(Material& material) noxnd
         return indx.value();
     else
     {
-        auto newIndex = loadedMaterials.size();
+        const size_t newIndex = loadedMaterials.size();
         assert(loadedMaterials.size() <= MAX_MATERIALS);
         pMaterialBuffer->Update(*pGfx, material.GetMaterialDesc(), newIndex);
         loadedMaterials.push_back(std::make_unique<Material>(std::move(material)));
@@ -583,7 +583,7 @@ size_t Graphics::MaterialSystem::GetMaterialIndex(aiMaterial* pMaterial, const s
         return indx.value();
     else
     {
-        auto newIndex = loadedMaterials.size();
+        const size_t newIndex = loadedMaterials.size();
         assert(loadedMaterials.size() <= MAX_MATERIALS);
         loadedMaterials.push_back(std::make_unique<Material>(*pGfx, pMaterial, materialDirectory));
         pMaterialBuffer->Update(*pGfx, loadedMaterials.back()->GetMaterialDesc(), newIndex);

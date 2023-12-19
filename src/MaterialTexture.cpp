@@ -1,18 +1,20 @@
 #include "MaterialTexture.h"
 #include <filesystem>
 
-MaterialTexture::MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& textureFilePath)
-	: 
-	WICTexture(Gfx, textureFilePath.c_str()), 
-	textureType(textureType), 
-	textureFilePath(textureFilePath)
+MaterialTexture::MaterialTexture
+(
+	Graphics& Gfx, 
+	const aiTextureType& textureType, 
+	const std::string& path, 
+	UINT bindSlot, 
+	wicFlg wicLoadFlags
+) :
+	textureFilePath(path),
+	textureType(textureType),
+	textureFileName(std::filesystem::path(path).filename().string()),
+	WICTexture(Gfx, path.c_str(), bindSlot, wicLoadFlags)
 {
-	textureFileName = std::filesystem::path(textureFilePath).filename().string();
-}
 
-MaterialTexture::MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path, UINT bindSlot) : MaterialTexture(Gfx, textureType, path)
-{
-	SetBindSlot(bindSlot);
 }
 
 void MaterialTexture::SetFileName(std::string fileName) noexcept
