@@ -47,7 +47,9 @@ Game::Game()
 	Sponza.Load(*gfx, R"(.\Models\Sponza\sponza.obj)", 
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenNormals |
-		aiProcess_Triangulate);
+		aiProcess_Triangulate | 
+		aiProcess_ConvertToLeftHanded
+	);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -122,7 +124,7 @@ void Game::UpdateFrame()
 			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
 				cam.Translate({ 0.0f,-dt,0.0f });
 			if (std::optional<int> zDelta = window->ReadZDelta())
-				cam.Accelerate(static_cast<float>(zDelta.value()) / 10.f);
+				cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
 		}
 
 #pragma region MODELS_DRAW
