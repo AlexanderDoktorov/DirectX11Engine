@@ -17,6 +17,7 @@ public:
 	void SetFilePath(std::string filePath) noexcept;
 	void SetTextureAiType(aiTextureType aiType) noexcept;
 
+	DXGI_FORMAT GetTextureFormat() const noexcept;
 	std::string GetFileName() const noexcept;
 	std::string GetFilePath() const noexcept;
 	const char* GetFilePath_C_str() const noexcept;

@@ -4,7 +4,7 @@
 Texture2D<float4> GBufferPosition   : register(t0);
 Texture2D<float4> GBufferNormal     : register(t1);
 Texture2D<float4> GBufferAlbedo     : register(t2);
-Texture2D<float>  GBufferSpecular   : register(t3);
+Texture2D<float4> GBufferSpecular   : register(t3);
 Texture2D<int>    GBufferMatID      : register(t4);
 SamplerState      sampleState       : register(s0);
 
@@ -39,6 +39,7 @@ struct MaterialDesc
     bool hasNormalMap;
     bool hasDiffuseMap;
     bool hasSpecularMap;
+    bool hasSpecularMapColored;
     bool hasHeightMap;
     float3 Kd; // reflected color diffuse
     float3 Ks; // reflected color specular
@@ -62,7 +63,8 @@ float4 main(in PS_INPUT input) : SV_Target0
     float3 fragWorldPos     = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 fragWorldNormal  = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
     float4 fragDiffuseColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
-    float  fragShininess    = GBufferSpecular.Sample(sampleState, input.TexCoord);
+    float3 fragSpecColor    = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb;
+    float  fragShininess    = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
     
     LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
@@ -95,10 +97,18 @@ float4 main(in PS_INPUT input) : SV_Target0
         float3 specularReflectiveColor = matDesc.Ks; // specular coor of material if specular color map not present
         float  shininess = matDesc.Ns; // material shininess if R8 spec map not present
        
-        if (matDesc.hasSpecularMap)
+        if (matDesc.hasSpecularMapColored)
+        {
             shininess = fragShininess;
+            specularReflectiveColor = fragSpecColor;
+        }
+        else if (matDesc.hasSpecularMap)
+        {
+            shininess = fragShininess;
+        }
+        
         if (matDesc.hasDiffuseMap)
-            diffuseReflectiveColor = fragDiffuseColor;
+            diffuseReflectiveColor = fragDiffuseColor.rgb;
         
         const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
         

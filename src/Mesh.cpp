@@ -14,6 +14,7 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, si
 		temp.useDiffuseMap = ml.hasDiffuseMap;
 		temp.useNormalMap = ml.hasNormalMap;
 		temp.useSpecularMap = ml.hasSpecularMap;
+		temp.useSpecularMapColored = ml.hasSpecularMapColored;
 		temp.matId = (int)mId;
 		meshDesc = std::move(temp);
 		AddBindable( std::make_shared<DataBufferPS<MeshDesc, 0U>>(Gfx, std::get<MeshDesc>(meshDesc)));

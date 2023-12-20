@@ -20,6 +20,8 @@ public:
 		bool pad2[3];
 		bool useSpecularMap	= false;
 		bool pad3[3];
+		bool useSpecularMapColored = false;
+		bool pad4[3];
 		int matId;
 		dx::XMFLOAT4 albedoColor { 0.f,1.f,0.f, 1.f}; // default color if diffuse map is not used is // WHITE //
 	};

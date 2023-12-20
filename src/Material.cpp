@@ -15,10 +15,19 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
-	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE);
-	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, wicFlg::WIC_LOADER_IGNORE_SRGB);
-	mapLayout.hasSpecularMap = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,		SLOT_TEXTURE_SPECULAR);
-	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT);
+	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE) != materialTextures.end();
+	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, wicFlg::WIC_LOADER_IGNORE_SRGB) != materialTextures.end();
+	mIterator mIt = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR, SLOT_TEXTURE_SPECULAR, wicFlg::WIC_LOADER_IGNORE_SRGB);
+	for (mIterator it = mIt; it != materialTextures.end(); ++it)
+	{
+		mapLayout.hasSpecularMap = true;
+		if ((*it)->GetTextureFormat() == DXGI_FORMAT_B8G8R8A8_UNORM)
+		{
+			mapLayout.hasSpecularMapColored = true;
+			(*it)->SetBindSlot(SLOT_TEXTURE_SPECULAR_COLORED);
+		}
+	}
+	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT) != materialTextures.end();
 	LoadMaterialProperties(pMaterial);
 }
 
@@ -94,7 +103,7 @@ MaterialDesc Material::GetMaterialDesc() const noexcept
 	materialDesc_.Ka = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
 	materialDesc_.Kd = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();
 	materialDesc_.Ks = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
-	materialDesc_.Ke = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();
+	materialDesc_.Ke = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_EMISSIVE).value();
 	materialDesc_.Ns = matProps.GetPropertyAs<float>(AI_MATKEY_SHININESS).value();
 	materialDesc_.illum = *(int*)matProps.GetProperty(AI_MATKEY_SHADING_MODEL)->GetData().data();
 	return materialDesc_;
@@ -104,7 +113,7 @@ bool Material::operator==(const Material& rhs) const noexcept
 	return materialName == rhs.materialName && materialDirectory == rhs.materialDirectory;
 }
 
-bool Material::LoadMaterialTextures
+Material::mIterator Material::LoadMaterialTextures
 (
 	Graphics& Gfx, 
 	aiMaterial* pMaterial, 
@@ -113,10 +122,9 @@ bool Material::LoadMaterialTextures
 	wicFlg wicFlags
 )
 {
-	bool hasSuchMap = false;
+	size_t prevSize = materialTextures.size();
 	for (unsigned int i = 0u; i < pMaterial->GetTextureCount(textureType); i++)
 	{
-		hasSuchMap = true;
 		aiString textureFileName;
 		if (pMaterial->GetTexture(textureType, i, &textureFileName) == aiReturn_SUCCESS)
 		{
@@ -125,7 +133,7 @@ bool Material::LoadMaterialTextures
 			materialTextures.push_back(pTexture);
 		}
 	}
-	return hasSuchMap;
+	return std::prev(materialTextures.end(), materialTextures.size() - prevSize);
 }
 
 std::shared_ptr<MaterialTexture> Material::PushTexture

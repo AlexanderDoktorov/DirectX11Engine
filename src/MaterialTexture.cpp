@@ -32,6 +32,13 @@ void MaterialTexture::SetTextureAiType(aiTextureType aiType) noexcept
 	textureType = aiType;
 }
 
+DXGI_FORMAT MaterialTexture::GetTextureFormat() const noexcept
+{
+	D3D11_TEXTURE2D_DESC desc;
+	p_Texture->GetDesc(&desc);
+	return desc.Format;
+}
+
 std::string MaterialTexture::GetFileName() const noexcept
 {
 	return textureFileName;
