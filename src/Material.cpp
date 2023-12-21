@@ -15,13 +15,14 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
+	using enum MaterialTexture::wicFlg;
 	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE) != materialTextures.end();
-	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, wicFlg::WIC_LOADER_IGNORE_SRGB) != materialTextures.end();
-	mIterator mIt = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR, SLOT_TEXTURE_SPECULAR, wicFlg::WIC_LOADER_IGNORE_SRGB);
+	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, WIC_FLAGS_IGNORE_SRGB) != materialTextures.end();
+	mIterator mIt = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR, SLOT_TEXTURE_SPECULAR, WIC_FLAGS_IGNORE_SRGB);
 	for (mIterator it = mIt; it != materialTextures.end(); ++it)
 	{
 		mapLayout.hasSpecularMap = true;
-		if ((*it)->GetTextureFormat() == DXGI_FORMAT_B8G8R8A8_UNORM)
+		if ((*it)->GetTextureFormat() == DXGI_FORMAT_R8G8B8A8_UNORM || (*it)->GetTextureFormat() == DXGI_FORMAT_B8G8R8A8_UNORM)
 		{
 			mapLayout.hasSpecularMapColored = true;
 			(*it)->SetBindSlot(SLOT_TEXTURE_SPECULAR_COLORED);
@@ -78,7 +79,7 @@ MapLayout Material::GetMapLayout() const noexcept
 
 bool Material::HasAnyMaps() const noexcept
 {
-	return mapLayout.hasDiffuseMap || mapLayout.hasHeightMap || mapLayout.hasNormalMap || mapLayout.hasSpecularMap;
+	return mapLayout.hasDiffuseMap || mapLayout.hasHeightMap || mapLayout.hasNormalMap || mapLayout.hasSpecularMap || mapLayout.hasSpecularMapColored;
 }
 
 std::string Material::GetName() const noexcept
@@ -100,6 +101,7 @@ MaterialDesc Material::GetMaterialDesc() const noexcept
 	materialDesc_.hasHeightMap	 = mapLayout.hasHeightMap;
 	materialDesc_.hasNormalMap	 = mapLayout.hasNormalMap;
 	materialDesc_.hasSpecularMap = mapLayout.hasSpecularMap;
+	materialDesc_.hasSpecularMapColored = mapLayout.hasSpecularMapColored;
 	materialDesc_.Ka = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
 	materialDesc_.Kd = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();
 	materialDesc_.Ks = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_SPECULAR).value();

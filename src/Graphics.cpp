@@ -284,6 +284,8 @@ void Graphics::EndFrame()
         if (backBuffer)
             ShowRenderWindow(backBuffer.Get(), &open);
     }
+    else
+        p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 
     if (ImGuiEnabled)
     {

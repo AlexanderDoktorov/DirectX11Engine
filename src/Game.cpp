@@ -2,6 +2,7 @@
 #include "StringHelper.h"
 #include <fstream>
 #include <regex>
+#include "DirectXTex.h"
 
 #define NEAR_Z 2
 #define FAR_Z 5000
@@ -50,6 +51,7 @@ Game::Game()
 		aiProcess_Triangulate | 
 		aiProcess_ConvertToLeftHanded
 	);
+	Sponza.Scale(1 / 20.f);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -61,7 +63,9 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-	Sponza.Scale(1 / 20.f);
+	auto wicT = WICTexture();
+	bool hasAlphaGloss = false;
+	wicT.CreateWICTexture(*gfx, LR"(.\Models\Sponza\textures\sponza_curtain_blue_diff_spec.png)", WICTexture::wicFlg::WIC_FLAGS_NONE, &hasAlphaGloss);
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
@@ -161,7 +165,7 @@ void Game::UpdateFrame()
 	gfx->PerformCombinePass();
 
 #ifndef _NOIMGUI
-	ShowControlWindow();
+	ShowItemsSubMenu();
 	cam.ShowControlWindow();
 	Tree.ShowControlWindow(*gfx, "Tree controls");
 	Tree2.ShowControlWindow(*gfx, "Tree2 controls");

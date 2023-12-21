@@ -14,7 +14,6 @@ MaterialTexture::MaterialTexture
 	textureFileName(std::filesystem::path(path).filename().string()),
 	WICTexture(Gfx, path.c_str(), bindSlot, wicLoadFlags)
 {
-
 }
 
 void MaterialTexture::SetFileName(std::string fileName) noexcept

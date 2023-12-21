@@ -64,7 +64,7 @@ float4 main(in PS_INPUT input) : SV_Target0
     float3 fragWorldNormal  = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
     float4 fragDiffuseColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
     float3 fragSpecColor    = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb;
-    float  fragShininess    = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
+    float  fragSpecularPower = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
     
     LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
@@ -82,9 +82,9 @@ float4 main(in PS_INPUT input) : SV_Target0
     
     if (materialID < 0)
     {
-        const float3 ambientColor = { 0.05f, 0.05f, 0.05f };
-        const float  shininess = 128;
-        const float  spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        const float3 ambientColor  = { 0.05f, 0.05f, 0.05f };
+        const float  specularPower = 128;
+        const float  spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);
         
         return float4((ambientColor + lightParams.diffuseColor * lightParams.diffuseIntensity * diff * att) * fragDiffuseColor.rgb + lightParams.diffuseColor * spec * att, fragDiffuseColor.a);
     }
@@ -92,25 +92,28 @@ float4 main(in PS_INPUT input) : SV_Target0
     {
         MaterialDesc matDesc = RenderMaterials.Load(materialID);
         
-        float3 ambientReflectiveColor = matDesc.Ka; // ambiemnt color of material if ambeint map not present
-        float3 diffuseReflectiveColor = matDesc.Kd; // diffuse color of material if diffuse map not present
-        float3 specularReflectiveColor = matDesc.Ks; // specular coor of material if specular color map not present
-        float  shininess = matDesc.Ns; // material shininess if R8 spec map not present
-       
+        float3 ambientReflectiveColor   = matDesc.Ka; // ambiemnt color of material if ambeint map not present
+        float3 diffuseReflectiveColor   = matDesc.Kd; // diffuse color of material if diffuse map not present
+        float3 specularReflectiveColor  = matDesc.Ks; // specular coor of material if specular color map not present
+        float  specularPower            = matDesc.Ns; // material specularPower if R8 spec map not present
+        
+        if (matDesc.hasDiffuseMap)
+        {
+            diffuseReflectiveColor = fragDiffuseColor.rgb;
+            ambientReflectiveColor = fragDiffuseColor.rgb;
+        }
+        
         if (matDesc.hasSpecularMapColored)
         {
-            shininess = fragShininess;
+            specularPower = fragSpecularPower;
             specularReflectiveColor = fragSpecColor;
         }
         else if (matDesc.hasSpecularMap)
         {
-            shininess = fragShininess;
+            specularPower = fragSpecularPower;
         }
         
-        if (matDesc.hasDiffuseMap)
-            diffuseReflectiveColor = fragDiffuseColor.rgb;
-        
-        const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);
         
         // depends on: ambient color of material and light ambient intensity
         const float3 ambient = ambientReflectiveColor * lightParams.ambientIntensity;
@@ -127,7 +130,7 @@ float4 main(in PS_INPUT input) : SV_Target0
             case 2:
                 return float4(ambient + diffuse, fragDiffuseColor.a); // Color on and Ambient on
             case 3:
-                return float4(ambient + diffuse + specular, fragDiffuseColor.a); // Highlight on
+                return float4(saturate(ambient + diffuse + specular), fragDiffuseColor.a); // Highlight on
         }
         
         return float4(1.0, 0.f, 0.f, 1.f); // red color as a sign that material was not used (or illum model isn't [0:2])

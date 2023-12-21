@@ -1094,3 +1094,77 @@ HRESULT DirectX::CreateWICTextureFromFileEx(
 
     return hr;
 }
+
+HRESULT TestAlphaGloss(bool& hasAlphaGloss, const wchar_t* fileName) noexcept
+{
+    // Assuming you have a valid IWICImagingFactory pointer (pWICFactory) and a file path (filePath)
+
+    auto pWIC = GetWIC();
+    if (!pWIC)
+        return E_NOINTERFACE;
+
+    // Create a WIC decoder
+    ComPtr<IWICBitmapDecoder> pDecoder = nullptr;
+    HRESULT hr = pWIC->CreateDecoderFromFilename(
+        fileName,
+        nullptr,
+        GENERIC_READ,
+        WICDecodeMetadataCacheOnLoad,
+        &pDecoder
+    );
+    if (FAILED(hr))
+        return hr;
+
+    ComPtr<IWICBitmapFrameDecode> pFrame = nullptr;
+    hr = pDecoder->GetFrame(0, &pFrame);
+    if (FAILED(hr))
+         return hr;
+
+    WICPixelFormatGUID pixelFormat;
+    hr = pFrame->GetPixelFormat(&pixelFormat);
+    if (FAILED(hr))
+        return hr;
+
+    // Get the width and height of the WIC texture
+    UINT width, height;
+    if (SUCCEEDED(pFrame->GetSize(&width, &height)))
+    {
+        // Calculate the size of the pixel buffer
+        UINT bufferSize = width * height * sizeof(WICColor);
+
+        // Create a buffer to hold the pixel data
+        BYTE* pBuffer = new BYTE[bufferSize];
+
+        // Copy the pixel data from the WIC texture to the buffer
+        if (SUCCEEDED(pFrame->CopyPixels(nullptr, width * sizeof(WICColor), bufferSize, pBuffer)))
+        {
+            // Now you can iterate through the pixel data
+            for (UINT y = 0; y < height; ++y)
+            {
+                for (UINT x = 0; x < width; ++x)
+                {
+                    // Assuming the pixel format is 32bpp BGRA
+                    WICColor* pPixel = reinterpret_cast<WICColor*>(pBuffer + (y * width + x) * sizeof(WICColor));
+
+                    // Access pixel components (BGRA order)
+                    BYTE r = *(reinterpret_cast<BYTE*>(pPixel) );
+                    BYTE g = *(reinterpret_cast<BYTE*>(pPixel) + 1);
+                    BYTE b = *(reinterpret_cast<BYTE*>(pPixel) + 2);
+                    BYTE a = *(reinterpret_cast<BYTE*>(pPixel) + 3);
+
+                    if (a != 255)
+                    {
+                        hasAlphaGloss = true;
+                        break;
+                    }
+                }
+                if (hasAlphaGloss)
+                    break;
+            }
+        }
+
+        // Don't forget to release the buffer when done
+        delete[] pBuffer;
+    }
+    return hr;
+}

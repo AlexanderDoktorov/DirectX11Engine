@@ -64,7 +64,7 @@ void Camera::ShowControlWindow(bool *p_open) noexcept
 
 void Camera::Reset()
 {
-    pos = { 0.f, 0.f, -10.f };
+    pos = { 3.6f, 9.8f, -24.0f };
     pitch = 0.f;
     yaw = 0.f;
 }

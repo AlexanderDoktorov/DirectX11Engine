@@ -37,8 +37,8 @@ struct MapLayout
 
 class Material : public IBindable
 {
-	typedef DirectX::WIC_LOADER_FLAGS wicFlg;
 	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
+	using wicFlg = MaterialTexture::wicFlg;
 public:
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
@@ -63,7 +63,7 @@ private:
 		aiMaterial* pMaterial, 
 		aiTextureType textureType, 
 		UINT bindSlot, 
-		wicFlg wicLoadFlags = wicFlg::WIC_LOADER_DEFAULT
+		wicFlg wicLoadFlags = wicFlg::WIC_FLAGS_NONE
 	);
 	void LoadMaterialProperties(aiMaterial* pMaterial);
 private:

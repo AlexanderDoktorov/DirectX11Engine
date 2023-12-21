@@ -35,6 +35,8 @@ struct PSOutput
     int    materialID   : SV_TARGET4;
 };
 
+static const float specularMapWeigth = 1.f;
+
 PSOutput main(VS_OUT ps_input)
 {
     PSOutput output = (PSOutput) 0;
@@ -70,10 +72,14 @@ PSOutput main(VS_OUT ps_input)
     clip(output.Albedo.a < 0.1f ? -1 : 1);
     
     // Specular map //
+    if (useSpecularMapColored || useSpecularMap)
+    {
+        output.Specular.a   = pow(2.f, SpecularMapColored.Sample(Sampler, ps_input.textCoord).a * 13.f);
+    }
     if (useSpecularMapColored)
-        output.Specular = SpecularMapColored.Sample(Sampler, ps_input.textCoord);
-    else if (useSpecularMap)
-        output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord);
+    {
+        output.Specular.rgb = SpecularMapColored.Sample(Sampler, ps_input.textCoord).rgb * specularMapWeigth;
+    }
         
     
     output.wPosition    = ps_input.wPosition;
