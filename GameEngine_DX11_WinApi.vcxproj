@@ -188,7 +188,7 @@
       </DelayLoadDLLs>
     </Link>
     <FxCompile>
-      <ObjectFileOutput>$(ProjectDir)shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>$(OutDir)shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
   </ItemDefinitionGroup>
@@ -270,6 +270,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialPropertiesDesc.cpp" />
     <ClCompile Include="src\MaterialProperty.cpp" />
+    <ClCompile Include="src\MaterialSystem.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="include\IBuffer.h" />
     <ClInclude Include="include\IGetID.h" />
     <ClInclude Include="include\MaterialPropertiesDesc.h" />
+    <ClInclude Include="include\MaterialSystem.h" />
     <ClInclude Include="include\noxnd.h" />
     <ClInclude Include="include\Numerated.h" />
     <ClInclude Include="include\Cube.h" />
@@ -537,5 +539,8 @@
   </ImportGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="call AddDLLs.bat &quot;$(SolutionDir)&quot; &quot;$(OutDir)&quot;" />
+    <Exec Command="xcopy &quot;$(SolutionDir)imgui.ini&quot;  &quot;$(OutDir)&quot; /Y" />
+    <Exec Command="xcopy &quot;$(SolutionDir)game.config&quot;  &quot;$(OutDir)&quot; /Y" />
+    <Exec Command="xcopy &quot;$(SolutionDir)Models&quot; &quot;$(OutDir)Models\&quot; /Y /E"/>
   </Target>
 </Project>

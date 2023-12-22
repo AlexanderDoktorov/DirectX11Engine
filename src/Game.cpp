@@ -299,7 +299,7 @@ bool Game::LoadConfigurationFile(const char* path)
 
 void Game::UpdateConfigurationFile(const char* path)
 {
-	std::ofstream fout("game.config");
+	std::ofstream fout(path);
 
 	fout << "[CAMERA]" << std::endl;
 	fout << "POS=" << std::to_string(cam.GetPos().x) << ',' << std::to_string(cam.GetPos().y) << ',' << std::to_string(cam.GetPos().z) << std::endl;
