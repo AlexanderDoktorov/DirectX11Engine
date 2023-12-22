@@ -1,13 +1,13 @@
-cbuffer meshDescBuffer : register(b0)
-{
-    bool   useNormalMap;
-    bool   useDiffuseMap;
-    bool   useSpecularMap;
-    bool   useSpecularMapColored;
-    int    materialID;
-    float4 albedo;
-}
-
+cbuffer MeshDesc : register(b0)
+{   
+    float4 albedoColor;
+    uint  matId;
+    bool useNormalMap;
+    bool useDiffuseMap;
+    bool useSpecularMap;
+    bool useSpecularMapColored;
+};
+    
 Texture2D DiffuseMap                 : register(t0);
 Texture2D NormalMap                  : register(t1);
 Texture2D<float> SpecularMap         : register(t2);
@@ -66,7 +66,7 @@ PSOutput main(VS_OUT ps_input)
     if(useDiffuseMap)
         output.Albedo = DiffuseMap.Sample(Sampler, ps_input.textCoord);
     else
-        output.Albedo = albedo;
+        output.Albedo = albedoColor;
     
     // Alpha testing { Pixel discarded if alpha is too small }
     clip(output.Albedo.a < 0.1f ? -1 : 1);
@@ -83,7 +83,7 @@ PSOutput main(VS_OUT ps_input)
         
     
     output.wPosition    = ps_input.wPosition;
-    output.materialID   = materialID;
+    output.materialID   = matId;
     
     return output;
 }

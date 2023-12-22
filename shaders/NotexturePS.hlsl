@@ -3,7 +3,7 @@
 cbuffer MeshBuffer : register(b0)
 {
     float4 albedo;
-    int matID;
+    uint matID;
 }
 
 struct VS_OUT

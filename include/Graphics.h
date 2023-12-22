@@ -21,8 +21,8 @@
 #include "PixelConstantBuffer.h"
 #include "RenderTexture.h"
 #include "Interfaces.h"
-#include "Material.h"
 #include "Sampler.h"
+#include "MaterialSystem.h"
 #include "noxnd.h"
 #include "DOK_traits.h"
 
@@ -35,31 +35,9 @@ class Graphics
 {
 public:
 	// Meta info
-	using material_buffer_type = StructuredBuffer<MaterialDesc, MAX_MATERIALS, shader_type_pixel>;
 	using window_type = DirectXWindow;
 private:
 	friend class GraphicsChild;
-	class MaterialSystem
-	{
-		friend class Graphics;
-	public:
-		MaterialSystem() = default;
-		void Initilize(Graphics& Gfx, const RECT& rc) noexcept;
-		void OnResize(UINT resizeWidth, UINT resizeHeight) noexcept;
-		size_t GetMaterialIndex(Material& material) noxnd;
-		size_t GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd;
-		bool UpdateMaterialAt(size_t indx) noexcept;
-		std::shared_ptr<Material> GetMaterialAt(size_t indx) noexcept;
-		std::optional<size_t> IsLoaded(const Material& material) const noexcept;
-		std::optional<size_t> IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept;
-		void ShowMaterialsWindow(bool* p_open = (bool*)1) noexcept;
-	private:
-		wrl::ComPtr<ID3D11RenderTargetView>		rtvMaterialID;
-		std::unique_ptr<material_buffer_type>	pMaterialBuffer;
-		std::unique_ptr<RenderTexture>			MaterialIDTexture;
-		std::vector<std::shared_ptr<Material>>	loadedMaterials;
-		Graphics* pGfx = nullptr;
-	};
 public:
 	Graphics(HWND hwnd);
 
@@ -144,7 +122,7 @@ private:
 	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
 
 	// Material system
-	MaterialSystem materialSystem;
+	std::unique_ptr<MaterialSystem> pMatSys;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here

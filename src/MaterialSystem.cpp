@@ -5,7 +5,7 @@ MaterialSystem::MaterialSystem(Graphics& Gfx, const RECT& windowRect)
 	D3D11_TEXTURE2D_DESC textureDesc{};
 	textureDesc.Height =  static_cast<UINT>(std::abs(windowRect.bottom - windowRect.top));
 	textureDesc.Width =  static_cast<UINT>(std::abs(windowRect.right - windowRect.left));
-	textureDesc.Format = DXGI_FORMAT_R16_SINT; // -1 as a sign of empty material
+	textureDesc.Format = buff_format; 
 	textureDesc.MipLevels = 1U; // only mos detailed mip level
 	textureDesc.ArraySize = 1U;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
@@ -58,6 +58,74 @@ const ID3D11ShaderResourceView* MaterialSystem::GetMaterialTexure(Graphics& Gfx)
 const ID3D11ShaderResourceView* MaterialSystem::GetMaterialBuffer(Graphics& Gfx) const noexcept
 { 
 	return pSrv_strbuff.Get(); 
+}
+
+std::shared_ptr<MaterialSystem::m_type> MaterialSystem::GetMaterialByIndex(const size_t& index) const noexcept
+{
+	return vMaterials.at(index);
+}
+
+void MaterialSystem::UpdateMaterialAt(Graphics& Gfx, const size_t& index) noexcept
+{
+	UpdateBuffAt(Gfx, GetMaterialByIndex(index)->GetMaterialDesc(), index);
+}
+
+size_t MaterialSystem::ResolveMaterial(Graphics& Gfx, aiMaterial* pMaterial, const std::string& materialDirectory) noexcept
+{
+	return ResolveMaterialImpl(Gfx, pMaterial, materialDirectory);
+}
+
+MaterialSystem& MaterialSystem::ClearRenderTarget(Graphics& Gfx, const buff_format_type& clearValue) noexcept
+{
+	const FLOAT asFloat = static_cast<FLOAT>(clearValue);
+	const FLOAT clearColor[4] = { asFloat, asFloat, asFloat, asFloat };
+	GetContext(Gfx)->ClearRenderTargetView(pRtv_mId.Get(), clearColor);
+	return *this;
+}
+
+HRESULT MaterialSystem::OnResize(Graphics& Gfx, const RECT& windowRect) noexcept
+{
+	D3D11_TEXTURE2D_DESC textureDesc;
+	pText2D_mID->GetDesc(&textureDesc);
+
+	// Resize texture
+	textureDesc.Height =  static_cast<UINT>(std::abs(windowRect.bottom - windowRect.top));
+	textureDesc.Width =  static_cast<UINT>(std::abs(windowRect.right - windowRect.left));
+
+	HRESULT hr = GetDevice(Gfx)->CreateTexture2D(&textureDesc, nullptr, &pText2D_mID);
+	if (FAILED(hr))
+		return hr;
+
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	rtvDesc.Format = textureDesc.Format;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D; 
+	rtvDesc.Texture2D.MipSlice = 0U; 
+
+	hr = GetDevice(Gfx)->CreateRenderTargetView(pText2D_mID.Get(), &rtvDesc, &pRtv_mId); 
+	if (FAILED(hr))
+		return hr;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{}; 
+	srvDesc.Format = textureDesc.Format; 
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D; 
+	srvDesc.Texture2D.MipLevels = textureDesc.MipLevels; 
+	srvDesc.Texture2D.MostDetailedMip = 0U; 
+	hr = GetDevice(Gfx)->CreateShaderResourceView(pText2D_mID.Get(), &srvDesc, &pSrv_mId); 
+
+	return hr;
+}
+
+void MaterialSystem::ShowMaterialsWindow(Graphics& Gfx, bool* p_open) noexcept
+{
+	if (ImGui::Begin("Loaded materials", p_open))
+	{
+		for (size_t i = 0; i < vMaterials.size(); i++)
+		{
+			if (vMaterials[i]->ShowMaterialGUI())
+				UpdateMaterialAt(Gfx, i);
+		}
+	}
+	ImGui::End();
 }
 
 HRESULT MaterialSystem::InitilizeMaterialBuffer(Graphics& Gfx, UINT maxMaterials, const buff_data_type& initialValue) noexcept

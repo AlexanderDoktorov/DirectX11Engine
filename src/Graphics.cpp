@@ -116,7 +116,8 @@ Graphics::Graphics(HWND hwnd) :
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
 
     // Initilize material system
-    materialSystem.Initilize(*this, rc);
+    pMatSys = std::make_unique<MaterialSystem>(*this, rc);
+    pMatSys->InitilizeMaterialBuffer(*this, MAX_MATERIALS);
 
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
@@ -137,7 +138,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), materialSystem.rtvMaterialID.Get() };
+    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), pMatSys->pRtv_mId.Get() };
     
     // Clear render targets
     const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
@@ -145,8 +146,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     {
         p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
     }
-    const float rtvMaterialIdClear [4] = { -1.f,-1.f,-1.f,-1.f };
-    p_Context->ClearRenderTargetView(materialSystem.rtvMaterialID.Get(), rtvMaterialIdClear);
+    pMatSys->ClearRenderTarget(*this);
 
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
@@ -167,12 +167,12 @@ void Graphics::BeginLightningPass()
     SetAdditiveBlendingState();
 
     // Bind shader resourses
-    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), materialSystem.MaterialIDTexture->GetSRV() };
+    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), pMatSys->pSrv_mId.Get() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
 
     // Set materials structured buffer
-    materialSystem.pMaterialBuffer->Bind(*this);
+    p_Context->PSSetShaderResources(SLOT_MATERIAL_STRUCTURED_BUFFER, 1U, pMatSys->pSrv_strbuff.GetAddressOf());
 
     // Bind CameraBuffer
     const dx::XMFLOAT3 camPos = cam.GetPos();
@@ -331,9 +331,10 @@ void Graphics::RenderToImGui(const bool& state)
     IsRenderingToImGui = state;
 }
 
-Graphics::MaterialSystem& Graphics::GetMaterialSystem() noexcept
+MaterialSystem& Graphics::GetMaterialSystem() noexcept
 {
-    return materialSystem;
+    assert(pMatSys != nullptr);
+    return *pMatSys;
 }
 
 Graphics::~Graphics()
@@ -474,7 +475,7 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
     {
         RecreateMainViews(w, h);
         RecreateGBufferViews(w, h);
-        materialSystem.OnResize(w, h);
+        pMatSys->OnResize(*this, pWnd->GetWndRect());
         pWnd->ZeroResizeInfo();
         RECT rc;
         GetClientRect(pWnd->GetWnd(), &rc);
@@ -548,100 +549,3 @@ Camera Graphics::GetCamera() const
 {
     return this->cam;
 }
-
-// (********************) Material System (********************) //
-//                                                               //
-void Graphics::MaterialSystem::Initilize(Graphics& Gfx, const RECT& rc) noexcept
-{
-    pGfx = &Gfx;
-    MaterialIDTexture   = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R32_SINT, rc.bottom - rc.top, rc.right - rc.left);
-    pMaterialBuffer     = std::make_unique<material_buffer_type>(*pGfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
-    rtvMaterialID       = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
-}
-
-void Graphics::MaterialSystem::OnResize(UINT resizeWidth, UINT resizeHeight) noexcept
-{
-    MaterialIDTexture->Resize(*pGfx, resizeHeight, resizeWidth);
-    rtvMaterialID = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
-}
-
-size_t Graphics::MaterialSystem::GetMaterialIndex(Material& material) noxnd
-{
-    if (std::optional<size_t> indx = IsLoaded(material))
-        return indx.value();
-    else
-    {
-        const size_t newIndex = loadedMaterials.size();
-        assert(loadedMaterials.size() <= MAX_MATERIALS);
-        pMaterialBuffer->Update(*pGfx, material.GetMaterialDesc(), newIndex);
-        loadedMaterials.push_back(std::make_unique<Material>(std::move(material)));
-        return newIndex;
-    }
-}
-
-size_t Graphics::MaterialSystem::GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd
-{
-    if (std::optional<size_t> indx = IsLoaded(pMaterial->GetName().C_Str(), materialDirectory))
-        return indx.value();
-    else
-    {
-        const size_t newIndex = loadedMaterials.size();
-        assert(loadedMaterials.size() <= MAX_MATERIALS);
-        loadedMaterials.push_back(std::make_unique<Material>(*pGfx, pMaterial, materialDirectory));
-        pMaterialBuffer->Update(*pGfx, loadedMaterials.back()->GetMaterialDesc(), newIndex);
-        return newIndex;
-    }
-}
-
-bool Graphics::MaterialSystem::UpdateMaterialAt(size_t indx) noexcept
-{
-    if (indx >= MAX_MATERIALS || !pMaterialBuffer.get())
-        return false;
-    if (auto pMat = GetMaterialAt(indx))
-    {
-        pMaterialBuffer->Update(*pGfx, pMat->GetMaterialDesc(), indx);
-        return true;
-    }
-    return false;
-}
-
-std::shared_ptr<Material> Graphics::MaterialSystem::GetMaterialAt(size_t indx) noexcept
-{
-    if (indx < loadedMaterials.size())
-        return loadedMaterials.at(indx);
-    return nullptr;
-}
-
-std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const Material& material) const noexcept
-{
-    for (size_t i = 0U; i < loadedMaterials.size(); i++)
-    {
-        if (loadedMaterials[i]->GetDirectory() == material.GetDirectory() && loadedMaterials[i]->GetName() == material.GetName())
-            return i;
-    }
-    return std::nullopt;
-
-}
-std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept
-{
-    for (size_t i = 0U; i < loadedMaterials.size(); i++)
-    {
-        if (loadedMaterials[i]->GetDirectory() == materialDirectory && loadedMaterials[i]->GetName() == materialName)
-            return i;
-    }
-    return std::nullopt;
-}
-void Graphics::MaterialSystem::ShowMaterialsWindow(bool* p_open) noexcept
-{
-    if (ImGui::Begin("Loaded materials", p_open))
-    {
-        for (size_t i = 0; i < loadedMaterials.size(); i++)
-        {
-            if (loadedMaterials[i]->ShowMaterialGUI())
-                UpdateMaterialAt(i);
-        }
-    }
-    ImGui::End();
-}
-//                                                               //
-//***************************************************************//

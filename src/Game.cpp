@@ -3,6 +3,7 @@
 #include <fstream>
 #include <regex>
 #include "DirectXTex.h"
+#include "MaterialSystem.h"
 
 #define NEAR_Z 2
 #define FAR_Z 5000
@@ -63,9 +64,7 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-	auto wicT = WICTexture();
-	bool hasAlphaGloss = false;
-	wicT.CreateWICTexture(*gfx, LR"(.\Models\Sponza\textures\sponza_curtain_blue_diff_spec.png)", WICTexture::wicFlg::WIC_FLAGS_NONE, &hasAlphaGloss);
+
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
@@ -170,7 +169,7 @@ void Game::UpdateFrame()
 	Tree.ShowControlWindow(*gfx, "Tree controls");
 	Tree2.ShowControlWindow(*gfx, "Tree2 controls");
 	Lamp.ShowControlWindow(*gfx, "Lamp controls");
-	gfx->GetMaterialSystem().ShowMaterialsWindow();
+	gfx->GetMaterialSystem().ShowMaterialsWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }
