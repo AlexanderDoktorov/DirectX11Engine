@@ -38,8 +38,10 @@ struct MapLayout
 class Material : public IBindable
 {
 	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
-	using wicFlg = MaterialTexture::wicFlg;
 public:
+	using wicFlg = MaterialTexture::wicFlg;
+	using strbuff_type = MaterialDesc;
+
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
 	const std::vector<std::shared_ptr<MaterialTexture>>& GetTextures() const noexcept;
@@ -48,6 +50,7 @@ public:
 	bool ShowMaterialGUI(bool* p_open = (bool*)0);
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
+	static std::string GenerateID(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) noexcept;
 	
 	MapLayout	 GetMapLayout() const noexcept;
 	bool		 HasAnyMaps() const noexcept;

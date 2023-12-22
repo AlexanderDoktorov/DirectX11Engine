@@ -11,6 +11,13 @@ public:
 	BaseWindow() : hWnd(NULL) {}
 
 	HWND GetWnd() const { return hWnd; }
+	RECT GetWndRect() const noexcept 
+	{
+		RECT rect{};
+		if (hWnd)
+			GetClientRect(hWnd, &rect);
+		return rect;
+	}
 
 	static std::optional<int> ProcessMessage() noexcept
 	{

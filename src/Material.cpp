@@ -57,6 +57,11 @@ void Material::Bind(Graphics& Gfx) noexcept
 	}
 }
 
+std::string Material::GenerateID(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) noexcept
+{
+	return std::string(typeid(Material).name()) + pMaterial->GetName().C_Str() + materialDirectory;
+}
+
 int Material::IsLoaded(const std::string& textureFileName, aiTextureType textureType) noexcept
 {
 	int i = 0;
