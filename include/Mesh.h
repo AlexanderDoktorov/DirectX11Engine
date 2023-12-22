@@ -34,6 +34,7 @@ public:
 
 	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept;
 	int  GetMaterialIndex() const noexcept;
+	virtual void Draw(Graphics& Gfx) override;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 	Mesh& Translate(float dx, float dy, float dz) noexcept;
 	Mesh& SetPosition(float x, float y, float z)  noexcept;
