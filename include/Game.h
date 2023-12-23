@@ -12,12 +12,6 @@
 #include "Sheet.h"
 #include "SolidTexturedBall.h"
 
-#ifdef _DEBUG
-#define _LOGGING_EN
-#endif DEBUG
-
-#include "Logger.h"
-
 class Game
 {
 public:

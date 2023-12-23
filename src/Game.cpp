@@ -10,10 +10,6 @@
 
 Game::Game()
 {
-	// std::cerr and std::cout now writes into files of logger
-	logger.RedirectErrors(&std::cerr);
-	logger.RedirectLog(&std::cout);
-
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
 	// Graphics and window
 	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);
