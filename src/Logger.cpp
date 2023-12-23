@@ -24,12 +24,12 @@ void Logger::RedirectLog(std::ostream* oStream) const noexcept
 	RedirectStreamImpl(&logFile, oStream);
 }
 
-void Logger::LogError(const std::ofstream::char_type* message)
+void Logger::LogError(const std::ofstream::char_type* message) noexcept
 {
 	errFile << message;
 }
 
-void Logger::LogMsg(const std::ofstream::char_type* message)
+void Logger::LogMsg(const std::ofstream::char_type* message) noexcept
 {
 	logFile << message;
 }

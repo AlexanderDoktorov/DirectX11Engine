@@ -10,22 +10,22 @@ struct ILogger
 	virtual void LogMsg(const std::ofstream::char_type* message) = 0;
 };
 
+template<class oStream1, class oStream2>
+static void RedirectStreamImpl(oStream1* oStreamOld, oStream2* oStreamNew) noexcept
+{
+	oStreamNew->rdbuf(oStreamOld->rdbuf());
+}
+
 class Logger : public ILogger
 {
 public:
 	Logger(const std::string& logFileName, const std::string& errFileName);
 	~Logger();
 
-	template<class oStream1, class oStream2>
-	static void RedirectStreamImpl(oStream1* oStreamOld, oStream2* oStreamNew) noexcept
-	{
-		oStreamNew->rdbuf(oStreamOld->rdbuf());
-	}
-
-	void RedirectErrors(std::ostream* oStream) const noexcept	override;
-	void RedirectLog(std::ostream* oStream) const noexcept		override;
-	void LogError(const std::ofstream::char_type* message)		override;
-	void LogMsg(const std::ofstream::char_type* message)		override;
+	void RedirectErrors(std::ostream* oStream)			const noexcept	override;
+	void RedirectLog(std::ostream* oStream)				const noexcept	override;
+	void LogError(const std::ofstream::char_type* message)	  noexcept	override;
+	void LogMsg(const std::ofstream::char_type* message)	  noexcept	override;
 private:
 	std::ofstream logFile;
 	std::ofstream errFile;
