@@ -268,6 +268,7 @@
     <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\ISlot.cpp" />
     <ClCompile Include="src\LightSource.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialPropertiesDesc.cpp" />
     <ClCompile Include="src\MaterialProperty.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="include\ColorBuffer.h" />
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
+    <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
     <ClInclude Include="include\DOK_assimp.h" />
     <ClInclude Include="include\DOK_traits.h" />

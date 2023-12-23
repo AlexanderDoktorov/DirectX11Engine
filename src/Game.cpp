@@ -5,11 +5,22 @@
 #include "DirectXTex.h"
 #include "MaterialSystem.h"
 
+#ifdef _DEBUG
+#define _LOGGING_EN
+#endif DEBUG
+
+#include "Logger.h"
+
+
 #define NEAR_Z 2
 #define FAR_Z 5000
 
 Game::Game()
 {
+	// std::cerr and std::cout now writes into files of logger
+	logger.RedirectErrors(&std::cerr);
+	logger.RedirectLog(&std::cout);
+
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
 	// Graphics and window
 	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);

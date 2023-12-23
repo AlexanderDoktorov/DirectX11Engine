@@ -365,3 +365,5 @@ FodyWeavers.xsd
 /shaders/*.cso
 /x64/Debug/ProjForTests.log
 !/Models/*/*.obj
+/ErrorLog.txt
+/OutLog.txt
