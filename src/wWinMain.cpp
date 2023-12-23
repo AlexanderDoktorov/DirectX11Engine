@@ -1,5 +1,7 @@
 // Programm that visualizes sorting
 #include "Game.h"
+#include <iostream>
+#include "baseException.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
 {
@@ -8,12 +10,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		Game game = Game();
 		return game.Start(nCmdShow);
 	}
-	catch (hrException& hr_ex)
+	catch (baseException& baseEx)
 	{
-		OutputDebugStringW(L" *************** EXCEPTION OCCURED *************** \n");
-		OutputDebugStringW(hr_ex.what());
-		OutputDebugStringW(L"\n");
-		OutputDebugStringW(L" *************** EXCEPTION OCCURED *************** \n");
+		std::cerr << baseEx.what() << std::endl;
+		MessageBoxA(NULL, baseEx.what().c_str(), "Exception info", MB_OK);
+		return -1;
+	}
+	catch (std::exception& stdex)
+	{
+		std::cerr << stdex.what() << std::endl;
+		MessageBoxA(NULL, stdex.what() , "Std exception info", MB_OK);
+		return -1;
+	}
+	catch (...)
+	{
+		MessageBoxA(NULL, "Unknown exception", "Exception info", MB_OK);
+		std::cerr << "Unknown exception" << std::endl;
 		return -1;
 	}
 }

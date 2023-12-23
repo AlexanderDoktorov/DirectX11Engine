@@ -1,5 +1,6 @@
 #pragma once
 #include "IBindable.h"
+#include "hrException.h"
 
 template<class T>
 class ResourseBuffer : public IBindable
@@ -16,7 +17,7 @@ public:
 		D3D11_SUBRESOURCE_DATA bufferSrd{};
 		bufferSrd.pSysMem = &bufferData;
 
-		CHECK_HR( GetDevice(Gfx)->CreateBuffer(&bufferDesc, &bufferSrd, &pBuffer) );
+		CHECK_EXPR_DEFINE_HR(GetDevice(Gfx)->CreateBuffer(&bufferDesc, &bufferSrd, &pBuffer)); 
 	}
 
 	ResourseBuffer(Graphics& Gfx)
@@ -27,13 +28,13 @@ public:
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
-		CHECK_HR( GetDevice(Gfx)->CreateBuffer(&bufferDesc, &nullptr, &pBuffer) );
+		CHECK_EXPR_DEFINE_HR( GetDevice(Gfx)->CreateBuffer(&bufferDesc, &nullptr, &pBuffer) );
 	}
 
 	void Update(Graphics& Gfx, const T& NewData)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource{};
-		CHECK_HR( GetContext(Gfx)->Map(pBuffer.Get(), 0U, D3D11_MAP_WRITE_DISCARD, 0U, &mappedSubresource) );
+		CHECK_EXPR_DEFINE_HR( GetContext(Gfx)->Map(pBuffer.Get(), 0U, D3D11_MAP_WRITE_DISCARD, 0U, &mappedSubresource) );
 
 		memcpy(mappedSubresource.pData, &NewData, sizeof(NewData));
 

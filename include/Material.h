@@ -35,9 +35,14 @@ struct MapLayout
 	// may add more maps
 };
 
+
 class Material : public IBindable
 {
 	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
+	class matrialException
+	{
+
+	};
 public:
 	using wicFlg = MaterialTexture::wicFlg;
 	using strbuff_type = MaterialDesc;

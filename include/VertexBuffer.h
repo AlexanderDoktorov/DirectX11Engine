@@ -1,7 +1,7 @@
 #pragma once
 #include "IBindable.h"
 #include "Vertex.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include <wrl.h>
 
 class VertexBuffer : public IBindable
@@ -22,7 +22,7 @@ public:
 		D3D11_SUBRESOURCE_DATA sd = {};
 		sd.pSysMem = verts.data();
 
-		CHECK_HR( GetDevice( gfx )->CreateBuffer( &bd,&sd,&pVertexBuffer ) );
+		HRESULT hr = GetDevice(gfx)->CreateBuffer(&bd, &sd, &pVertexBuffer); CHECK_HR(hr);
 	}
 
 	void Bind( Graphics& gfx ) noexcept override;

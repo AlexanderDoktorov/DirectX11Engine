@@ -248,7 +248,7 @@
     <ClInclude Include="include\Camera.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\Exceptions.h">
+    <ClInclude Include="include\hrException.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\Game.h">
@@ -537,6 +537,9 @@
       <Filter>Файлы заголовков\Assimp</Filter>
     </ClInclude>
     <ClInclude Include="include\Logger.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baseException.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

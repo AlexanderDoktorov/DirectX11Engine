@@ -299,6 +299,7 @@
     <ClCompile Include="src\wWinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\baseException.h" />
     <ClInclude Include="include\BaseWindow.h" />
     <ClInclude Include="include\BindableSystem.h" />
     <ClInclude Include="include\Blob.h" />
@@ -326,7 +327,7 @@
     <ClInclude Include="include\DOK_math.h" />
     <ClInclude Include="include\Drawable.h" />
     <ClInclude Include="include\DrawableBase.h" />
-    <ClInclude Include="include\Exceptions.h" />
+    <ClInclude Include="include\hrException.h" />
     <ClInclude Include="include\FlatRect.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\GenerateShuffledVector.h" />

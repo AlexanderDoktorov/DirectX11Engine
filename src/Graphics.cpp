@@ -1,7 +1,7 @@
 #include "HPipelineElements.h"
 #include "ITexture2D.h"
 #include "IBindable.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include "Graphics.h"
 #include "Material.h"
 #include "XSResourse.h"
@@ -69,7 +69,7 @@ Graphics::Graphics(HWND hwnd) :
     DSD.DepthFunc = D3D11_COMPARISON_LESS; // means that object is overwritten when it's Z is closer - LOGIC
     DSD.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     wrl::ComPtr<ID3D11DepthStencilState> p_DSState;
-    CHECK_HR( p_Device->CreateDepthStencilState(&DSD, &p_DSState) );
+    hr = p_Device->CreateDepthStencilState(&DSD, &p_DSState); CHECK_HR(hr);
 
     // Bind depth stencil state
     p_Context->OMSetDepthStencilState(p_DSState.Get(), 1U);
@@ -307,11 +307,11 @@ void Graphics::EndFrame()
     {
         if (hr == DXGI_ERROR_DEVICE_REMOVED)
         {
-            throw hrException(p_Device->GetDeviceRemovedReason());
+            throw hrException(__LINE__, __FILE__, p_Device->GetDeviceRemovedReason());
         }
         else
         {
-            throw hrException(hr);
+            throw hrException(__LINE__, __FILE__, hr);
         }
     }
 }
@@ -368,8 +368,9 @@ void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
 
 void Graphics::CreateDepthStencilView()
 {
+    HRESULT hr;
     ID3D11Texture2D* pBackBuffer;
-    CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+    hr = p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)); CHECK_HR(hr);
 
     D3D11_TEXTURE2D_DESC BackBufferDesc;
     pBackBuffer->GetDesc(&BackBufferDesc);
@@ -386,7 +387,7 @@ void Graphics::CreateDepthStencilView()
     DSTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     DSTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    CHECK_HR ( p_Device->CreateTexture2D(&DSTextureDesc, nullptr, &pDepthStencil) ); 
+    hr = p_Device->CreateTexture2D(&DSTextureDesc, nullptr, &pDepthStencil); CHECK_HR(hr);
 
     // Create view (same as we did with "View" on back buffer with render target view)
     D3D11_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
@@ -394,15 +395,16 @@ void Graphics::CreateDepthStencilView()
     DSVDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     DSVDesc.Texture2D.MipSlice = 0U;
 
-    CHECK_HR ( p_Device->CreateDepthStencilView(pDepthStencil.Get(), &DSVDesc, &g_mainDepthStencilView) );
+    hr = p_Device->CreateDepthStencilView(pDepthStencil.Get(), &DSVDesc, &g_mainDepthStencilView); CHECK_HR(hr);
     pBackBuffer->Release();
 }
 
 void Graphics::CreateBackBufferView()
 {
+    HRESULT hr;
     ID3D11Texture2D* pBackBuffer;
-    CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
-    CHECK_HR(p_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView));
+    hr = p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)); CHECK_HR(hr);
+    hr = p_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView); CHECK_HR(hr);
     pBackBuffer->Release();
 }
 
@@ -414,11 +416,12 @@ void Graphics::CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11
     rtvDesc.Format = texture->GetDesc().Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0U;
-    CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
+    HRESULT hr = p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv); CHECK_HR(hr);
 }
 
 wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
 {
+    HRESULT hr;
     wrl::ComPtr<ID3D11ShaderResourceView> result;
     ID3D11Texture2D* pRenderTextureCopy = nullptr;
     ID3D11Texture2D* pRenderTexture = nullptr;
@@ -431,7 +434,7 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     descTextCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     descTextCopy.MipLevels = 0U;
     descTextCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-    CHECK_HR( p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy) );
+    hr = p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy); CHECK_HR(hr);
 
     // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
     p_Context->CopySubresourceRegion(pRenderTextureCopy, 0U, 0U, 0U, 0U, pRenderTexture, 0U, nullptr);
@@ -441,7 +444,7 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
     resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
-    CHECK_HR( p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result) );
+    hr = p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result); CHECK_HR(hr);
 
     // regenerate mipmap based on updated most detailed mip-level
     p_Context->GenerateMips(result.Get());
@@ -462,7 +465,7 @@ wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p
     rtvDesc.Format = texture->GetDesc().Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0U;
-    CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
+    CHECK_EXPR_DEFINE_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
 
     return rtv;
 }

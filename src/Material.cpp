@@ -1,6 +1,7 @@
 #include "Material.h"
 #include "SlotLayout.h"
 #include <filesystem>
+#include <iostream>
 #include "DOK_assimp.h"
 
 std::vector<std::shared_ptr<MaterialTexture>>  Material::loadedTextures{};

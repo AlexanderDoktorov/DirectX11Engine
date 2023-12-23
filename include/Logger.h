@@ -31,7 +31,7 @@ private:
 	std::ofstream errFile;
 };
 
-class EmptyLogger : ILogger
+class EmptyLogger : public ILogger
 {
 public:
 	EmptyLogger() = default;

@@ -5,13 +5,6 @@
 #include "DirectXTex.h"
 #include "MaterialSystem.h"
 
-#ifdef _DEBUG
-#define _LOGGING_EN
-#endif DEBUG
-
-#include "Logger.h"
-
-
 #define NEAR_Z 2
 #define FAR_Z 5000
 

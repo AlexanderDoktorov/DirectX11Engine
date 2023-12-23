@@ -1,11 +1,12 @@
 #include "ComputeShader.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include <d3dcompiler.h>
 
 ComputeShader::ComputeShader(Graphics& Gfx, const wchar_t* fileName)
 {
-	CHECK_HR(D3DReadFileToBlob(fileName, &p_Blob));
-	CHECK_HR(GetDevice(Gfx)->CreateComputeShader(p_Blob->GetBufferPointer(), p_Blob->GetBufferSize(), nullptr, &p_ComputeShader));
+	HRESULT hr;
+	hr = D3DReadFileToBlob(fileName, &p_Blob); CHECK_HR(hr);
+	hr = GetDevice(Gfx)->CreateComputeShader(p_Blob->GetBufferPointer(), p_Blob->GetBufferSize(), nullptr, &p_ComputeShader); CHECK_HR(hr);
 }
 
 ID3DBlob* ComputeShader::GetBlob() noexcept

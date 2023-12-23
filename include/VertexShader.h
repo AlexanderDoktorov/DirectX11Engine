@@ -7,8 +7,8 @@ class VertexShader : public IBindable
 public:
 	VertexShader(Graphics& Gfx, const wchar_t* fileName)
 	{
-		CHECK_HR(D3DReadFileToBlob(fileName, &p_Blob));
-		CHECK_HR(GetDevice(Gfx)->CreateVertexShader(p_Blob->GetBufferPointer(), p_Blob->GetBufferSize(), nullptr, &p_VS));
+		HRESULT hr = D3DReadFileToBlob(fileName, &p_Blob); CHECK_HR(hr);
+		hr = GetDevice(Gfx)->CreateVertexShader(p_Blob->GetBufferPointer(), p_Blob->GetBufferSize(), nullptr, &p_VS); CHECK_HR(hr);
 	}
 
 	ID3DBlob* GetBlob() noexcept

@@ -1,5 +1,5 @@
 #include "RenderTexture.h"
-#include "Exceptions.h"
+#include "hrException.h"
 
 RenderTexture::RenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
@@ -30,7 +30,8 @@ void RenderTexture::CreateRenderTextureImpl(ID3D11Device* pDevice, DXGI_FORMAT t
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
-    CHECK_HR( pDevice->CreateTexture2D(&textureDesc, nullptr, &p_Texture) );
+    HRESULT hr;
+    hr = pDevice->CreateTexture2D(&textureDesc, nullptr, &p_Texture); CHECK_HR(hr);
 
     D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
     SRVDesc.Format = textureFormat;
@@ -38,7 +39,7 @@ void RenderTexture::CreateRenderTextureImpl(ID3D11Device* pDevice, DXGI_FORMAT t
     SRVDesc.Texture2D.MostDetailedMip = 0U;
     SRVDesc.Texture2D.MipLevels = ~0U;
 
-    CHECK_HR ( pDevice->CreateShaderResourceView(p_Texture.Get(), &SRVDesc, &p_ShaderResourseView) );
+    hr = pDevice->CreateShaderResourceView(p_Texture.Get(), &SRVDesc, &p_ShaderResourseView); CHECK_HR(hr);
 }
 
 void RenderTexture::Reset()
