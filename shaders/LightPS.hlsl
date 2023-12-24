@@ -95,7 +95,8 @@ float4 main(in PS_INPUT input) : SV_Target0
         
         float3 ambientReflectiveColor   = matDesc.Ka; // ambiemnt color of material if ambeint map not present
         float3 diffuseReflectiveColor   = matDesc.Kd; // diffuse color of material if diffuse map not present
-        float3 specularReflectiveColor  = matDesc.Ks; // specular coor of material if specular color map not present
+        float3 specularReflectiveColor  = matDesc.Ks; // specular color of material if specular color map not present
+        float3 emissiveReflectiveColor  = matDesc.Ke; // emissive color of material if emissive color map not present
         float  specularPower            = matDesc.Ns; // material specularPower if R8 spec map not present
         
         if (matDesc.hasDiffuseMap)
@@ -123,6 +124,8 @@ float4 main(in PS_INPUT input) : SV_Target0
         const float3 diffuse = diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
         const float3 specular = specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
+        // depends on: emmsivie color, emmisive intensity
+        const float3 emmisive = emissiveReflectiveColor;
         
         // switch illumination model
         switch (matDesc.illum)
@@ -132,7 +135,7 @@ float4 main(in PS_INPUT input) : SV_Target0
             case 2:
                 return float4(ambient + diffuse, fragDiffuseColor.a); // Color on and Ambient on
             case 3:
-                return float4(saturate(ambient + diffuse + specular), fragDiffuseColor.a); // Highlight on
+                return float4(saturate(ambient + diffuse + specular + emmisive), fragDiffuseColor.a); // Highlight on
         }
         
         return float4(1.0, 0.f, 0.f, 1.f); // red color as a sign that material was not used (or illum model isn't [0:2])
