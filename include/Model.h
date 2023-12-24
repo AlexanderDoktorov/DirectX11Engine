@@ -16,18 +16,23 @@ public:
 	void Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept;
 	void ClearData() noexcept;
 	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
-	virtual void Draw(Graphics& Gfx) override;
-	Model& Translate(float dx, float dy, float dz) noexcept;
-	Model& SetPostion(float x, float y, float z) noexcept;
-	Model& SetRotation(float roll, float pitch, float yaw) noexcept;
-	Model& Scale(float scaleXYZ) noexcept;
+	virtual void Draw(Graphics& Gfx) const noexcept override;
+	Model& SetRootTransform(DirectX::FXMMATRIX tf) noexcept;
 private:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId) const;
 private:
-	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;
-	std::vector<size_t>						materialsIndices;
-	std::unique_ptr<Node>			        pRootNode;
-	DirectX::XMFLOAT3						modelRotation{};
+	struct TransformData
+	{
+		float x = 0.f;
+		float y = 0.f;
+		float z = 0.f;
+		float pitch = 0.f;
+		float roll = 0.f;
+		float yaw = 0.f;
+	} transformData{};
 	std::string directory;
+	std::vector<size_t>						materialsIndices;
+	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;
+	std::unique_ptr<Node>			        pRootNode;
 };

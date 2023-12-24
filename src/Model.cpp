@@ -61,58 +61,35 @@ void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexc
 			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
 		}
 
-		bool rotated = false;
-		rotated |= ImGui::SliderAngle(("Roll"s + modelName).c_str(), &modelRotation.x);
-		rotated |= ImGui::SliderAngle(("Pirch"s + modelName).c_str(), &modelRotation.y);
-		rotated |= ImGui::SliderAngle(("Yaw"s + modelName).c_str(), &modelRotation.z);
-		if(rotated)
-			std::for_each(meshesPtrs.begin(), meshesPtrs.end(), [&](const std::shared_ptr<Mesh>& pMesh) { pMesh->SetRotatin(modelRotation.x, modelRotation.y, modelRotation.z); });
-	}
+		ImGui::SliderAngle(("Roll"s + modelName).c_str(), &transformData.roll);
+		ImGui::SliderAngle(("Pitch"s + modelName).c_str(), &transformData.pitch);
+		ImGui::SliderAngle(("Yaw"s + modelName).c_str(), &transformData.yaw);
+		ImGui::SliderFloat(("Position x"s + modelName).c_str(), &transformData.x, -100.f, 100.f);
+		ImGui::SliderFloat(("Position y"s + modelName).c_str(), &transformData.y, -100.f, 100.f);
+		ImGui::SliderFloat(("Position z"s + modelName).c_str(), &transformData.z, -100.f, 100.f);
+	}		
 	ImGui::End();
 }
 
-void Model::Draw(Graphics& Gfx)
+void Model::Draw(Graphics& Gfx) const noexcept
 {
-	for (size_t i = 0; i < meshesPtrs.size(); i++)
-	{
-		meshesPtrs[i]->Draw(Gfx);
-	}
+	pRootNode->Draw(Gfx, 
+		dx::XMMatrixTranslation(transformData.x, transformData.y, transformData.z) *
+		dx::XMMatrixRotationRollPitchYaw(transformData.pitch, transformData.yaw, transformData.roll)
+	);
 }
 
-Model& Model::Translate(float dx, float dy, float dz) noexcept
+Model& Model::SetRootTransform( DirectX::FXMMATRIX tf ) noexcept
 {
-	for (auto& pMesh : meshesPtrs)
-	{
-		pMesh->Translate(dx, dy, dz);
-	}
-	return *this;
-}
-
-Model& Model::SetPostion(float x, float y, float z) noexcept
-{
-	for (auto& pMesh : meshesPtrs)
-	{
-		pMesh->SetPosition(x, y, z);
-	}
-	return *this;
-}
-
-Model& Model::SetRotation(float roll, float pitch, float yaw) noexcept
-{
-	for (auto& pMesh : meshesPtrs)
-		pMesh->SetRotatin(roll, pitch, yaw);
-	return *this;
-}
-
-Model& Model::Scale(float scaleXYZ) noexcept
-{
-	for (auto& pMesh : meshesPtrs)
-		pMesh->Scale(scaleXYZ);
+	pRootNode->SetAppliedTransform( tf );
 	return *this;
 }
 
 std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode)
 {
+	const dx::XMMATRIX mDxNodeTransform = dx::XMMatrixTranspose( dx::XMLoadFloat4x4(
+		reinterpret_cast<const dx::XMFLOAT4X4*>(&pRootNode->mTransformation)
+	) );
 	// fill nodeMeshes pointers for building a node
 	std::vector<Mesh*> nodeMeshes;
 	nodeMeshes.reserve(pRootNode->mNumMeshes);
@@ -122,8 +99,8 @@ std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pR
 		nodeMeshes.push_back(meshesPtrs.at(meshIndx).get());
 	}
 
-	// construct root with meshes
-	std::unique_ptr<Node> pMyNode = std::make_unique<Node>(startID++, pRootNode->mName.C_Str(), nodeMeshes);
+	// construct root with meshes and transformation
+	std::unique_ptr<Node> pMyNode = std::make_unique<Node>(startID++, pRootNode->mName.C_Str(), nodeMeshes, mDxNodeTransform);
 	
 	pMyNode->Reserve(pRootNode->mNumChildren);
 	// add children for node by building them the same way
@@ -146,8 +123,6 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 	assert(pMat);
 	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
 	bindablePtrs.push_back(pMat);
-	
-	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
 
 	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
 	const bool HasNormalMaps		= pMat->GetMapLayout().hasNormalMap;
@@ -217,6 +192,8 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 		for (size_t k = 0; k < pMesh->mFaces[i].mNumIndices; k++)
 			indices.push_back(pMesh->mFaces[i].mIndices[k]);
 	}
+
+	std::string meshTag = directory + "%" + pMesh->mName.C_Str();
 	bindablePtrs.push_back( IndexBuffer::Resolve(Gfx, meshTag, indices) );
 
 

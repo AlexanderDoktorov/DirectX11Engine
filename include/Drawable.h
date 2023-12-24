@@ -9,7 +9,7 @@ class Drawable : virtual public IObject
 public:
 	~Drawable() = default;
 
-	virtual void Draw(Graphics& Gfx);
+	virtual void Draw(Graphics& Gfx) const noexcept;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 
 protected:
@@ -30,7 +30,7 @@ protected:
 	}
 
 	template <class T>
-	T* QueryBindable()
+	T* QueryBindable() const noexcept
 	{
 		for (auto& bindable : PipelineElements)
 		{

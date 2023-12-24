@@ -10,7 +10,7 @@ class LightSource : public IBindable, public ILight, public IAnimated, public Mo
 public:
 	LightSource(Graphics& Gfx);
 	
-	void		Draw(Graphics& Gfx) override;
+	void		Draw(Graphics& Gfx) const noexcept  override;
 	void		Reset();
 	void		Bind(Graphics& Gfx) noexcept override;
 

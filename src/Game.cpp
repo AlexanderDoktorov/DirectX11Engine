@@ -24,6 +24,7 @@ Game::Game()
 
 	// Lights
 	lights.push_back(std::make_unique<LightSource>(*gfx));
+	lights.push_back(std::make_unique<LightSource>(*gfx));
 
 	sheet->Scale(20.f, 20.f, 20.f);
 
@@ -41,7 +42,7 @@ Game::Game()
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded
 	);
-	Tree2.Translate(10, 0, 0);
+	Tree2.SetRootTransform(dx::XMMatrixTranslation(10, 0, 0));
 
 	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
 		aiProcess_Triangulate
@@ -52,7 +53,7 @@ Game::Game()
 		aiProcess_Triangulate | 
 		aiProcess_ConvertToLeftHanded
 	);
-	Sponza.Scale(1 / 20.f);
+	Sponza.SetRootTransform(dx::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -64,9 +65,7 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-	WICTexture wicTxt{};
-	bool hasAlpha;
-	wicTxt.CreateWICTexture(*gfx, LR"(G:\Visual Studio Projects\GameEngine_DX11_WinApi\Models\Tree\DB2X2_L01_Spec.png)", DirectX::WIC_FLAGS_NONE, &hasAlpha);
+
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");

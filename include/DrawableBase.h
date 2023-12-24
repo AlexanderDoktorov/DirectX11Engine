@@ -60,10 +60,10 @@ protected:
 	}
 
 public:
-	void Draw(Graphics& Gfx) override
+	void Draw(Graphics& Gfx) const noexcept override
 	{
 		//DOK_assert_noexit(staticIndexBuffer != nullptr || pIndexBuffer != nullptr, L"Non of the index buffer is set for drawing, add one with AddStaticElement() or AddElement()");
-		DOK_assert_noexit(staticIndexBuffer == nullptr || pIndexBuffer == nullptr, L"Both of the index buffers [static] and [non-static] is set for drawing, which one to use?");
+		assert(staticIndexBuffer == nullptr || pIndexBuffer == nullptr && L"Both of the index buffers [static] and [non-static] is set for drawing, which one to use?");
 
 		for (auto& non_static_el : PipelineElements)
 		{

@@ -35,7 +35,7 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, si
 	AddBindable( std::make_shared<TransformBuffer>( Gfx,*this ) );
 }
 
-void Mesh::Draw(Graphics& Gfx)
+void Mesh::Draw(Graphics& Gfx, DirectX::FXMMATRIX rusultTransform) const
 {
 	// Update constant buffer with current mesh data
 	// If it is textured
@@ -47,6 +47,7 @@ void Mesh::Draw(Graphics& Gfx)
 		if (auto pBuffer = QueryBindable<PixelConstantBuffer<MeshDescNotex>>())
 			pBuffer->Update(Gfx, *pMeshDescUntextured);
 	// And draw
+	dx::XMStoreFloat4x4(&this->rusultiveTransform, rusultTransform); // set resultive transform
 	Drawable::Draw(Gfx);
 }
 
@@ -88,39 +89,5 @@ int Mesh::GetMaterialIndex() const noexcept
 
 DirectX::XMMATRIX Mesh::GetTransform() const noexcept
 {
-	return 
-		DirectX::XMMatrixRotationRollPitchYaw(worldRotation.y, worldRotation.z, worldRotation.x) *
-		DirectX::XMMatrixTranslation(worldTranslation.x, worldTranslation.y, worldTranslation.z) * 
-		DirectX::XMMatrixScaling(scale,scale,scale);
+	return DirectX::XMLoadFloat4x4( &rusultiveTransform );
 }
-
-Mesh& Mesh::Translate(float dx, float dy, float dz) noexcept
-{
-	worldTranslation.x += dx;
-	worldTranslation.y += dy;
-	worldTranslation.z += dz;
-	return *this;
-}
-
-Mesh& Mesh::SetPosition(float x, float y, float z) noexcept
-{
-	worldTranslation.x = x;
-	worldTranslation.y = y;
-	worldTranslation.z = z;
-	return *this;
-}
-
-Mesh& Mesh::SetRotatin(float roll, float pitch, float yaw) noexcept
-{
-	worldRotation.x = roll;
-	worldRotation.y = pitch;
-	worldRotation.z = yaw;
-	return *this;
-}
-
-Mesh& Mesh::Scale(float scaleXYZ) noexcept
-{
-	scale = scaleXYZ;
-	return *this;
-}
-

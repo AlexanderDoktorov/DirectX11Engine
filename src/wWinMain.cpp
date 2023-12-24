@@ -23,19 +23,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 	catch (baseException& baseEx)
 	{
 		std::cerr << baseEx.what() << std::endl;
-		MessageBoxA(NULL, baseEx.what().c_str(), "Exception info", MB_OK);
-		return -1;
+		MessageBoxA(nullptr, baseEx.what().c_str(), "Exception info", MB_OK);
 	}
 	catch (std::exception& stdex)
 	{
 		std::cerr << stdex.what() << std::endl;
-		MessageBoxA(NULL, stdex.what() , "Std exception info", MB_OK);
-		return -1;
+		MessageBoxA(nullptr, stdex.what() , "Std exception info", MB_OK);
 	}
 	catch (...)
 	{
-		MessageBoxA(NULL, "Unknown exception", "Exception info", MB_OK);
+		MessageBoxA(nullptr, "Unknown exception", "Exception info", MB_OK);
 		std::cerr << "Unknown exception" << std::endl;
-		return -1;
 	}
+	return -1;
 }

@@ -41,7 +41,7 @@ void LightSource::ShowControlChildWindow()
 
 void LightSource::SetPosition(float _x, float _y, float _z)
 {
-	Model::SetPostion(_x, _y, _z);
+	Model::SetRootTransform(dx::XMMatrixTranslation(_x, _y, _z));
 	lightDesc.worldPosition = { _x,_y,_z };
 }
 
@@ -68,7 +68,14 @@ void LightSource::Reset()
 	defaultDesc.Latt = 0.045f;
 	defaultDesc.Qatt = 0.0075f;
 	lightDesc = defaultDesc;
-	Model::SetPostion(lightDesc.worldPosition.x, lightDesc.worldPosition.y, lightDesc.worldPosition.z);
+	Model::SetRootTransform(
+		dx::XMMatrixTranslation
+		(
+			lightDesc.worldPosition.x, 
+			lightDesc.worldPosition.y, 
+			lightDesc.worldPosition.z
+		)
+	);
 }
 
 void LightSource::Bind(Graphics& Gfx) noexcept
@@ -77,7 +84,7 @@ void LightSource::Bind(Graphics& Gfx) noexcept
 	pLightBuffer->Bind(Gfx);
 }
 
-void LightSource::Draw(Graphics& Gfx)
+void LightSource::Draw(Graphics& Gfx) const noexcept 
 {
 	Model::Draw(Gfx);
 }

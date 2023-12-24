@@ -7,8 +7,8 @@ template <class T>
 class BaseWindow
 {
 public:
-	virtual ~BaseWindow() = default;
 	BaseWindow() : hWnd(NULL) {}
+	~BaseWindow() { SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)nullptr); } // unattach window long ptr
 
 	HWND GetWnd() const { return hWnd; }
 	RECT GetWndRect() const noexcept 

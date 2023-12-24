@@ -1,7 +1,7 @@
 #include "Drawable.h"
 #include "Graphics.h"
 
-void Drawable::Draw(Graphics& Gfx)
+void Drawable::Draw(Graphics& Gfx) const noexcept
 {
 	DOK_assert(pIndexBuffer != nullptr, L"IndexBuffer hasn't been set before drawing object, add it with AddBindable()");
 
