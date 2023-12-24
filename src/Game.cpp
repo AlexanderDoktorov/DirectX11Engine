@@ -2,6 +2,8 @@
 #include "StringHelper.h"
 #include <fstream>
 #include <regex>
+#include "DirectXTex.h"
+#include "MaterialSystem.h"
 
 #define NEAR_Z 2
 #define FAR_Z 5000
@@ -47,7 +49,10 @@ Game::Game()
 	Sponza.Load(*gfx, R"(.\Models\Sponza\sponza.obj)", 
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenNormals |
-		aiProcess_Triangulate);
+		aiProcess_Triangulate | 
+		aiProcess_ConvertToLeftHanded
+	);
+	Sponza.Scale(1 / 20.f);
 
 	balls[0]->SetPosition(1.f, 5.f, 1.f);
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
@@ -59,7 +64,9 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-	Sponza.Scale(1 / 20.f);
+	WICTexture wicTxt{};
+	bool hasAlpha;
+	wicTxt.CreateWICTexture(*gfx, LR"(G:\Visual Studio Projects\GameEngine_DX11_WinApi\Models\Tree\DB2X2_L01_Spec.png)", DirectX::WIC_FLAGS_NONE, &hasAlpha);
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
@@ -122,7 +129,7 @@ void Game::UpdateFrame()
 			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
 				cam.Translate({ 0.0f,-dt,0.0f });
 			if (std::optional<int> zDelta = window->ReadZDelta())
-				cam.Accelerate(static_cast<float>(zDelta.value()) / 10.f);
+				cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
 		}
 
 #pragma region MODELS_DRAW
@@ -159,12 +166,12 @@ void Game::UpdateFrame()
 	gfx->PerformCombinePass();
 
 #ifndef _NOIMGUI
-	ShowControlWindow();
+	ShowItemsSubMenu();
 	cam.ShowControlWindow();
 	Tree.ShowControlWindow(*gfx, "Tree controls");
 	Tree2.ShowControlWindow(*gfx, "Tree2 controls");
 	Lamp.ShowControlWindow(*gfx, "Lamp controls");
-	gfx->GetMaterialSystem().ShowMaterialsWindow();
+	gfx->GetMaterialSystem().ShowMaterialsWindow(*gfx);
 #endif
 	gfx->EndFrame();
 }
@@ -293,7 +300,7 @@ bool Game::LoadConfigurationFile(const char* path)
 
 void Game::UpdateConfigurationFile(const char* path)
 {
-	std::ofstream fout("game.config");
+	std::ofstream fout(path);
 
 	fout << "[CAMERA]" << std::endl;
 	fout << "POS=" << std::to_string(cam.GetPos().x) << ',' << std::to_string(cam.GetPos().y) << ',' << std::to_string(cam.GetPos().z) << std::endl;

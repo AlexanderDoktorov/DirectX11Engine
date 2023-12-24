@@ -1,7 +1,7 @@
 #include "HPipelineElements.h"
 #include "ITexture2D.h"
 #include "IBindable.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include "Graphics.h"
 #include "Material.h"
 #include "XSResourse.h"
@@ -69,7 +69,7 @@ Graphics::Graphics(HWND hwnd) :
     DSD.DepthFunc = D3D11_COMPARISON_LESS; // means that object is overwritten when it's Z is closer - LOGIC
     DSD.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     wrl::ComPtr<ID3D11DepthStencilState> p_DSState;
-    CHECK_HR( p_Device->CreateDepthStencilState(&DSD, &p_DSState) );
+    hr = p_Device->CreateDepthStencilState(&DSD, &p_DSState); CHECK_HR(hr);
 
     // Bind depth stencil state
     p_Context->OMSetDepthStencilState(p_DSState.Get(), 1U);
@@ -100,7 +100,7 @@ Graphics::Graphics(HWND hwnd) :
     PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8_UNORM,           rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM      ,rc.bottom - rc.top, rc.right - rc.left);
     LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     
@@ -116,7 +116,8 @@ Graphics::Graphics(HWND hwnd) :
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
 
     // Initilize material system
-    materialSystem.Initilize(*this, rc);
+    pMatSys = std::make_unique<MaterialSystem>(*this, rc);
+    pMatSys->InitilizeMaterialBuffer(*this, MAX_MATERIALS);
 
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
@@ -137,7 +138,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), materialSystem.rtvMaterialID.Get() };
+    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), pMatSys->pRtv_mId.Get() };
     
     // Clear render targets
     const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
@@ -145,8 +146,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     {
         p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
     }
-    const float rtvMaterialIdClear [4] = { -1.f,-1.f,-1.f,-1.f };
-    p_Context->ClearRenderTargetView(materialSystem.rtvMaterialID.Get(), rtvMaterialIdClear);
+    pMatSys->ClearRenderTarget(*this);
 
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
@@ -167,12 +167,12 @@ void Graphics::BeginLightningPass()
     SetAdditiveBlendingState();
 
     // Bind shader resourses
-    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), materialSystem.MaterialIDTexture->GetSRV() };
+    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), pMatSys->pSrv_mId.Get() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
 
     // Set materials structured buffer
-    materialSystem.pMaterialBuffer->Bind(*this);
+    p_Context->PSSetShaderResources(SLOT_MATERIAL_STRUCTURED_BUFFER, 1U, pMatSys->pSrv_strbuff.GetAddressOf());
 
     // Bind CameraBuffer
     const dx::XMFLOAT3 camPos = cam.GetPos();
@@ -284,6 +284,8 @@ void Graphics::EndFrame()
         if (backBuffer)
             ShowRenderWindow(backBuffer.Get(), &open);
     }
+    else
+        p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
 
     if (ImGuiEnabled)
     {
@@ -305,11 +307,11 @@ void Graphics::EndFrame()
     {
         if (hr == DXGI_ERROR_DEVICE_REMOVED)
         {
-            throw hrException(p_Device->GetDeviceRemovedReason());
+            throw hrException(__LINE__, __FILE__, p_Device->GetDeviceRemovedReason());
         }
         else
         {
-            throw hrException(hr);
+            throw hrException(__LINE__, __FILE__, hr);
         }
     }
 }
@@ -329,9 +331,10 @@ void Graphics::RenderToImGui(const bool& state)
     IsRenderingToImGui = state;
 }
 
-Graphics::MaterialSystem& Graphics::GetMaterialSystem() noexcept
+MaterialSystem& Graphics::GetMaterialSystem() noexcept
 {
-    return materialSystem;
+    assert(pMatSys != nullptr);
+    return *pMatSys;
 }
 
 Graphics::~Graphics()
@@ -365,8 +368,9 @@ void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
 
 void Graphics::CreateDepthStencilView()
 {
+    HRESULT hr;
     ID3D11Texture2D* pBackBuffer;
-    CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+    hr = p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)); CHECK_HR(hr);
 
     D3D11_TEXTURE2D_DESC BackBufferDesc;
     pBackBuffer->GetDesc(&BackBufferDesc);
@@ -383,7 +387,7 @@ void Graphics::CreateDepthStencilView()
     DSTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     DSTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    CHECK_HR ( p_Device->CreateTexture2D(&DSTextureDesc, nullptr, &pDepthStencil) ); 
+    hr = p_Device->CreateTexture2D(&DSTextureDesc, nullptr, &pDepthStencil); CHECK_HR(hr);
 
     // Create view (same as we did with "View" on back buffer with render target view)
     D3D11_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
@@ -391,15 +395,16 @@ void Graphics::CreateDepthStencilView()
     DSVDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     DSVDesc.Texture2D.MipSlice = 0U;
 
-    CHECK_HR ( p_Device->CreateDepthStencilView(pDepthStencil.Get(), &DSVDesc, &g_mainDepthStencilView) );
+    hr = p_Device->CreateDepthStencilView(pDepthStencil.Get(), &DSVDesc, &g_mainDepthStencilView); CHECK_HR(hr);
     pBackBuffer->Release();
 }
 
 void Graphics::CreateBackBufferView()
 {
+    HRESULT hr;
     ID3D11Texture2D* pBackBuffer;
-    CHECK_HR(p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
-    CHECK_HR(p_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView));
+    hr = p_SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)); CHECK_HR(hr);
+    hr = p_Device->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView); CHECK_HR(hr);
     pBackBuffer->Release();
 }
 
@@ -411,11 +416,12 @@ void Graphics::CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11
     rtvDesc.Format = texture->GetDesc().Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0U;
-    CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
+    HRESULT hr = p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv); CHECK_HR(hr);
 }
 
 wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
 {
+    HRESULT hr;
     wrl::ComPtr<ID3D11ShaderResourceView> result;
     ID3D11Texture2D* pRenderTextureCopy = nullptr;
     ID3D11Texture2D* pRenderTexture = nullptr;
@@ -428,7 +434,7 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     descTextCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     descTextCopy.MipLevels = 0U;
     descTextCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-    CHECK_HR( p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy) );
+    hr = p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy); CHECK_HR(hr);
 
     // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
     p_Context->CopySubresourceRegion(pRenderTextureCopy, 0U, 0U, 0U, 0U, pRenderTexture, 0U, nullptr);
@@ -438,7 +444,7 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
     resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
-    CHECK_HR( p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result) );
+    hr = p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result); CHECK_HR(hr);
 
     // regenerate mipmap based on updated most detailed mip-level
     p_Context->GenerateMips(result.Get());
@@ -459,7 +465,7 @@ wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p
     rtvDesc.Format = texture->GetDesc().Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0U;
-    CHECK_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
+    CHECK_EXPR_DEFINE_HR(p_Device->CreateRenderTargetView(texture->GetTexture(), &rtvDesc, &rtv));
 
     return rtv;
 }
@@ -472,7 +478,7 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
     {
         RecreateMainViews(w, h);
         RecreateGBufferViews(w, h);
-        materialSystem.OnResize(w, h);
+        pMatSys->OnResize(*this, pWnd->GetWndRect());
         pWnd->ZeroResizeInfo();
         RECT rc;
         GetClientRect(pWnd->GetWnd(), &rc);
@@ -546,100 +552,3 @@ Camera Graphics::GetCamera() const
 {
     return this->cam;
 }
-
-// (********************) Material System (********************) //
-//                                                               //
-void Graphics::MaterialSystem::Initilize(Graphics& Gfx, const RECT& rc) noexcept
-{
-    pGfx = &Gfx;
-    MaterialIDTexture   = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R32_SINT, rc.bottom - rc.top, rc.right - rc.left);
-    pMaterialBuffer     = std::make_unique<material_buffer_type>(*pGfx, SLOT_MATERIAL_STRUCTURED_BUFFER);
-    rtvMaterialID       = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
-}
-
-void Graphics::MaterialSystem::OnResize(UINT resizeWidth, UINT resizeHeight) noexcept
-{
-    MaterialIDTexture->Resize(*pGfx, resizeHeight, resizeWidth);
-    rtvMaterialID = Graphics::MakeRTVFromTexture(pGfx->p_Device.Get(), MaterialIDTexture.get());
-}
-
-size_t Graphics::MaterialSystem::GetMaterialIndex(Material& material) noxnd
-{
-    if (std::optional<size_t> indx = IsLoaded(material))
-        return indx.value();
-    else
-    {
-        auto newIndex = loadedMaterials.size();
-        assert(loadedMaterials.size() <= MAX_MATERIALS);
-        pMaterialBuffer->Update(*pGfx, material.GetMaterialDesc(), newIndex);
-        loadedMaterials.push_back(std::make_unique<Material>(std::move(material)));
-        return newIndex;
-    }
-}
-
-size_t Graphics::MaterialSystem::GetMaterialIndex(aiMaterial* pMaterial, const std::string& materialDirectory) noxnd
-{
-    if (std::optional<size_t> indx = IsLoaded(pMaterial->GetName().C_Str(), materialDirectory))
-        return indx.value();
-    else
-    {
-        auto newIndex = loadedMaterials.size();
-        assert(loadedMaterials.size() <= MAX_MATERIALS);
-        loadedMaterials.push_back(std::make_unique<Material>(*pGfx, pMaterial, materialDirectory));
-        pMaterialBuffer->Update(*pGfx, loadedMaterials.back()->GetMaterialDesc(), newIndex);
-        return newIndex;
-    }
-}
-
-bool Graphics::MaterialSystem::UpdateMaterialAt(size_t indx) noexcept
-{
-    if (indx >= MAX_MATERIALS || !pMaterialBuffer.get())
-        return false;
-    if (auto pMat = GetMaterialAt(indx))
-    {
-        pMaterialBuffer->Update(*pGfx, pMat->GetMaterialDesc(), indx);
-        return true;
-    }
-    return false;
-}
-
-std::shared_ptr<Material> Graphics::MaterialSystem::GetMaterialAt(size_t indx) noexcept
-{
-    if (indx < loadedMaterials.size())
-        return loadedMaterials.at(indx);
-    return nullptr;
-}
-
-std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const Material& material) const noexcept
-{
-    for (size_t i = 0U; i < loadedMaterials.size(); i++)
-    {
-        if (loadedMaterials[i]->GetDirectory() == material.GetDirectory() && loadedMaterials[i]->GetName() == material.GetName())
-            return i;
-    }
-    return std::nullopt;
-
-}
-std::optional<size_t> Graphics::MaterialSystem::IsLoaded(const std::string& materialName, const std::string& materialDirectory) const noexcept
-{
-    for (size_t i = 0U; i < loadedMaterials.size(); i++)
-    {
-        if (loadedMaterials[i]->GetDirectory() == materialDirectory && loadedMaterials[i]->GetName() == materialName)
-            return i;
-    }
-    return std::nullopt;
-}
-void Graphics::MaterialSystem::ShowMaterialsWindow(bool* p_open) noexcept
-{
-    if (ImGui::Begin("Loaded materials", p_open))
-    {
-        for (size_t i = 0; i < loadedMaterials.size(); i++)
-        {
-            if (loadedMaterials[i]->ShowMaterialGUI())
-                UpdateMaterialAt(i);
-        }
-    }
-    ImGui::End();
-}
-//                                                               //
-//***************************************************************//

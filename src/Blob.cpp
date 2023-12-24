@@ -2,7 +2,8 @@
 
 Blob::Blob(const wchar_t* ShaderPath)
 {
-	CHECK_HR ( D3DReadFileToBlob(ShaderPath, &pBlob) );
+	HRESULT hr = D3DReadFileToBlob(ShaderPath, &pBlob);
+	CHECK_HR ( hr );
 }
 
 ID3DBlob* Blob::GetBlob() noexcept
@@ -12,5 +13,6 @@ ID3DBlob* Blob::GetBlob() noexcept
 
 void Blob::ReadFile(const wchar_t* ShaderPath)
 {
-	CHECK_HR ( D3DReadFileToBlob(ShaderPath, &pBlob) );
+	HRESULT hr = D3DReadFileToBlob(ShaderPath, &pBlob);
+	CHECK_HR ( hr );
 }

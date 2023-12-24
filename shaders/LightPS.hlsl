@@ -4,7 +4,7 @@
 Texture2D<float4> GBufferPosition   : register(t0);
 Texture2D<float4> GBufferNormal     : register(t1);
 Texture2D<float4> GBufferAlbedo     : register(t2);
-Texture2D<float>  GBufferSpecular   : register(t3);
+Texture2D<float4> GBufferSpecular   : register(t3);
 Texture2D<int>    GBufferMatID      : register(t4);
 SamplerState      sampleState       : register(s0);
 
@@ -39,6 +39,8 @@ struct MaterialDesc
     bool hasNormalMap;
     bool hasDiffuseMap;
     bool hasSpecularMap;
+    bool hasSpecularMapColored;
+	bool hasSpecularAlpha;
     bool hasHeightMap;
     float3 Kd; // reflected color diffuse
     float3 Ks; // reflected color specular
@@ -62,7 +64,8 @@ float4 main(in PS_INPUT input) : SV_Target0
     float3 fragWorldPos     = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 fragWorldNormal  = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
     float4 fragDiffuseColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
-    float  fragShininess    = GBufferSpecular.Sample(sampleState, input.TexCoord);
+    float3 fragSpecColor    = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb;
+    float  fragSpecularPower = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
     
     LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
@@ -80,9 +83,9 @@ float4 main(in PS_INPUT input) : SV_Target0
     
     if (materialID < 0)
     {
-        const float3 ambientColor = { 0.05f, 0.05f, 0.05f };
-        const float  shininess = 128;
-        const float  spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        const float3 ambientColor  = { 0.05f, 0.05f, 0.05f };
+        const float  specularPower = 128;
+        const float  spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);
         
         return float4((ambientColor + lightParams.diffuseColor * lightParams.diffuseIntensity * diff * att) * fragDiffuseColor.rgb + lightParams.diffuseColor * spec * att, fragDiffuseColor.a);
     }
@@ -90,30 +93,46 @@ float4 main(in PS_INPUT input) : SV_Target0
     {
         MaterialDesc matDesc = RenderMaterials.Load(materialID);
         
-        float3 ambientReflectiveColor = matDesc.Ka;
-        float3 diffuseReflectiveColor = matDesc.Kd;
-        float3 specularReflectiveColor = matDesc.Ks;
-        float  shininess = matDesc.Ns;
-       
-        if (matDesc.hasSpecularMap)
-            shininess *= fragShininess;
+        float3 ambientReflectiveColor   = matDesc.Ka; // ambiemnt color of material if ambeint map not present
+        float3 diffuseReflectiveColor   = matDesc.Kd; // diffuse color of material if diffuse map not present
+        float3 specularReflectiveColor  = matDesc.Ks; // specular coor of material if specular color map not present
+        float  specularPower            = matDesc.Ns; // material specularPower if R8 spec map not present
         
-        const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, shininess);
+        if (matDesc.hasDiffuseMap)
+        {
+            diffuseReflectiveColor = fragDiffuseColor.rgb;
+            ambientReflectiveColor = fragDiffuseColor.rgb;
+        }
+        
+        if(matDesc.hasSpecularMapColored) 
+        {
+            specularReflectiveColor = fragSpecColor; // if has colored map we take it's color 
+            if (matDesc.hasSpecularAlpha)
+                specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if colored map has alpha gloss - we take it || otherwise it is Ns
+        }
+        else if (matDesc.hasSpecularMap)
+        {
+            specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if has specular map we take it's specular power
+        }
+        
+        const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);
+        
+        // depends on: ambient color of material and light ambient intensity
+        const float3 ambient = ambientReflectiveColor * lightParams.ambientIntensity;
+        // depends on: color of light, color of material, intensity of light, att, and lambertian
+        const float3 diffuse = diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att;
+        // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
+        const float3 specular = specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
         
         // switch illumination model
         switch (matDesc.illum)
         {
             case 1:
-                return float4(diffuseReflectiveColor, fragDiffuseColor.a);
+                return float4(diffuse, fragDiffuseColor.a); // Color on and Ambient off
             case 2:
-                return float4(
-            ambientReflectiveColor +
-            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * att * fragDiffuseColor.rgb, fragDiffuseColor.a); // probably diffColor of light should be here too
+                return float4(ambient + diffuse, fragDiffuseColor.a); // Color on and Ambient on
             case 3:
-                return float4(
-            ambientReflectiveColor * lightParams.ambientIntensity * lightParams.ambientColor +
-            diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att * fragDiffuseColor.rgb +
-            specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.specularColor * att, fragDiffuseColor.a); // probably diffColor of light should be here too
+                return float4(saturate(ambient + diffuse + specular), fragDiffuseColor.a); // Highlight on
         }
         
         return float4(1.0, 0.f, 0.f, 1.f); // red color as a sign that material was not used (or illum model isn't [0:2])

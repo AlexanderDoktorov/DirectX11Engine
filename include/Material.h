@@ -15,6 +15,8 @@ struct MaterialDesc
 	alignas(4) bool hasNormalMap;
 	alignas(4) bool hasDiffuseMap;
 	alignas(4) bool hasSpecularMap;
+	alignas(4) bool hasSpecularMapColored;
+	alignas(4) bool hasSpecularAlpha;
 	alignas(4) bool hasHeightMap;
 	dx::XMFLOAT3 Kd; // reflected color diffuse
 	dx::XMFLOAT3 Ks; // reflected color specular
@@ -26,17 +28,23 @@ struct MaterialDesc
 
 struct MapLayout
 {
-	// Assuming a 32-bit integer for simplicity
-	uint32_t hasNormalMap   : 1 = 0;  // 1 bit for NormalMap
-	uint32_t hasDiffuseMap  : 1 = 0;  // 1 bit for DiffuseMap
-	uint32_t hasSpecularMap : 1 = 0;  // 1 bit for SpecularMap
-	uint32_t hasHeightMap	: 1 = 0;  // 1 bit for HeightMap
+	bool hasNormalMap   : 1 = 0;  // 1 bit for NormalMap
+	bool hasDiffuseMap  : 1 = 0;  // 1 bit for DiffuseMap
+	bool hasSpecularMap : 1 = 0;  // 1 bit for SpecularMap
+	bool hasHeightMap	: 1 = 0;  // 1 bit for HeightMap
+	bool hasSpecularAlpha	: 1 = 0;  // 1 bit for SpecularAlpha channel
+	bool hasSpecularMapColored	: 1 = 0;  // 1 bit for SpecularMapColored
 	// may add more maps
 };
 
+
 class Material : public IBindable
 {
+	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
 public:
+	using wicFlg = MaterialTexture::wicFlg;
+	using strbuff_type = MaterialDesc;
+
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
 	const std::vector<std::shared_ptr<MaterialTexture>>& GetTextures() const noexcept;
@@ -45,6 +53,7 @@ public:
 	bool ShowMaterialGUI(bool* p_open = (bool*)0);
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
+	static std::string GenerateID(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) noexcept;
 	
 	MapLayout	 GetMapLayout() const noexcept;
 	bool		 HasAnyMaps() const noexcept;
@@ -55,7 +64,13 @@ public:
 	bool operator==(const Material& rhs) const noexcept;
 private:
 	void ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial);
-	bool LoadMaterialTextures(Graphics& Gfx, aiMaterial* pMaterial, aiTextureType textureType, UINT bindSlot);
+	mIterator LoadMaterialTextures(
+		Graphics& Gfx,
+		aiMaterial* pMaterial, 
+		aiTextureType textureType, 
+		UINT bindSlot, 
+		wicFlg wicLoadFlags = wicFlg::WIC_FLAGS_NONE
+	);
 	void LoadMaterialProperties(aiMaterial* pMaterial);
 private:
 	MapLayout   mapLayout;
@@ -65,7 +80,12 @@ private:
 	MaterialPropertiesDesc matProps;
 private:
 	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
-	static std::shared_ptr<MaterialTexture> PushTexture(Graphics& Gfx, const std::string& texturePath,  aiTextureType textureType, UINT bindSlot) noexcept;
+	static std::shared_ptr<MaterialTexture> PushTexture(
+		Graphics& Gfx, 
+		const std::string& texturePath,  
+		aiTextureType textureType, 
+		UINT bindSlot,
+		wicFlg wicLoadFlags) noexcept;
 private:
 	static std::vector<std::shared_ptr<MaterialTexture>> loadedTextures;
 };

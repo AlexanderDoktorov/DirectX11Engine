@@ -27,7 +27,7 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 	materialsIndices.reserve(pScene->mNumMaterials);
 	for (size_t i = 0; i < pScene->mNumMaterials; i++)
 	{
-		materialsIndices.push_back(Gfx.GetMaterialSystem().GetMaterialIndex(pScene->mMaterials[i], directory));
+		materialsIndices.push_back(Gfx.GetMaterialSystem().ResolveMaterial(Gfx, pScene->mMaterials[i], directory));
 	}
 
 	// Fill meshesPtrs array with all scene meshes
@@ -142,7 +142,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 	DynamicVertex::VertexBuffer vertexBuffer;
 
 	// Get material index from material system in gfx (or create new and get index)
-	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
+	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialByIndex(mId);
 	assert(pMat);
 	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
 	bindablePtrs.push_back(pMat);
@@ -151,7 +151,7 @@ std::unique_ptr<Mesh> Model::ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mI
 
 	const bool HasDiffuseMaps		= pMat->GetMapLayout().hasDiffuseMap;
 	const bool HasNormalMaps		= pMat->GetMapLayout().hasNormalMap;
-	const bool HasSpecularMaps		= pMat->GetMapLayout().hasSpecularMap;
+	const bool HasSpecularMaps		= pMat->GetMapLayout().hasSpecularMap || pMat->GetMapLayout().hasSpecularMapColored;
 	const bool HasHeightMaps		= pMat->GetMapLayout().hasHeightMap;
 	const bool HasAnyMaps			= HasDiffuseMaps || HasNormalMaps || HasSpecularMaps || HasHeightMaps;
 

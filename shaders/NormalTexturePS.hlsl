@@ -1,16 +1,18 @@
-cbuffer meshDescBuffer : register(b0)
-{
-    bool   useNormalMap;
-    bool   useDiffuseMap;
-    bool   useSpecularMap;
-    int    materialID;
-    float4 albedo;
-}
-
-Texture2D DiffuseMap  : register(t0);
-Texture2D NormalMap   : register(t1);
-Texture2D<float> SpecularMap : register(t2);
-Texture2D HeightMap   : register(t3);
+cbuffer MeshDesc : register(b0)
+{   
+    float4 albedoColor;
+    uint  matId;
+    bool useNormalMap;
+    bool useDiffuseMap;
+    bool useSpecularMap;
+    bool useSpecularMapColored;
+};
+    
+Texture2D DiffuseMap                 : register(t0);
+Texture2D NormalMap                  : register(t1);
+Texture2D<float> SpecularMap         : register(t2);
+Texture2D HeightMap                  : register(t3);
+Texture2D<float4> SpecularMapColored : register(t4);
 
 SamplerState Sampler : register(s0);
 
@@ -29,9 +31,11 @@ struct PSOutput
     float4 wPosition    : SV_TARGET0;
     float4 wNormal      : SV_TARGET1;
     float4 Albedo       : SV_TARGET2;
-    float  Specular     : SV_TARGET3;
+    float4 Specular     : SV_TARGET3;
     int    materialID   : SV_TARGET4;
 };
+
+static const float specularMapWeigth = 1.f;
 
 PSOutput main(VS_OUT ps_input)
 {
@@ -62,17 +66,29 @@ PSOutput main(VS_OUT ps_input)
     if(useDiffuseMap)
         output.Albedo = DiffuseMap.Sample(Sampler, ps_input.textCoord);
     else
-        output.Albedo = albedo;
+        output.Albedo = albedoColor;
     
     // Alpha testing { Pixel discarded if alpha is too small }
     clip(output.Albedo.a < 0.1f ? -1 : 1);
     
     // Specular map //
-    if (useSpecularMap)
-        output.Specular = SpecularMap.Sample(Sampler, ps_input.textCoord);
+    if (useSpecularMapColored)
+    {
+        output.Specular.a = SpecularMapColored.Sample(Sampler, ps_input.textCoord).a;
+    }
+    else if (useSpecularMap)
+    {
+        output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord);
+    }
+    
+    if (useSpecularMapColored)
+    {
+        output.Specular.rgb = SpecularMapColored.Sample(Sampler, ps_input.textCoord).rgb * specularMapWeigth;
+    }
+        
     
     output.wPosition    = ps_input.wPosition;
-    output.materialID   = materialID;
+    output.materialID   = matId;
     
     return output;
 }

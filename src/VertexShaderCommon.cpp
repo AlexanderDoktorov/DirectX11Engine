@@ -3,12 +3,24 @@
 
 VertexShaderCommon::VertexShaderCommon(Graphics& Gfx, const wchar_t* FileName) : blob(FileName)
 {
-	CHECK_HR ( GetDevice(Gfx)->CreateVertexShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_VertexShader) );
+	HRESULT hr = GetDevice(Gfx)->CreateVertexShader(
+		blob.GetBlob()->GetBufferPointer(), 
+		blob.GetBlob()->GetBufferSize(), 
+		nullptr, 
+		&p_VertexShader
+	); 
+	CHECK_HR(hr);
 }
 void VertexShaderCommon::LoadFromFile(Graphics& Gfx, const wchar_t* FileName)
 {
 	blob.ReadFile(FileName);
-	CHECK_HR ( GetDevice(Gfx)->CreateVertexShader(blob.GetBlob()->GetBufferPointer(), blob.GetBlob()->GetBufferSize(), nullptr, &p_VertexShader) );
+	HRESULT hr = GetDevice(Gfx)->CreateVertexShader(
+		blob.GetBlob()->GetBufferPointer(), 
+		blob.GetBlob()->GetBufferSize(), 
+		nullptr, 
+		&p_VertexShader
+	);
+	CHECK_HR(hr);
 }
 void VertexShaderCommon::SetShaderResourses(Graphics& Gfx, UINT start_slot, std::vector<ID3D11ShaderResourceView*> srvs) noexcept
 {

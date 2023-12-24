@@ -1,18 +1,20 @@
 #include "MaterialTexture.h"
 #include <filesystem>
 
-MaterialTexture::MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& textureFilePath)
-	: 
-	WICTexture(Gfx, textureFilePath.c_str()), 
-	textureType(textureType), 
-	textureFilePath(textureFilePath)
+MaterialTexture::MaterialTexture
+(
+	Graphics& Gfx, 
+	const aiTextureType& textureType,
+	const std::string& path,
+	UINT bindSlot, 
+	wicFlg wicLoadFlags
+) :
+	textureFilePath(path),
+	textureType(textureType),
+	textureFileName(std::filesystem::path(path).filename().string())
 {
-	textureFileName = std::filesystem::path(textureFilePath).filename().string();
-}
-
-MaterialTexture::MaterialTexture(Graphics& Gfx, const aiTextureType& textureType, const std::string& path, UINT bindSlot) : MaterialTexture(Gfx, textureType, path)
-{
-	SetBindSlot(bindSlot);
+	WICTexture::CreateWICTexture(Gfx, path.c_str(), wicLoadFlags, &hasAlpha);
+	WICTexture::SetBindSlot(bindSlot);
 }
 
 void MaterialTexture::SetFileName(std::string fileName) noexcept
@@ -28,6 +30,13 @@ void MaterialTexture::SetFilePath(std::string filePath) noexcept
 void MaterialTexture::SetTextureAiType(aiTextureType aiType) noexcept
 {
 	textureType = aiType;
+}
+
+DXGI_FORMAT MaterialTexture::GetTextureFormat() const noexcept
+{
+	D3D11_TEXTURE2D_DESC desc;
+	p_Texture->GetDesc(&desc);
+	return desc.Format;
 }
 
 std::string MaterialTexture::GetFileName() const noexcept
@@ -48,5 +57,10 @@ const char* MaterialTexture::GetFilePath_C_str() const noexcept
 aiTextureType MaterialTexture::GetTextureAiType() const noexcept
 {
 	return textureType;
+}
+
+bool MaterialTexture::HasAlphaGloss() const noexcept
+{
+	return hasAlpha;
 }
 

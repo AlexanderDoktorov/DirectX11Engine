@@ -3,6 +3,8 @@
 #include "ISlot.h"
 #include "ITexture2D.h"
 #include <wrl.h>
+#include <wincodec.h>
+#include "WICTextureLoader11.h"
 
 class TextureBase : public IBindable, public Slotted, public ITexture2D
 {

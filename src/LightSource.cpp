@@ -61,13 +61,13 @@ void LightSource::Reset()
 	defaultDesc.ambientColor  = dx::XMFLOAT3(0.05f,0.05f,0.05f);
 	defaultDesc.diffuseColor  = dx::XMFLOAT3(1.f,1.f,1.f); // White
 	defaultDesc.specularColor = dx::XMFLOAT3(1.f,1.f,1.f); // White
-	defaultDesc.ambientIntensity = 0.5f;
-	defaultDesc.diffuseIntensity = 44.f;
-	defaultDesc.specularIntensity = 0.3f;
-	defaultDesc.Catt = 19.6f;
-	defaultDesc.Latt = 2.2f;
+	defaultDesc.ambientIntensity = 0.05f;
+	defaultDesc.diffuseIntensity = 1.f;
+	defaultDesc.specularIntensity = 0.5f;
+	defaultDesc.Catt = 1.f;
+	defaultDesc.Latt = 0.045f;
 	defaultDesc.Qatt = 0.0075f;
-	lightDesc = std::move(defaultDesc);
+	lightDesc = defaultDesc;
 	Model::SetPostion(lightDesc.worldPosition.x, lightDesc.worldPosition.y, lightDesc.worldPosition.z);
 }
 

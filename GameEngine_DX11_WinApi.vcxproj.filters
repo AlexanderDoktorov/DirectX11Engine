@@ -210,6 +210,12 @@
     <ClCompile Include="src\InputLayout.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="src\MaterialSystem.cpp">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -242,7 +248,7 @@
     <ClInclude Include="include\Camera.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\Exceptions.h">
+    <ClInclude Include="include\hrException.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\Game.h">
@@ -526,6 +532,15 @@
     </ClInclude>
     <ClInclude Include="include\DOK_assimp.h">
       <Filter>DOK</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialSystem.h">
+      <Filter>Файлы заголовков\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Logger.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\baseException.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

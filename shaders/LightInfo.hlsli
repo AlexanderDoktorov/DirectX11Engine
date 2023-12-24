@@ -20,10 +20,10 @@ float Attenuate(float Catt, float Latt, float Qatt, float distToL)
 }
 
 // specAngle
-float Speculate(float3 fragWorldNormal, float3 fragWorldPos, float3 camWorldPos, float3 dirToL, float shininess)
+float Speculate(float3 fragWorldNormal, float3 fragWorldPos, float3 camWorldPos, float3 dirToL, float specularPower)
 {
     const float3 viewDir = normalize(camWorldPos - fragWorldPos);
-    return pow(saturate(dot(viewDir, reflect(-dirToL, fragWorldNormal))), shininess);
+    return pow(saturate(dot(viewDir, reflect(-dirToL, fragWorldNormal))), specularPower);
 }
 
 // diffAngle

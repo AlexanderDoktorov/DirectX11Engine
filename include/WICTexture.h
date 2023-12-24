@@ -2,16 +2,18 @@
 #include "WICTextureLoader11.h"
 #include "TextureBase.h"
 #include "IShaderResourse.h"
+#include "DirectXTex.h"
 #include <wrl.h>
 
 class WICTexture : public TextureBase
 {
-	using wicFlg = DirectX::WIC_LOADER_FLAGS;
 public:
-	WICTexture() = default;
-	WICTexture(Graphics& Gfx, const wchar_t* filePath, UINT bindSlot = 0U, wicFlg loadFlags = wicFlg::WIC_LOADER_DEFAULT);
-	WICTexture(Graphics& Gfx, const char* filePath, UINT bindSlot = 0U, wicFlg loadFlags = wicFlg::WIC_LOADER_DEFAULT);
+	typedef DirectX::WIC_FLAGS wicFlg;
 
-	void CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg loadFlags = DirectX::WIC_LOADER_DEFAULT);
-	void CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, wicFlg loadFlags = DirectX::WIC_LOADER_DEFAULT);
+	WICTexture() = default;
+	WICTexture(Graphics& Gfx, const wchar_t* filePath, UINT bindSlot = 0U, wicFlg loadFlags = wicFlg::WIC_FLAGS_NONE);
+	WICTexture(Graphics& Gfx, const char* filePath, UINT bindSlot = 0U, wicFlg loadFlags = wicFlg::WIC_FLAGS_NONE);
+
+	HRESULT CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg loadFlags = wicFlg::WIC_FLAGS_NONE, bool* hasAlphaGloss = nullptr) noexcept;
+	HRESULT CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, wicFlg loadFlags = wicFlg::WIC_FLAGS_NONE, bool* hasAlphaGloss = nullptr) noexcept;
 };

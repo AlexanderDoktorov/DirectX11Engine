@@ -3,7 +3,7 @@
 #include <d3d11.h>
 #include <vector>
 #include "BindableSystem.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include "noxnd.h"
 
 class IndexBuffer : public IBindable, public IGetID

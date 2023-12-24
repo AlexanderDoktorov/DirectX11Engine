@@ -1,29 +1,28 @@
 #include "Mesh.h"
-#include "Exceptions.h"
+#include "hrException.h"
 #include "DataBufferPS.h"
 
 // ********** Mesh **********
 
 Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, size_t mId)
 {
-	const auto pMat = Gfx.GetMaterialSystem().GetMaterialAt(mId);
+	const auto pMat = Gfx.GetMaterialSystem().GetMaterialByIndex(mId);
 	if (pMat->HasAnyMaps())
 	{
 		MapLayout ml = pMat->GetMapLayout();
-		MeshDesc temp{};
-		temp.useDiffuseMap = ml.hasDiffuseMap;
-		temp.useNormalMap = ml.hasNormalMap;
-		temp.useSpecularMap = ml.hasSpecularMap;
-		temp.matId = (int)mId;
-		meshDesc = std::move(temp);
-		AddBindable( std::make_shared<DataBufferPS<MeshDesc, 0U>>(Gfx, std::get<MeshDesc>(meshDesc)));
+		pMeshDescTextured = std::make_unique<MeshDesc>();
+		pMeshDescTextured->useDiffuseMap = ml.hasDiffuseMap;
+		pMeshDescTextured->useNormalMap = ml.hasNormalMap;
+		pMeshDescTextured->useSpecularMap = ml.hasSpecularMap;
+		pMeshDescTextured->useSpecularMapColored = ml.hasSpecularMapColored;
+		pMeshDescTextured->matId = (uint32_t)mId;
+		AddBindable( PixelConstantBuffer<MeshDesc>::Resolve(Gfx, *pMeshDescTextured, 0U));
 	}
 	else
 	{
-		MeshDescNotex temp{};
-		temp.matId = (int)mId;
-		meshDesc = std::move(temp);
-		AddBindable( std::make_shared<DataBufferPS<MeshDescNotex, 0U>>(Gfx, std::get<MeshDescNotex>(meshDesc)));
+		pMeshDescUntextured = std::make_unique<MeshDescNotex>();
+		pMeshDescUntextured->matId = (uint32_t)mId;
+		AddBindable( PixelConstantBuffer<MeshDescNotex>::Resolve(Gfx, *pMeshDescUntextured, 0U));
 	}
 
 	AddBindable( Topology::Resolve(Gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) );
@@ -36,6 +35,21 @@ Mesh::Mesh(Graphics& Gfx, std::vector<std::shared_ptr<IBindable>> pBindables, si
 	AddBindable( std::make_shared<TransformBuffer>( Gfx,*this ) );
 }
 
+void Mesh::Draw(Graphics& Gfx)
+{
+	// Update constant buffer with current mesh data
+	// If it is textured
+	if (pMeshDescTextured)
+		if (auto pBuffer = QueryBindable<PixelConstantBuffer<MeshDesc>>())
+			pBuffer->Update(Gfx, *pMeshDescTextured);// If it is textured
+	// If it is not textured
+	if (pMeshDescUntextured)
+		if (auto pBuffer = QueryBindable<PixelConstantBuffer<MeshDescNotex>>())
+			pBuffer->Update(Gfx, *pMeshDescUntextured);
+	// And draw
+	Drawable::Draw(Gfx);
+}
+
 bool Mesh::ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 {
 	auto makeHashed = [](std::string str, const std::string& hash) -> std::string
@@ -43,38 +57,33 @@ bool Mesh::ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 			return str.append("##").append(hash);
 		};
 	bool changed = false;
-	if (auto pDesc = std::get_if<MeshDesc>(&meshDesc))
+	if (pMeshDescTextured)
 	{
-		auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialAt(pDesc->matId);
+		auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialByIndex(pMeshDescTextured->matId);
 		MapLayout mapLayout = pMeshMaterial->GetMapLayout();
 
 		if(mapLayout.hasDiffuseMap)
-			changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &pDesc->useDiffuseMap);
-		if(!pDesc->useDiffuseMap)
-			changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pDesc->albedoColor.x);
+			changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &pMeshDescTextured->useDiffuseMap);
+		if(!pMeshDescTextured->useDiffuseMap)
+			changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pMeshDescTextured->albedoColor.x);
 		if(mapLayout.hasNormalMap)
-			changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &pDesc->useNormalMap);
+			changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &pMeshDescTextured->useNormalMap);
 		if(mapLayout.hasSpecularMap)
-			changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &pDesc->useSpecularMap);
-
-		if(auto pMeshBuffer = QueryBindable<meshBufferTextured>(); changed && pMeshBuffer)
-			pMeshBuffer->Update(Gfx, *pDesc);
+			changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &pMeshDescTextured->useSpecularMap);
 	}
-	if (auto pNoTexDesc = std::get_if<MeshDescNotex>(&meshDesc))
+	if (pMeshDescUntextured)
 	{
-		changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pNoTexDesc->albedoColor.x);
-		if (auto pMeshBufferNoTex = QueryBindable<meshBufferNoTex>(); changed && pMeshBufferNoTex)
-			pMeshBufferNoTex->Update(Gfx, *pNoTexDesc);
+		changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &pMeshDescUntextured->albedoColor.x);
 	}
 	return changed;
 }
 
 int Mesh::GetMaterialIndex() const noexcept
 {
-	if (auto texturedDesc = std::get_if<MeshDesc>(&meshDesc))
-		return texturedDesc->matId;
+	if (pMeshDescTextured)
+		return pMeshDescTextured->matId;
 	else
-		return std::get<MeshDescNotex>(meshDesc).matId;
+		return pMeshDescUntextured->matId;
 }
 
 DirectX::XMMATRIX Mesh::GetTransform() const noexcept
