@@ -1,5 +1,5 @@
 #include "Sampler.h"
-#include "Exceptions.h"
+#include "hrException.h"
 
 Sampler::Sampler(Graphics& Gfx, UINT bindSlot) : Slotted(bindSlot)
 {
@@ -9,7 +9,7 @@ Sampler::Sampler(Graphics& Gfx, UINT bindSlot) : Slotted(bindSlot)
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 
-	CHECK_HR(GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState));
+	CHECK_EXPR_DEFINE_HR(GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState));
 }
 
 void Sampler::Bind(Graphics & Gfx) noexcept
