@@ -4,16 +4,17 @@
 MaterialTexture::MaterialTexture
 (
 	Graphics& Gfx, 
-	const aiTextureType& textureType, 
-	const std::string& path, 
+	const aiTextureType& textureType,
+	const std::string& path,
 	UINT bindSlot, 
 	wicFlg wicLoadFlags
 ) :
 	textureFilePath(path),
 	textureType(textureType),
-	textureFileName(std::filesystem::path(path).filename().string()),
-	WICTexture(Gfx, path.c_str(), bindSlot, wicLoadFlags)
+	textureFileName(std::filesystem::path(path).filename().string())
 {
+	WICTexture::CreateWICTexture(Gfx, path.c_str(), wicLoadFlags, &hasAlpha);
+	WICTexture::SetBindSlot(bindSlot);
 }
 
 void MaterialTexture::SetFileName(std::string fileName) noexcept
@@ -56,5 +57,10 @@ const char* MaterialTexture::GetFilePath_C_str() const noexcept
 aiTextureType MaterialTexture::GetTextureAiType() const noexcept
 {
 	return textureType;
+}
+
+bool MaterialTexture::HasAlphaGloss() const noexcept
+{
+	return hasAlpha;
 }
 

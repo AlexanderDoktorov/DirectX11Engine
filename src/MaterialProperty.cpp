@@ -79,6 +79,5 @@ bool MaterialProperty::ShowGUI(std::string hash) noexcept
 		ImGui::PopStyleColor();
 		break;
 	}
-	ImGui::Separator();
 	return updated;
 }

@@ -72,10 +72,15 @@ PSOutput main(VS_OUT ps_input)
     clip(output.Albedo.a < 0.1f ? -1 : 1);
     
     // Specular map //
-    if (useSpecularMapColored || useSpecularMap)
+    if (useSpecularMapColored)
     {
-        output.Specular.a   = pow(2.f, SpecularMapColored.Sample(Sampler, ps_input.textCoord).a * 13.f);
+        output.Specular.a = SpecularMapColored.Sample(Sampler, ps_input.textCoord).a;
     }
+    else if (useSpecularMap)
+    {
+        output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord);
+    }
+    
     if (useSpecularMapColored)
     {
         output.Specular.rgb = SpecularMapColored.Sample(Sampler, ps_input.textCoord).rgb * specularMapWeigth;

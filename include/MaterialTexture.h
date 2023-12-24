@@ -21,8 +21,9 @@ public:
 	std::string GetFilePath() const noexcept;
 	const char* GetFilePath_C_str() const noexcept;
 	aiTextureType GetTextureAiType() const noexcept;
+	bool HasAlphaGloss() const noexcept;
 private:
-	bool		  HasAlphaGloss			  = false;
+	bool		  hasAlpha				 = false;
 	aiTextureType textureType			  = aiTextureType_NONE;
 	std::string	  textureFilePath		  = "FILE_PATH_UNKNOWN";
 	std::string	  textureFileName		  = "FILE_NAME_UNKNOWN";

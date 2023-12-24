@@ -4,8 +4,6 @@
 #include "Material.h"
 #include "imgui.h"
 #include <DirectXMath.h>
-#include <vector>
-#include <variant>
 
 struct alignas(16) MeshDesc
 {

@@ -40,6 +40,7 @@ struct MaterialDesc
     bool hasDiffuseMap;
     bool hasSpecularMap;
     bool hasSpecularMapColored;
+	bool hasSpecularAlpha;
     bool hasHeightMap;
     float3 Kd; // reflected color diffuse
     float3 Ks; // reflected color specular
@@ -103,14 +104,15 @@ float4 main(in PS_INPUT input) : SV_Target0
             ambientReflectiveColor = fragDiffuseColor.rgb;
         }
         
-        if (matDesc.hasSpecularMapColored)
+        if(matDesc.hasSpecularMapColored) 
         {
-            specularPower = fragSpecularPower;
-            specularReflectiveColor = fragSpecColor;
+            specularReflectiveColor = fragSpecColor; // if has colored map we take it's color 
+            if (matDesc.hasSpecularAlpha)
+                specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if colored map has alpha gloss - we take it || otherwise it is Ns
         }
         else if (matDesc.hasSpecularMap)
         {
-            specularPower = fragSpecularPower;
+            specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if has specular map we take it's specular power
         }
         
         const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);

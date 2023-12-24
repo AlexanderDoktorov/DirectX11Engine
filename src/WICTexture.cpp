@@ -1,23 +1,23 @@
 #include <Windows.h>
 #include "WICTexture.h"
-#include "Exceptions.h"
+#include "hrException.h"
 
 WICTexture::WICTexture(Graphics& Gfx, const wchar_t* filePath, UINT bindSlot, wicFlg loadFlags) : TextureBase(bindSlot)
 {
-    HRESULT hr = CreateWICTexture(Gfx, filePath, loadFlags); assert(SUCCEEDED(hr));
+    HRESULT hr = CreateWICTexture(Gfx, filePath, loadFlags); CHECK_HR(hr);
 }
 
 WICTexture::WICTexture(Graphics& Gfx, const char* filePath, UINT bindSlot, wicFlg loadFlags) : TextureBase(bindSlot)
 {
-    HRESULT hr = CreateWICTexture(Gfx, filePath, loadFlags); assert(SUCCEEDED(hr));
+    HRESULT hr = CreateWICTexture(Gfx, filePath, loadFlags); CHECK_HR(hr);
 }
 
-HRESULT WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg loadFlags) noexcept
+HRESULT WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg loadFlags, bool* hasAlphaGloss) noexcept
 {
     std::string sfilePath(filePath);
     std::wstring wFilePath(sfilePath.begin(), sfilePath.end());
 
-    return CreateWICTexture(Gfx, wFilePath.c_str(), loadFlags);
+    return CreateWICTexture(Gfx, wFilePath.c_str(), loadFlags, hasAlphaGloss);
 }
 
 HRESULT WICTexture::CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, wicFlg loadFlags, bool* hasAlphaGloss) noexcept

@@ -16,6 +16,7 @@ struct MaterialDesc
 	alignas(4) bool hasDiffuseMap;
 	alignas(4) bool hasSpecularMap;
 	alignas(4) bool hasSpecularMapColored;
+	alignas(4) bool hasSpecularAlpha;
 	alignas(4) bool hasHeightMap;
 	dx::XMFLOAT3 Kd; // reflected color diffuse
 	dx::XMFLOAT3 Ks; // reflected color specular
@@ -31,6 +32,7 @@ struct MapLayout
 	bool hasDiffuseMap  : 1 = 0;  // 1 bit for DiffuseMap
 	bool hasSpecularMap : 1 = 0;  // 1 bit for SpecularMap
 	bool hasHeightMap	: 1 = 0;  // 1 bit for HeightMap
+	bool hasSpecularAlpha	: 1 = 0;  // 1 bit for SpecularAlpha channel
 	bool hasSpecularMapColored	: 1 = 0;  // 1 bit for SpecularMapColored
 	// may add more maps
 };
@@ -39,10 +41,6 @@ struct MapLayout
 class Material : public IBindable
 {
 	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
-	class matrialException
-	{
-
-	};
 public:
 	using wicFlg = MaterialTexture::wicFlg;
 	using strbuff_type = MaterialDesc;

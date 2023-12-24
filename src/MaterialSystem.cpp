@@ -123,6 +123,7 @@ void MaterialSystem::ShowMaterialsWindow(Graphics& Gfx, bool* p_open) noexcept
 		{
 			if (vMaterials[i]->ShowMaterialGUI())
 				UpdateMaterialAt(Gfx, i);
+			ImGui::Separator();
 		}
 	}
 	ImGui::End();

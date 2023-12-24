@@ -27,6 +27,8 @@ void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 		{
 			mapLayout.hasSpecularMapColored = true;
 			(*it)->SetBindSlot(SLOT_TEXTURE_SPECULAR_COLORED);
+			if ((*it)->HasAlphaGloss())
+				mapLayout.hasSpecularAlpha = true;
 		}
 	}
 	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT) != materialTextures.end();
@@ -47,6 +49,8 @@ bool Material::ShowMaterialGUI(bool* p_open)
 	ImGui::TextColored(mapLayout.hasHeightMap ? yellow : red, "Height map");
 	ImGui::TextColored(mapLayout.hasNormalMap ? yellow : red, "Normal map");
 	ImGui::TextColored(mapLayout.hasSpecularMap ? yellow : red, "Specular map");
+	ImGui::TextColored(mapLayout.hasSpecularMapColored ? yellow : red, "Specular map colored");
+	ImGui::TextColored(mapLayout.hasSpecularAlpha ? yellow : red, "Alpha used");
 	return changed;
 }
 
@@ -107,6 +111,7 @@ MaterialDesc Material::GetMaterialDesc() const noexcept
 	materialDesc_.hasHeightMap	 = mapLayout.hasHeightMap;
 	materialDesc_.hasNormalMap	 = mapLayout.hasNormalMap;
 	materialDesc_.hasSpecularMap = mapLayout.hasSpecularMap;
+	materialDesc_.hasSpecularAlpha = mapLayout.hasSpecularAlpha;
 	materialDesc_.hasSpecularMapColored = mapLayout.hasSpecularMapColored;
 	materialDesc_.Ka = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_AMBIENT).value();
 	materialDesc_.Kd = matProps.GetPropertyAs<DirectX::XMFLOAT3>(AI_MATKEY_COLOR_DIFFUSE).value();

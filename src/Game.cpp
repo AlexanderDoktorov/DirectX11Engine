@@ -64,7 +64,9 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-
+	WICTexture wicTxt{};
+	bool hasAlpha;
+	wicTxt.CreateWICTexture(*gfx, LR"(G:\Visual Studio Projects\GameEngine_DX11_WinApi\Models\Tree\DB2X2_L01_Spec.png)", DirectX::WIC_FLAGS_NONE, &hasAlpha);
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
