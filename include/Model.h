@@ -18,10 +18,9 @@ public:
 	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
 	virtual void Draw(Graphics& Gfx) const noexcept override;
 	Model& SetRootTransform(DirectX::FXMMATRIX tf) noexcept;
-private:
+protected:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
 	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId) const;
-private:
 	struct TransformData
 	{
 		float x = 0.f;
@@ -31,6 +30,7 @@ private:
 		float roll = 0.f;
 		float yaw = 0.f;
 	} transformData{};
+private:
 	std::string directory;
 	std::vector<size_t>						materialsIndices;
 	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;

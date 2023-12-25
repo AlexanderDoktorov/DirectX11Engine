@@ -23,8 +23,8 @@ Game::Game()
 	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
 
 	// Lights
-	lights.push_back(std::make_unique<LightSource>(*gfx));
-	lights.push_back(std::make_unique<LightSource>(*gfx));
+	lights.push_back(std::make_unique<PointLight>(*gfx));
+	lights.push_back(std::make_unique<PointLight>(*gfx));
 
 	sheet->Scale(20.f, 20.f, 20.f);
 
@@ -65,7 +65,6 @@ Game::Game()
 		objects.push_back(light.get());
 
 #pragma region TEST
-
 #pragma endregion TEST
 
 	LoadConfigurationFile("./game.config");
@@ -231,21 +230,11 @@ void Game::ShowItemsSubMenu()
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
-		if(auto lightSource = dynamic_cast<ILight*>(objects[current_item_selected]))
+		if(auto pointLight = dynamic_cast<PointLight*>(objects[current_item_selected]))
 		{
-			auto lightDesc = lightSource->GetDesc();
-			bool updated = false;
-			updated |= ImGui::ColorEdit3("Ambient color", &lightDesc.ambientColor.x);
-			updated |= ImGui::ColorEdit3("Diffuse color", &lightDesc.diffuseColor.x);
-			updated |= ImGui::ColorEdit3("Specular color", &lightDesc.specularColor.x);
-			updated |= ImGui::SliderFloat("Ambient Intensity", &lightDesc.ambientIntensity, 0.f, 100.f);
-			updated |= ImGui::SliderFloat("Diffuse Intensity", &lightDesc.diffuseIntensity, 0.f, 100.f);
-			updated |= ImGui::SliderFloat("Specular Intensity", &lightDesc.specularIntensity, 0.f, 100.f);
-			updated |= ImGui::SliderFloat("Constant Attenuation", &lightDesc.Catt, 0.f, 100.f);
-			updated |= ImGui::SliderFloat("Linear Attenuation", &lightDesc.Latt, 0.f, 100.f);
-			updated |= ImGui::SliderFloat("Quad Attenuation", &lightDesc.Qatt, 0.f, 100.f);
-			if (updated)
-				lightSource->SetDesc(lightDesc);
+			if(ImGui::BeginChild("Point light properties", ImVec2(200, 200)))
+				pointLight->ShowLightGUI();
+			ImGui::EndChild();
 		}
 	}
 	ImGui::End();

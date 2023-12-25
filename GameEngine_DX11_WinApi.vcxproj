@@ -274,7 +274,7 @@
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\ISlot.cpp" />
-    <ClCompile Include="src\LightSource.cpp" />
+    <ClCompile Include="src\PointLight.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialPropertiesDesc.cpp" />
@@ -315,6 +315,7 @@
     <ClInclude Include="include\ColorBuffer.h" />
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
+    <ClInclude Include="include\LightCommon.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\ConstantBuffer.h" />
     <ClInclude Include="include\DOK_assimp.h" />
@@ -365,7 +366,7 @@
     <ClInclude Include="include\IToString.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\LightPassPixelShader.h" />
-    <ClInclude Include="include\LightSource.h" />
+    <ClInclude Include="include\PointLight.h" />
     <ClInclude Include="include\Material.h" />
     <ClInclude Include="include\MaterialProperty.h" />
     <ClInclude Include="include\Mesh.h" />
@@ -374,6 +375,7 @@
     <ClInclude Include="include\Node.h" />
     <ClInclude Include="include\Sheet.h" />
     <ClInclude Include="include\SolidTexturedBall.h" />
+    <ClInclude Include="include\Techique.h" />
     <ClInclude Include="include\XSResourse.h" />
     <ClInclude Include="include\TextureBase.h" />
     <ClInclude Include="include\WICTexture.h" />

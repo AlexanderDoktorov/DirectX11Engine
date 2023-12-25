@@ -4,7 +4,7 @@
 #include "ImGuiManager.h"
 #include "Camera.h"
 #include "Timer.h"
-#include "LightSource.h"
+#include "PointLight.h"
 #include "Interfaces.h"
 #include "Model.h"
 #include "XSResourse.h"
@@ -46,7 +46,7 @@ private:
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;
 
-	std::unique_ptr<LightSource> light;
-	std::unique_ptr<LightSource> light2;
-	std::vector<std::unique_ptr<LightSource>> lights;
+	std::unique_ptr<PointLight> light;
+	std::unique_ptr<PointLight> light2;
+	std::vector<std::unique_ptr<PointLight>> lights;
 };

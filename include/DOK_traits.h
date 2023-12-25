@@ -39,4 +39,8 @@ constexpr bool has_bool_operator_v = has_bool_operator<T>::value;
 template<class T>
 constexpr bool has_type_using_v = has_type_using<T>::value;
 
+template<class T, class A = void>
+struct has_light_desc_type { static constexpr bool value = false; };
 
+template<class T>
+struct has_light_desc_type<T, std::void_t<typename T::light_desc_type>> { static constexpr bool value = true; };

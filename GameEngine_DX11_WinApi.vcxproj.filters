@@ -55,6 +55,9 @@
     <Filter Include="Файлы указаний">
       <UniqueIdentifier>{165dc27f-44d5-4895-84d3-4713cb009ebc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\LightSourses">
+      <UniqueIdentifier>{b887ba34-ea45-452b-9f3d-fe7588bfec4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -91,9 +94,6 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LightSource.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Mouse.cpp">
@@ -215,6 +215,9 @@
     </ClCompile>
     <ClCompile Include="src\Logger.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PointLight.cpp">
+      <Filter>Файлы заголовков\LightSourses</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -375,9 +378,6 @@
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="include\Items.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LightSource.h">
       <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="include\IAnimated.h">
@@ -541,6 +541,15 @@
     </ClInclude>
     <ClInclude Include="include\baseException.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Techique.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PointLight.h">
+      <Filter>Файлы заголовков\LightSourses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LightCommon.h">
+      <Filter>Файлы заголовков\LightSourses</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
