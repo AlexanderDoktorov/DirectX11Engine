@@ -230,11 +230,9 @@ void Game::ShowItemsSubMenu()
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
-		if(auto pointLight = dynamic_cast<PointLight*>(objects[current_item_selected]))
+		if(auto light = dynamic_cast<ILight*>(objects[current_item_selected]))
 		{
-			if(ImGui::BeginChild("Point light properties", ImVec2(200, 200)))
-				pointLight->ShowLightGUI();
-			ImGui::EndChild();
+			light->ShowLightGUI();
 		}
 	}
 	ImGui::End();

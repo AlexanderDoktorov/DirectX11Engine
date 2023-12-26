@@ -35,7 +35,7 @@ public:
 	virtual void Draw(Graphics& Gfx, DirectX::FXMMATRIX rusultiveTransform) const;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 private:
-	mutable dx::XMFLOAT4X4 rusultiveTransform;
+	mutable dx::XMFLOAT4X4 rusultiveTransform{};
 	float		   scale = 1.f;
 	std::unique_ptr<MeshDesc>	   pMeshDescTextured;
 	std::unique_ptr<MeshDescNotex> pMeshDescUntextured;
