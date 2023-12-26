@@ -47,6 +47,5 @@ private:
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;
 
-	std::unique_ptr<Light> pSpotLight;
-	std::vector<std::unique_ptr<PointLight>> pointLights;
+	std::vector<std::unique_ptr<Light>> lightSources;
 };

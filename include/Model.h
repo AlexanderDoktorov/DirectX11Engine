@@ -7,14 +7,31 @@
 #include "assimp/Scene.h"
 #include "Material.h"
 #include "Numerated.h"
+#include "baseException.h"
 
 class Model : public Drawable
 {
+	class assimpException : public baseException
+	{
+	public:
+		assimpException(const char* errorString, int codeLine, const char* codeFileName)
+			: 
+			baseException(codeLine, codeFileName),
+			errorString(errorString) {}
+
+		virtual std::string what() const override {
+			std::stringstream ss;
+			ss << "ERROR ASSIMP:  " << errorString << std::endl << baseException::what() << std::endl;
+			return ss.str().c_str();
+		}
+	private:
+		const char* errorString;
+	};
 public:
 	Model() = default;
 	Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags);
 	Model(Model&& other) noexcept;
-	void Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept;
+	bool Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept; 
 	void ClearData() noexcept;
 	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
 	virtual void Draw(Graphics& Gfx) const noexcept override;

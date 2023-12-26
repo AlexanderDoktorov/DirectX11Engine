@@ -23,8 +23,9 @@ Game::Game()
 	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
 
 	// Lights
-	pointLights.push_back(std::make_unique<PointLight>(*gfx));
-	pointLights.push_back(std::make_unique<PointLight>(*gfx));
+	lightSources.push_back(std::make_unique<PointLight>(*gfx));
+	lightSources.push_back(std::make_unique<PointLight>(*gfx));
+	lightSources.push_back(std::make_unique<Spotlight>(*gfx));
 
 	sheet->Scale(20.f, 20.f, 20.f);
 
@@ -61,8 +62,11 @@ Game::Game()
 	for (auto& ball : balls)
 		drawables.push_back(ball.get());
 
-	for (auto& pointLight : pointLights)
-		drawables.push_back(pointLight.get());
+	for (auto& lightsource : lightSources)
+	{
+		if(Drawable* drawableLightSource = dynamic_cast<Drawable*>(lightsource.get()))
+			drawables.push_back(drawableLightSource);
+	}
 
 #pragma region TEST
 #pragma endregion TEST
@@ -151,12 +155,12 @@ void Game::UpdateFrame()
 	// Apply light
 	gfx->BeginLightningPass();
 	{
-		for (auto& pointLight : pointLights)
+		for (auto& lightsrc : lightSources)
 		{
-			pointLight->Bind(*gfx);
-			//light_source->Update(dt);
+			lightsrc->Bind(*gfx);
 			gfx->Draw(3U);
 		}
+
 	}
 	gfx->EndLightningPass();
 

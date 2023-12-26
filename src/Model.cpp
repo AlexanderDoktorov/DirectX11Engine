@@ -17,7 +17,7 @@ Model::Model(Model&& other) noexcept
 	pRootNode		 = std::move(other.pRootNode);
 }
 
-void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept
+bool Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept
 {
 	ClearData();
 
@@ -26,11 +26,9 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 
 	if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) // if is Not Zero
 	{
-		OutputDebugStringA("ERROR ASSIMP: ");
 		OutputDebugStringA(imp.GetErrorString());
-		return;
+		return false;
 	}
-
 	directory = fileName.substr(0, fileName.find_last_of('\\'));
 
 	// Fill materialPtrs array with all scene materials and push them to structured buffer
@@ -49,6 +47,8 @@ void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFl
 
 	int StartId = 0;
 	pRootNode = ProcessNode(Gfx, StartId, pScene->mRootNode);
+
+	return true;
 }
 
 void Model::ClearData() noexcept
