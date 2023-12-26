@@ -23,8 +23,8 @@ Game::Game()
 	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
 
 	// Lights
-	lights.push_back(std::make_unique<PointLight>(*gfx));
-	lights.push_back(std::make_unique<PointLight>(*gfx));
+	pointLights.push_back(std::make_unique<PointLight>(*gfx));
+	pointLights.push_back(std::make_unique<PointLight>(*gfx));
 
 	sheet->Scale(20.f, 20.f, 20.f);
 
@@ -59,10 +59,10 @@ Game::Game()
 	balls[1]->SetPosition(1.f, 5.f, 10.f);
 
 	for (auto& ball : balls)
-		objects.push_back(ball.get());
+		drawables.push_back(ball.get());
 
-	for (auto& light : lights)
-		objects.push_back(light.get());
+	for (auto& pointLight : pointLights)
+		drawables.push_back(pointLight.get());
 
 #pragma region TEST
 #pragma endregion TEST
@@ -131,9 +131,9 @@ void Game::UpdateFrame()
 		}
 
 #pragma region MODELS_DRAW
-		for (auto& light_source : lights)
+		for (auto& drawable : drawables)
 		{
-			light_source->Draw(*gfx);
+			drawable->Draw(*gfx);
 		}
 
 		for (auto& ball : balls)
@@ -151,9 +151,9 @@ void Game::UpdateFrame()
 	// Apply light
 	gfx->BeginLightningPass();
 	{
-		for (auto& light_source : lights)
+		for (auto& pointLight : pointLights)
 		{
-			light_source->Bind(*gfx);
+			pointLight->Bind(*gfx);
 			//light_source->Update(dt);
 			gfx->Draw(3U);
 		}
@@ -192,12 +192,12 @@ void Game::ShowItemsSubMenu()
 		static unsigned int current_item_selected = 0;
 		if(ImGui::BeginListBox("Items", ImVec2(200, 100)))
 		{
-			for (unsigned int i = 0; i < objects.size(); i++)
+			for (unsigned int i = 0; i < drawables.size(); i++)
 			{
 				const bool is_selected = (current_item_selected == i);
 
 				std::string str;
-				if(auto labeled = dynamic_cast<IToString*>(objects[i]))
+				if(auto labeled = dynamic_cast<IToString*>(drawables[i]))
 					str.append(labeled->ToString());
 				str.append(" " + std::to_string(i));
 
@@ -212,25 +212,25 @@ void Game::ShowItemsSubMenu()
 		if (ImGui::Button("Create ball"))
 			CreateBall();
 
-		if(auto movable = dynamic_cast<IMovable*>(objects[current_item_selected]))
+		if(auto movable = dynamic_cast<IMovable*>(drawables[current_item_selected]))
 		{
 			dx::XMFLOAT3 pos = movable->GetPosition();
 			if (ImGui::SliderFloat3("Item position", &pos.x, -100.f, 100.f))
 				movable->SetPosition(pos.x, pos.y, pos.z);
 		}
-		if(auto scalable = dynamic_cast<IScalable*>(objects[current_item_selected]))
+		if(auto scalable = dynamic_cast<IScalable*>(drawables[current_item_selected]))
 		{
 			dx::XMFLOAT3 scale = scalable->GetScale();
 			if (ImGui::SliderFloat3("Item scale", &scale.x, 0.f, 100.f))
 				scalable->SetScale(scale);
 		}
-		if(auto colored = dynamic_cast<IColored*>(objects[current_item_selected]))
+		if(auto colored = dynamic_cast<IColored*>(drawables[current_item_selected]))
 		{
 			dx::XMFLOAT4 color = colored->GetColor();
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
-		if(auto light = dynamic_cast<LightDesc*>(objects[current_item_selected]))
+		if(auto light = dynamic_cast<Light*>(drawables[current_item_selected]))
 		{
 			light->ShowLightGUI();
 		}
@@ -241,7 +241,7 @@ void Game::ShowItemsSubMenu()
 void Game::CreateBall()
 {
 	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx));
-	objects.push_back(balls.back().get());
+	drawables.push_back(balls.back().get());
 }
 
 bool Game::LoadConfigurationFile(const char* path)

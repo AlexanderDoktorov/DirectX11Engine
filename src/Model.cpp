@@ -7,6 +7,16 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 	Load(Gfx, fileName, aippFlags);
 }
 
+Model::Model(Model&& other) noexcept
+{
+	position		 = std::move(other.position);
+	rotation		 = std::move(other.rotation);
+	directory		 = std::move(other.directory);
+	materialsIndices = std::move(other.materialsIndices);
+	meshesPtrs		 = std::move(other.meshesPtrs);
+	pRootNode		 = std::move(other.pRootNode);
+}
+
 void Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept
 {
 	ClearData();
@@ -60,22 +70,35 @@ void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexc
 			std::string hash = modelName + std::to_string(iMesh);
 			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
 		}
-
-		ImGui::SliderAngle(("Roll"s + modelName).c_str(), &transformData.roll);
-		ImGui::SliderAngle(("Pitch"s + modelName).c_str(), &transformData.pitch);
-		ImGui::SliderAngle(("Yaw"s + modelName).c_str(), &transformData.yaw);
-		ImGui::SliderFloat(("Position x"s + modelName).c_str(), &transformData.x, -100.f, 100.f);
-		ImGui::SliderFloat(("Position y"s + modelName).c_str(), &transformData.y, -100.f, 100.f);
-		ImGui::SliderFloat(("Position z"s + modelName).c_str(), &transformData.z, -100.f, 100.f);
+		dx::XMFLOAT3& rotationRef = rotation;
+		dx::XMFLOAT3& positionRef = position;
+		if (trackRot)
+			rotationRef = *trackRot;
+		if (trackPos)
+			positionRef = *trackPos;
+		
+		ImGui::SliderAngle(("Roll"s + modelName).c_str(), &rotationRef.x);
+		ImGui::SliderAngle(("Pitch"s + modelName).c_str(), &rotationRef.y);
+		ImGui::SliderAngle(("Yaw"s + modelName).c_str(), &rotationRef.z);
+		ImGui::SliderFloat(("Position x"s + modelName).c_str(), &positionRef.x, -100.f, 100.f);
+		ImGui::SliderFloat(("Position y"s + modelName).c_str(), &positionRef.y, -100.f, 100.f);
+		ImGui::SliderFloat(("Position z"s + modelName).c_str(), &positionRef.z, -100.f, 100.f);
 	}		
 	ImGui::End();
 }
 
 void Model::Draw(Graphics& Gfx) const noexcept
 {
+	dx::XMFLOAT3 translation_ = position;
+	dx::XMFLOAT3 rotation_    = rotation;
+	if (trackRot)
+		rotation_ = *trackRot;
+	if (trackPos)
+		translation_ = *trackPos;
+
 	pRootNode->Draw(Gfx, 
-		dx::XMMatrixTranslation(transformData.x, transformData.y, transformData.z) *
-		dx::XMMatrixRotationRollPitchYaw(transformData.pitch, transformData.yaw, transformData.roll)
+		dx::XMMatrixTranslation(translation_.x, translation_.y,translation_.z) *
+		dx::XMMatrixRotationRollPitchYaw(rotation_.y, rotation_.z, rotation_.x)
 	);
 }
 
@@ -83,6 +106,26 @@ Model& Model::SetRootTransform( DirectX::FXMMATRIX tf ) noexcept
 {
 	pRootNode->SetAppliedTransform( tf );
 	return *this;
+}
+
+void Model::TrackPosition(dx::XMFLOAT3& posToTrack) noexcept
+{
+	trackPos = &posToTrack;
+}
+
+void Model::TrackRotation(dx::XMFLOAT3& rotToTrack) noexcept
+{
+	trackRot = &rotToTrack;
+}
+
+void Model::UntrackPosition() noexcept
+{
+	trackPos = nullptr;
+}
+
+void Model::UntrackRotation() noexcept
+{
+	trackRot = nullptr;
 }
 
 std::unique_ptr<Node> Model::ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode)

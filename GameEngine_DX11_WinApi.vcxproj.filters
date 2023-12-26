@@ -437,9 +437,6 @@
     <ClInclude Include="include\ScreenSpaceVertexShader.h">
       <Filter>Файлы заголовков\Deffered Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="include\IModel.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="include\Light.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -552,6 +549,9 @@
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClInclude>
     <ClInclude Include="include\LightCommon.h">
+      <Filter>Файлы заголовков\LightSourses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Spotlight.h">
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,18 +4,13 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <memory>
-#include <array>
-#include <optional>
 #include "assimp\material.h"
 #include "DirectXWindow.h"
 #include "Camera.h"
 
 #include "imgui_impl_dx11.h"
-#include "imgui_impl_win32.h"
-#include "imgui.h"
 
 #include "IBindable.h"
-#include "StructuredBuffer.h"
 #include "VertexShaderCommon.h"
 #include "PixelShaderCommon.h"
 #include "PixelConstantBuffer.h"

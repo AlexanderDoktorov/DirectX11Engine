@@ -349,7 +349,6 @@
     <ClInclude Include="include\IColored.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\ImGuiManager.h" />
-    <ClInclude Include="include\IModel.h" />
     <ClInclude Include="include\IMovable.h" />
     <ClInclude Include="include\IndexBuffer.h" />
     <ClInclude Include="include\IndexedTriangleList.h" />
@@ -376,6 +375,7 @@
     <ClInclude Include="include\Node.h" />
     <ClInclude Include="include\Sheet.h" />
     <ClInclude Include="include\SolidTexturedBall.h" />
+    <ClInclude Include="include\Spotlight.h" />
     <ClInclude Include="include\Techique.h" />
     <ClInclude Include="include\XSResourse.h" />
     <ClInclude Include="include\TextureBase.h" />

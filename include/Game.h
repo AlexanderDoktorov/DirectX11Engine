@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Timer.h"
 #include "PointLight.h"
+#include "Spotlight.h"
 #include "Interfaces.h"
 #include "Model.h"
 #include "XSResourse.h"
@@ -34,7 +35,7 @@ private:
 	std::unique_ptr<DirectXWindow> window;
 	std::unique_ptr<Graphics> gfx;
 
-	std::vector<IObject*> objects;
+	std::vector<Drawable*> drawables;
 	std::unique_ptr<Sheet> sheet;
 	std::unique_ptr<Sheet> nmSheet;
 
@@ -46,7 +47,6 @@ private:
 	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
 	std::unique_ptr<SolidBall> solidBall;
 
-	std::unique_ptr<PointLight> light;
-	std::unique_ptr<PointLight> light2;
-	std::vector<std::unique_ptr<PointLight>> lights;
+	std::unique_ptr<Light> pSpotLight;
+	std::vector<std::unique_ptr<PointLight>> pointLights;
 };

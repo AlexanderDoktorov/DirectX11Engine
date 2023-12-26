@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "Material.h"
 #include "XSResourse.h"
+#include "DOK_DX11.h"
 #include <algorithm>
 #include <assert.h>
 

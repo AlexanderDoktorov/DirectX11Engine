@@ -2,10 +2,10 @@
 #include <DirectXMath.h>
 #include <memory>
 
-#include "IMovable.h"
 #include "IBindable.h"
 #include "imgui.h"
 #include "PixelConstantBuffer.h"
+#include "Model.h"
 
 namespace dx = DirectX;
 
@@ -42,29 +42,21 @@ protected:
 		LIGHT_TYPE typeId = LIGHT_TYPE_POINT_LIGHT;
 	} data{};
 public:
-	using data_type   = Data;
+	using data_type   = decltype(data);
 	using buffer_type = PixelConstantBuffer<data_type>;
 	static constexpr inline UINT light_desc_bind_slot = 1U;
 public:
-	Light(Graphics& Gfx, LIGHT_TYPE typeID)
-	{ 
-		SetLightType(typeID);
-		if (!pLightBuffer)
-		{
-			pLightBuffer = std::make_unique<buffer_type>(Gfx, data);
-			pLightBuffer->SetBindSlot(light_desc_bind_slot);
-		}
-	}
+	Light(Graphics& Gfx, LIGHT_TYPE typeID);
 
 	bool ShowLightGUI() noexcept;
 
 	LIGHT_TYPE  GetLightType() const noexcept { return data.typeId; }
-	const auto& GetDesc()      const noexcept { return data; }
+	const data_type& GetDesc()      const noexcept { return data; }
 
 			void SetLightType(const LIGHT_TYPE& typeId) noexcept { data.typeId = typeId; }
-	virtual void Reset()								noexcept { data = Data(); } // resets to default;
+	virtual void Reset()								noexcept { data = data_type(); } // resets to default;
 	virtual void Bind(Graphics& Gfx)					noexcept override;
 
 private:
-	static std::unique_ptr<buffer_type> pLightBuffer;
+	static std::shared_ptr<buffer_type> pLightBuffer;
 };

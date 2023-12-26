@@ -3,7 +3,7 @@
 #include "Model.h"
 #include "Light.h"
 
-class PointLight : public Light, public IAnimated, public Model, public IMovable, public IToString
+class PointLight : public Light, public Model, public IAnimated, public IMovable, public IToString
 {
 public:
 	PointLight(Graphics& Gfx);
