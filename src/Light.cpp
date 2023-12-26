@@ -36,7 +36,7 @@ bool Light::ShowLightGUI() noexcept
 
 	ImVec4 button_hovered_color = ImVec4(0.f, 0.f, 1.f, 1.f);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_hovered_color);
-	if (changed |= ImGui::Button("Reset light properties"))
+	if (ImGui::Button("Reset light properties"))
 		Reset();
 	ImGui::PopStyleColor(1U);
 
