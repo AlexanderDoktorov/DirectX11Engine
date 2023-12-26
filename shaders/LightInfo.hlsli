@@ -1,3 +1,30 @@
+struct LightDesc
+{
+	// World position
+    float3 worldPosition;
+    // Color
+    float3 ambientColor;
+    float3 diffuseColor;
+    float3 specularColor;
+    // Intensity
+    float ambientIntensity;
+    float diffuseIntensity;
+    float specularIntensity;
+    // Attenuation
+    float Catt;
+    float Latt;
+    float Qatt;
+	/// Spotlight
+    float3 worldDirection;
+    float  angle;
+	// TypeId
+    uint typeId;
+};
+
+static const uint LIGHT_TYPE_POINT_LIGHT = 0;
+static const uint LIGHT_TYPE_SPOTLIGHT = 1;
+static const uint LIGHT_TYPE_DIRECTIONAL = 2;
+
 struct LightInfo
 {
     float3 vToL;

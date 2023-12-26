@@ -4,7 +4,6 @@
 #include "IBindable.h"
 #include "IBlob.h"
 #include "IColored.h"
-#include "ILight.h"
 #include "IModel.h"
 #include "IMovable.h"
 #include "IObject.h"

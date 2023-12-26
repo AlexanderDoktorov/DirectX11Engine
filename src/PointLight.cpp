@@ -7,13 +7,9 @@ PointLight::PointLight(Graphics& Gfx)
 		aiProcess_GenNormals |
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded
-	)
+	),
+	LightDesc(Gfx, LIGHT_TYPE_POINT_LIGHT)
 {
-	if (!pLightBuffer)
-	{
-		pLightBuffer = std::make_unique<buffer_type>(Gfx, data);
-		pLightBuffer->SetBindSlot(1U);
-	}
 	Reset();
 }
 
@@ -39,7 +35,7 @@ const char* PointLight::ToString() const noexcept
 
 void PointLight::Reset() noexcept
 {
-	PointLightDesc::Reset();
+	LightDesc::Reset();
 	Model::SetRootTransform(
 		dx::XMMatrixTranslation
 		(
@@ -48,12 +44,6 @@ void PointLight::Reset() noexcept
 			data.worldPosition.z
 		)
 	);
-}
-
-void PointLight::Bind(Graphics& Gfx) noexcept
-{
-	pLightBuffer->Update(Gfx, data);
-	pLightBuffer->Bind(Gfx);
 }
 
 void PointLight::Update(float dt) noexcept

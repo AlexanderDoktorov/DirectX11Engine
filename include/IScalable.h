@@ -9,10 +9,10 @@ public:
 	virtual void SetScaleX(const float& scale_x_new) = 0;
 	virtual void SetScaleY(const float& scale_y_new) = 0;
 	virtual void SetScaleZ(const float& scale_z_new) = 0;
-	virtual dx::XMFLOAT3 GetScale() const noexcept = 0;
+	virtual DirectX::XMFLOAT3 GetScale() const noexcept = 0;
 
 
-	virtual void SetScale(const dx::XMFLOAT3& new_scale)
+	virtual void SetScale(const DirectX::XMFLOAT3& new_scale)
 	{
 		SetScaleX(new_scale.x);
 		SetScaleY(new_scale.y);

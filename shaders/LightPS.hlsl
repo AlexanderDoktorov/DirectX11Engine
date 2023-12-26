@@ -8,20 +8,6 @@ Texture2D<float4> GBufferSpecular   : register(t3);
 Texture2D<int>    GBufferMatID      : register(t4);
 SamplerState      sampleState       : register(s0);
 
-struct PointLightDesc
-{
-    float3 worldPosition;
-    float3 ambientColor;
-    float3 diffuseColor;
-    float3 specularColor;
-    float  ambientIntensity;
-    float  diffuseIntensity;
-    float  specularIntensity;
-    float  Catt;
-    float  Latt;
-    float  Qatt;
-};
-
 cbuffer CameraBuffer : register(b0)
 {
     float3 worldCameraPosition;
@@ -29,9 +15,9 @@ cbuffer CameraBuffer : register(b0)
 };
 
 // Constant buffer for lighting parameters
-cbuffer LightingPassPSConstants : register(b1)
+cbuffer LightingBuffer : register(b1)
 {
-    PointLightDesc lightParams;
+    LightDesc lightParams;
 };
 
 struct MaterialDesc

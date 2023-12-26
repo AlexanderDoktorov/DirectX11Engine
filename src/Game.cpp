@@ -230,7 +230,7 @@ void Game::ShowItemsSubMenu()
 			if (ImGui::ColorPicker4("Item color", &color.x))
 				colored->SetColor(color);
 		}
-		if(auto light = dynamic_cast<ILight*>(objects[current_item_selected]))
+		if(auto light = dynamic_cast<LightDesc*>(objects[current_item_selected]))
 		{
 			light->ShowLightGUI();
 		}

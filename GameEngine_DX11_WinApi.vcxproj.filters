@@ -219,6 +219,9 @@
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClCompile>
+    <ClCompile Include="src\LightDesc.cpp">
+      <Filter>Файлы заголовков\LightSourses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\backend\imgui_impl_dx11.h">
@@ -437,7 +440,7 @@
     <ClInclude Include="include\IModel.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\ILight.h">
+    <ClInclude Include="include\LightDesc.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\TransformBufferPS.h">

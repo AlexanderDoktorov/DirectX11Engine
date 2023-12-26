@@ -1,15 +1,14 @@
 #pragma once
 #include "IAnimated.h"
 #include "Model.h"
-#include "ILight.h"
+#include "LightDesc.h"
 
-class PointLight : public LightBase<PointLightDesc>, public IBindable, public IAnimated, public Model, public IMovable, public IToString
+class PointLight : public LightDesc, public IAnimated, public Model, public IMovable, public IToString
 {
 public:
 	PointLight(Graphics& Gfx);
 	
-	void		Reset() noexcept override;
-	void		Bind(Graphics& Gfx) noexcept override;
+	void Reset() noexcept override;
 
 	// IMovable
 	virtual void SetPosition(float _x, float _y, float _z) override;
