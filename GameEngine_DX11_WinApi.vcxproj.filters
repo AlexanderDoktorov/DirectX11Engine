@@ -219,7 +219,7 @@
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClCompile>
-    <ClCompile Include="src\LightDesc.cpp">
+    <ClCompile Include="src\Light.cpp">
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClCompile>
   </ItemGroup>
@@ -440,7 +440,7 @@
     <ClInclude Include="include\IModel.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\LightDesc.h">
+    <ClInclude Include="include\Light.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\TransformBufferPS.h">

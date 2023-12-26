@@ -1,9 +1,9 @@
 #pragma once
 #include "IAnimated.h"
 #include "Model.h"
-#include "LightDesc.h"
+#include "Light.h"
 
-class PointLight : public LightDesc, public IAnimated, public Model, public IMovable, public IToString
+class PointLight : public Light, public IAnimated, public Model, public IMovable, public IToString
 {
 public:
 	PointLight(Graphics& Gfx);

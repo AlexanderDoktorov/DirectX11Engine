@@ -8,7 +8,7 @@ PointLight::PointLight(Graphics& Gfx)
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded
 	),
-	LightDesc(Gfx, LIGHT_TYPE_POINT_LIGHT)
+	Light(Gfx, LIGHT_TYPE_POINT_LIGHT)
 {
 	Reset();
 }
@@ -35,7 +35,7 @@ const char* PointLight::ToString() const noexcept
 
 void PointLight::Reset() noexcept
 {
-	LightDesc::Reset();
+	Light::Reset();
 	Model::SetRootTransform(
 		dx::XMMatrixTranslation
 		(

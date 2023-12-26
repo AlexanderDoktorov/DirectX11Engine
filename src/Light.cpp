@@ -1,14 +1,14 @@
-#include "LightDesc.h"
+#include "Light.h"
 
-std::unique_ptr<LightDesc::buffer_type> LightDesc::pLightBuffer{};
+std::unique_ptr<Light::buffer_type> Light::pLightBuffer{};
 	
-void LightDesc::Bind(Graphics& Gfx) noexcept
+void Light::Bind(Graphics& Gfx) noexcept
 {
 	pLightBuffer->Update(Gfx, data);
 	pLightBuffer->Bind(Gfx);
 }
 
-bool LightDesc::ShowLightGUI() noexcept
+bool Light::ShowLightGUI() noexcept
 {
 	bool changed = false;
 	changed |= ImGui::ColorEdit3("Ambient color RGB", &data.ambientColor.x);

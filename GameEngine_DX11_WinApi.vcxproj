@@ -274,7 +274,7 @@
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\InputLayout.cpp" />
     <ClCompile Include="src\ISlot.cpp" />
-    <ClCompile Include="src\LightDesc.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\PointLight.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Material.cpp" />
@@ -347,7 +347,7 @@
     <ClInclude Include="include\IBindable.h" />
     <ClInclude Include="include\IBlob.h" />
     <ClInclude Include="include\IColored.h" />
-    <ClInclude Include="include\LightDesc.h" />
+    <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\ImGuiManager.h" />
     <ClInclude Include="include\IModel.h" />
     <ClInclude Include="include\IMovable.h" />

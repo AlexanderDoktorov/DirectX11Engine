@@ -16,7 +16,7 @@ enum LIGHT_TYPE : uint32_t
 	LIGHT_TYPE_DIRECTIONAL = 2
 };
 
-class LightDesc : public IBindable
+class Light : public IBindable
 {
 protected:
 	struct Data
@@ -46,7 +46,7 @@ public:
 	using buffer_type = PixelConstantBuffer<data_type>;
 	static constexpr inline UINT light_desc_bind_slot = 1U;
 public:
-	LightDesc(Graphics& Gfx, LIGHT_TYPE typeID)
+	Light(Graphics& Gfx, LIGHT_TYPE typeID)
 	{ 
 		SetLightType(typeID);
 		if (!pLightBuffer)
