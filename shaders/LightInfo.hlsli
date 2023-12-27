@@ -15,8 +15,8 @@ struct LightDesc
     float Latt;
     float Qatt;
 	/// Spotlight
-    float3 worldDirection;
-    float  angle;
+    float3 spotlightDirection;
+    float  spotlightAngle;
 	// TypeId
     uint typeId;
 };
@@ -57,4 +57,12 @@ float Speculate(float3 fragWorldNormal, float3 fragWorldPos, float3 camWorldPos,
 float Diffusate(float3 fragWorldNormal, float3 dirToL)
 {
     return max(0.0f, dot(dirToL, fragWorldNormal));
+}
+
+float Diffusate(float3 spotlightDirection, float3 dirToL, float spotlightAngle)
+{
+    float theta = saturate(dot(spotlightDirection, dirToL));
+    if (theta > cos(spotlightAngle))
+        return theta;
+    return 0;
 }

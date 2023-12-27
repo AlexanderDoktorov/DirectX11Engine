@@ -97,7 +97,7 @@ protected:
 		{
 			CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			T* wnd = reinterpret_cast<T*>(pCreate->lpCreateParams);
-			SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)wnd); // устанавливаем класс T как пользовательские данные созданного окна
+			SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)wnd); // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєР»Р°СЃСЃ T РєР°Рє РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РґР°РЅРЅС‹Рµ СЃРѕР·РґР°РЅРЅРѕРіРѕ РѕРєРЅР°
 
 			wnd->hWnd = hwnd;
 		}

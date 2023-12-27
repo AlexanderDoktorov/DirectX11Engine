@@ -56,16 +56,23 @@ float4 main(in PS_INPUT input) : SV_Target0
     LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
     float att  = Attenuate(lightParams.Catt, lightParams.Latt, lightParams.Qatt, li.distToL);
-    float diff = Diffusate(fragWorldNormal, li.dirToL);
+    
+    // Calucalte diffuse coefficient
+    float diff = 0;
+    switch (lightParams.typeId)
+    {
+        case LIGHT_TYPE_POINT_LIGHT:
+            diff = Diffusate(fragWorldNormal, li.dirToL);
+            break;
+        case LIGHT_TYPE_SPOTLIGHT:
+            diff = Diffusate(lightParams.spotlightDirection, li.dirToL, lightParams.spotlightAngle);
+            break;
+    }
     
     // Get material id from texture
-    uint textureWidth;
-    uint textureHeight;
-    GBufferMatID.GetDimensions(textureWidth, textureHeight);
-    int2 texelCoordinates;
-    texelCoordinates.x = input.TexCoord.x * textureWidth;
-    texelCoordinates.y = input.TexCoord.y * textureHeight;
-    int materialID = GBufferMatID.Load(int3(texelCoordinates, 0));
+    uint2 textureWH;
+    GBufferMatID.GetDimensions(textureWH.x, textureWH.y);
+    int materialID = GBufferMatID.Load(int3(input.TexCoord * textureWH, 0));
     
     if (materialID < 0)
     {
@@ -109,7 +116,7 @@ float4 main(in PS_INPUT input) : SV_Target0
         // depends on: color of light, color of material, intensity of light, att, and lambertian
         const float3 diffuse = diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
-        const float3 specular = specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
+        const float3 specular = specularReflectiveColor * diff * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
         // depends on: emmsivie color, emmisive intensity
         const float3 emmisive = emissiveReflectiveColor;
         

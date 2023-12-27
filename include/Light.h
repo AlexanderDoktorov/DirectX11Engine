@@ -36,7 +36,7 @@ protected:
 		float Latt = 0.045f;
 		float Qatt = 0.0075f;
 		// Spotlight
-		alignas(16) dx::XMFLOAT3 spotlightWorldDirection = dx::XMFLOAT3(0.f,0.f,1.f); // along Z-axis by default 
+		dx::XMFLOAT3 spotlightWorldDirection = dx::XMFLOAT3(0.f,0.f,1.f); // along Z-axis by default 
 		float spotlightAngle = dx::XM_PI / 5.f; // defaults to 36 degrees
 		// TypeId
 		LIGHT_TYPE typeId = LIGHT_TYPE_POINT_LIGHT;
