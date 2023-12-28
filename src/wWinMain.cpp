@@ -5,7 +5,7 @@
 
 #ifdef _DEBUG
 #define _LOGGING_EN
-#endif DEBUG
+#endif _DEBUG
 
 #include "Logger.h"
 

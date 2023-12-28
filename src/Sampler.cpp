@@ -8,6 +8,9 @@ Sampler::Sampler(Graphics& Gfx, UINT bindSlot) : Slotted(bindSlot)
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MinLOD = 0.f;
 
 	CHECK_EXPR_DEFINE_HR(GetDevice(Gfx)->CreateSamplerState(&samplerDesc, &p_SamplerState));
 }

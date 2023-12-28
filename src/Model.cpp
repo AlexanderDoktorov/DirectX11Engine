@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <ranges>
 
 // ********** Model **********
 
@@ -65,11 +66,8 @@ void Model::ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexc
 	if (ImGui::Begin(modelName.c_str()))
 	{
 		using namespace std::string_literals;
-		for (size_t iMesh = 0U; iMesh < meshesPtrs.size(); iMesh++)
-		{
-			std::string hash = modelName + std::to_string(iMesh);
-			meshesPtrs[iMesh]->ShowMeshGUI(Gfx, std::move(hash));
-		}
+		size_t iMesh = 0ull;
+		std::ranges::for_each(meshesPtrs, [&](std::shared_ptr<Mesh>& pMesh) { pMesh->ShowMeshGUI(Gfx, std::string(modelName) + std::to_string(iMesh++)); });
 		dx::XMFLOAT3& rotationRef = rotation;
 		dx::XMFLOAT3& positionRef = position;
 		if (trackRot)
@@ -97,8 +95,8 @@ void Model::Draw(Graphics& Gfx) const noexcept
 		translation_ = *trackPos;
 
 	pRootNode->Draw(Gfx, 
-		dx::XMMatrixTranslation(translation_.x, translation_.y,translation_.z) *
-		dx::XMMatrixRotationRollPitchYaw(rotation_.y, rotation_.z, rotation_.x)
+		dx::XMMatrixRotationRollPitchYaw(rotation_.y, rotation_.z, rotation_.x) * 
+		dx::XMMatrixTranslation(translation_.x, translation_.y,translation_.z)
 	);
 }
 

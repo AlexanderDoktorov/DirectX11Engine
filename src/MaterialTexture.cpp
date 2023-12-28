@@ -34,8 +34,8 @@ void MaterialTexture::SetTextureAiType(aiTextureType aiType) noexcept
 
 DXGI_FORMAT MaterialTexture::GetTextureFormat() const noexcept
 {
-	D3D11_TEXTURE2D_DESC desc;
-	p_Texture->GetDesc(&desc);
+	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+	p_ShaderResourseView->GetDesc(&desc);
 	return desc.Format;
 }
 

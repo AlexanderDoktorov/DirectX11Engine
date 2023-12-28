@@ -22,20 +22,31 @@ HRESULT WICTexture::CreateWICTexture(Graphics& Gfx, const char* filePath, wicFlg
 
 HRESULT WICTexture::CreateWICTexture(Graphics& Gfx, const wchar_t* filePath, wicFlg loadFlags, bool* hasAlphaGloss) noexcept
 {
-    using namespace DirectX;
     DirectX::ScratchImage image;
     HRESULT hr = LoadFromWICFile(filePath, loadFlags, nullptr, image);
     if (FAILED(hr))
         return hr;
 
-    hr = CreateTexture(GetDevice(Gfx), image.GetImages(), image.GetImageCount(), image.GetMetadata(), reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()));
+    // Generate mip maps
+    DirectX::ScratchImage mipChain;
+    hr = DirectX::GenerateMipMaps(
+        image.GetImages(), 
+        image.GetImageCount(), 
+        image.GetMetadata(), 
+        DirectX::TEX_FILTER_FORCE_NON_WIC, 
+        /* all levels? */ 0ull, 
+        mipChain
+    );
     if (FAILED(hr))
         return hr;
 
-    hr = CreateShaderResourceView(GetDevice(Gfx), image.GetImages(), image.GetImageCount(), image.GetMetadata(), &p_ShaderResourseView);
+    //hr = DirectX::CreateTexture(GetDevice(Gfx), mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), reinterpret_cast<ID3D11Resource**>(p_Texture.GetAddressOf()));
+    //if (FAILED(hr))
+    //    return hr;
+
+    hr = CreateShaderResourceView(GetDevice(Gfx), mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), &p_ShaderResourseView);
 
     const DirectX::Image* img = image.GetImage(0, 0, 0);
-
     if (hasAlphaGloss)
     {
         for (size_t i = 0; i < img->height; ++i)

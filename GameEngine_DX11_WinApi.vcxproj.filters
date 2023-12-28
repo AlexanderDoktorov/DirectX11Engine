@@ -43,20 +43,17 @@
     <Filter Include="Файлы заголовков\Assimp">
       <UniqueIdentifier>{aef780fc-5795-455e-b30a-0d7fd75d9dcb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы заголовков\WIC">
-      <UniqueIdentifier>{afb1efc5-b11f-4eb1-9e54-59cc6c961ed1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DOK">
       <UniqueIdentifier>{ebb60ba9-5e53-4fb7-9eac-3b75f2b85573}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WIC">
-      <UniqueIdentifier>{a176a080-941e-4cfd-8e21-954d6f78e22e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Файлы указаний">
       <UniqueIdentifier>{165dc27f-44d5-4895-84d3-4713cb009ebc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Файлы заголовков\LightSourses">
       <UniqueIdentifier>{b887ba34-ea45-452b-9f3d-fe7588bfec4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Textures">
+      <UniqueIdentifier>{34a67683-989e-4ff6-9ac1-5fd74471d83e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,12 +135,6 @@
     <ClCompile Include="src\MaterialPropertiesDesc.cpp">
       <Filter>Файлы заголовков\Assimp</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextureBase.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MaterialTexture.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="src\Sheet.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -155,9 +146,6 @@
     </ClCompile>
     <ClCompile Include="src\ISlot.cpp">
       <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderTexture.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\VertexBuffer.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
@@ -195,12 +183,6 @@
     <ClCompile Include="src\DOK_DX11.cpp">
       <Filter>DOK</Filter>
     </ClCompile>
-    <ClCompile Include="src\WICTexture.cpp">
-      <Filter>WIC</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WICTextureLoader11.cpp">
-      <Filter>WIC</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vertex.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
@@ -221,6 +203,21 @@
     </ClCompile>
     <ClCompile Include="src\Light.cpp">
       <Filter>Файлы заголовков\LightSourses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialTexture.cpp">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WICTexture.cpp">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WICTextureLoader11.cpp">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderTexture.cpp">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureBase.cpp">
+      <Filter>Файлы заголовков\Textures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +359,6 @@
     <ClInclude Include="include\VertexBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderTexture.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\VertexConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -413,9 +407,6 @@
     <ClInclude Include="include\ISlot.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\ITexture2D.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="include\IToString.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -448,9 +439,6 @@
     </ClInclude>
     <ClInclude Include="include\FlatRect.h">
       <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MaterialTexture.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IRotatable.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
@@ -488,9 +476,6 @@
     <ClInclude Include="include\SlotLayout.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\TextureBase.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\XSResourse.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -514,12 +499,6 @@
     </ClInclude>
     <ClInclude Include="include\DOK_traits.h">
       <Filter>DOK</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WICTexture.h">
-      <Filter>WIC</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WICTextureLoader11.h">
-      <Filter>WIC</Filter>
     </ClInclude>
     <ClInclude Include="include\BindableSystem.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
@@ -553,6 +532,24 @@
     </ClInclude>
     <ClInclude Include="include\Spotlight.h">
       <Filter>Файлы заголовков\LightSourses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialTexture.h">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WICTexture.h">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WICTextureLoader11.h">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderTexture.h">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextureBase.h">
+      <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ITexture2D.h">
+      <Filter>Файлы заголовков\Textures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

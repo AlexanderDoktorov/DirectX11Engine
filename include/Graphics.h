@@ -4,7 +4,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <memory>
-#include "assimp\material.h"
+#include "material.h"
 #include "DirectXWindow.h"
 #include "Camera.h"
 
