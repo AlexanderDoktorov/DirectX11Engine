@@ -90,7 +90,7 @@ int Game::Start(int nCmdShow)
 	{
 		// Messages
 		constexpr float fov = dx::XM_PIDIV2;
-		gfx->SetProjection(dx::XMMatrixPerspectiveFovLH(fov, 0.5, NEAR_Z, FAR_Z));
+		gfx->SetProjection(dx::XMMatrixPerspectiveFovLH(fov, 1, NEAR_Z, FAR_Z));
 		gfx->SetCamera(cam);
 		if (const auto r = window->ProcessMessage())
 		{
