@@ -5,13 +5,19 @@
 #include "IBindable.h"
 #include "IGetID.h"
 
+template<class T, typename... Args>
+concept Resolvable = std::is_base_of_v<IBindable, T> && 
+requires(T a, Args... args)
+{
+	{ T::GenerateID(args...) } -> std::convertible_to<std::string>;
+};
+
 class BindableSystem
 {
 public:
-	template<class T, class... Args>
+	template<class T, class... Args> requires Resolvable<T, Args...>
 	static std::shared_ptr<T> Resolve(Graphics& Gfx, Args&&... args)
 	{
-		static_assert(std::is_base_of_v<IBindable, T> , "Make sure you resolve type that inherits IBindable ");
 		return Get().ResolveImpl<T>(Gfx, std::forward<Args>(args)...);
 	}
 private:
