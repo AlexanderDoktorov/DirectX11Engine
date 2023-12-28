@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include <d3d11.h>
+#include <string_view>
 
 DirectX::XMMATRIX DOK_XMMatrixTranslation(const DirectX::XMFLOAT3& translations);
 constexpr DirectX::XMFLOAT3 operator-(DirectX::XMFLOAT3 lhs, DirectX::XMFLOAT3 rhs) noexcept
@@ -10,3 +11,4 @@ constexpr DirectX::XMFLOAT3 operator-(DirectX::XMFLOAT3 lhs, DirectX::XMFLOAT3 r
 
 bool operator==(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept;
 bool operator!=(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept;
+std::wstring to_wstring(const std::string_view& strView);

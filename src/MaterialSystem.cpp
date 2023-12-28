@@ -23,7 +23,8 @@ MaterialSystem::MaterialSystem(Graphics& Gfx, const RECT& windowRect)
 	initialData.SysMemPitch = sizeof(int16_t) * textureDesc.Width;
 	initialData.SysMemSlicePitch = 0U;
 
-	HRESULT hr = GetDevice(Gfx)->CreateTexture2D(&textureDesc, &initialData, &pText2D_mID);
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> tempTexture2D;
+	HRESULT hr = GetDevice(Gfx)->CreateTexture2D(&textureDesc, &initialData, &tempTexture2D);
 	assert(SUCCEEDED(hr));
 
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -31,7 +32,7 @@ MaterialSystem::MaterialSystem(Graphics& Gfx, const RECT& windowRect)
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Texture2D.MipSlice = 0U;
 
-	hr = GetDevice(Gfx)->CreateRenderTargetView(pText2D_mID.Get(), &rtvDesc, &pRtv_mId);
+	hr = GetDevice(Gfx)->CreateRenderTargetView(tempTexture2D.Get(), &rtvDesc, &pRtv_mId);
 	assert(SUCCEEDED(hr));
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -39,7 +40,7 @@ MaterialSystem::MaterialSystem(Graphics& Gfx, const RECT& windowRect)
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = textureDesc.MipLevels;
 	srvDesc.Texture2D.MostDetailedMip = 0U;
-	hr = GetDevice(Gfx)->CreateShaderResourceView(pText2D_mID.Get(), &srvDesc, &pSrv_mId);
+	hr = GetDevice(Gfx)->CreateShaderResourceView(tempTexture2D.Get(), &srvDesc, &pSrv_mId);
 	assert(SUCCEEDED(hr));
 
 	delete[] arrPixels;
@@ -85,14 +86,19 @@ MaterialSystem& MaterialSystem::ClearRenderTarget(Graphics& Gfx, const buff_form
 
 HRESULT MaterialSystem::OnResize(Graphics& Gfx, const RECT& windowRect) noexcept
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
-	pText2D_mID->GetDesc(&textureDesc);
+	ID3D11Texture2D* pTexture = nullptr;
+	pRtv_mId->GetResource(reinterpret_cast<ID3D11Resource**>(&pTexture));
+	if (!pTexture)
+		return E_POINTER;
 
-	// Resize texture
+	D3D11_TEXTURE2D_DESC textureDesc{};
+	pTexture->GetDesc(&textureDesc);
+	pTexture->Release();
 	textureDesc.Height =  static_cast<UINT>(std::abs(windowRect.bottom - windowRect.top));
 	textureDesc.Width =  static_cast<UINT>(std::abs(windowRect.right - windowRect.left));
 
-	HRESULT hr = GetDevice(Gfx)->CreateTexture2D(&textureDesc, nullptr, &pText2D_mID);
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> tempTexture2D;
+	HRESULT hr = GetDevice(Gfx)->CreateTexture2D(&textureDesc, nullptr, &tempTexture2D);
 	if (FAILED(hr))
 		return hr;
 
@@ -101,7 +107,7 @@ HRESULT MaterialSystem::OnResize(Graphics& Gfx, const RECT& windowRect) noexcept
 	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D; 
 	rtvDesc.Texture2D.MipSlice = 0U; 
 
-	hr = GetDevice(Gfx)->CreateRenderTargetView(pText2D_mID.Get(), &rtvDesc, &pRtv_mId); 
+	hr = GetDevice(Gfx)->CreateRenderTargetView(tempTexture2D.Get(), &rtvDesc, &pRtv_mId); 
 	if (FAILED(hr))
 		return hr;
 
@@ -110,7 +116,7 @@ HRESULT MaterialSystem::OnResize(Graphics& Gfx, const RECT& windowRect) noexcept
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D; 
 	srvDesc.Texture2D.MipLevels = textureDesc.MipLevels; 
 	srvDesc.Texture2D.MostDetailedMip = 0U; 
-	hr = GetDevice(Gfx)->CreateShaderResourceView(pText2D_mID.Get(), &srvDesc, &pSrv_mId); 
+	hr = GetDevice(Gfx)->CreateShaderResourceView(tempTexture2D.Get(), &srvDesc, &pSrv_mId); 
 
 	return hr;
 }

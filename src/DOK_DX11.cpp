@@ -1,12 +1,10 @@
 #include "DOK_DX11.h"
 
-DirectX::XMMATRIX DOK_XMMatrixTranslation(const DirectX::XMFLOAT3& translations)
-{
+DirectX::XMMATRIX DOK_XMMatrixTranslation(const DirectX::XMFLOAT3& translations) {
 	return DirectX::XMMatrixTranslation(translations.x, translations.y, translations.z);
 }
 
-bool operator==(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept
-{
+bool operator==(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept {
 	bool equal = true;
 	for (size_t i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; i++)
 	{
@@ -29,7 +27,10 @@ bool operator==(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexce
 	return equal;
 }
 
-bool operator!=(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept
-{
+bool operator!=(const D3D11_BLEND_DESC& lhs, const D3D11_BLEND_DESC& rhs) noexcept {
 	return !operator==(lhs, rhs);
+}
+
+std::wstring to_wstring(const std::string_view& strView) {
+	return std::wstring(strView.begin(), strView.end());
 }

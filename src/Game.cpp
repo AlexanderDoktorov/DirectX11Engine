@@ -10,7 +10,7 @@
 
 Game::Game()
 {
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
+	HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED); CHECK_HR(hr);
 	// Graphics and window
 	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);
 	gfx				= std::make_unique<Graphics>(window->GetWnd());

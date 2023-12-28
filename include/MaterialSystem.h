@@ -54,7 +54,6 @@ private:
 private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRtv_mId;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSrv_mId;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pText2D_mID;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pStrbuff;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSrv_strbuff;
 };

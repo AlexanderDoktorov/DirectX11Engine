@@ -24,7 +24,7 @@ public:
             AddStaticBindable(std::move(VS));
             AddStaticBindable(std::make_unique<Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
             AddStaticBindable(std::make_unique<IndexBuffer>(Gfx, model.indices));
-            AddStaticBindable(std::make_unique<WICTexture>(Gfx, L"G:\\Visual Studio Projects\\DirectX11LearnFromScrap\\Текстуры\\globus_texture.jpeg", 3U));
+            AddStaticBindable(std::make_unique<WICTexture>(Gfx, ".\\Models\\globus_texture.jpeg", 3U));
         }
         AddBindable(std::make_unique<TransformBuffer>(Gfx, *this));
         AddBindable(std::make_unique<ColorBuffer>(Gfx, *this));

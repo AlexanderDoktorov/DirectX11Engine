@@ -18,6 +18,7 @@ public:
 	virtual D3D11_TEXTURE2D_DESC			GetDesc() const noexcept override;	
 
 protected:
+
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> p_Texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> p_ShaderResourseView;
 };
