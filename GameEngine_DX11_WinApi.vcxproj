@@ -297,7 +297,6 @@
     <ClCompile Include="src\SolidBall.cpp" />
     <ClCompile Include="src\SolidTexturedBall.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
-    <ClCompile Include="src\MaterialTexture.cpp" />
     <ClCompile Include="src\TransformBuffer.cpp" />
     <ClCompile Include="src\TransformBufferPS.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
@@ -395,7 +394,6 @@
     <ClInclude Include="include\Sphere.h" />
     <ClInclude Include="include\StringHelper.h" />
     <ClInclude Include="include\StructuredBuffer.h" />
-    <ClInclude Include="include\MaterialTexture.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\Topology.h" />
     <ClInclude Include="include\TransformBuffer.h" />

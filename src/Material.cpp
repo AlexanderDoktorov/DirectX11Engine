@@ -4,8 +4,6 @@
 #include <iostream>
 #include "DOK_assimp.h"
 
-std::vector<std::shared_ptr<MaterialTexture>>  Material::loadedTextures{};
-
 Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) 
 	: 
 	materialName(pMaterial->GetName().C_Str()), 
@@ -16,14 +14,14 @@ Material::Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDir
 
 void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 {
-	using enum MaterialTexture::wicFlg;
+	using enum WICTexture::wicFlg;
 	mapLayout.hasDiffuseMap  = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,		SLOT_TEXTURE_DIFFUSE) != materialTextures.end();
 	mapLayout.hasNormalMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,		SLOT_TEXTURE_NORMALMAP, WIC_FLAGS_IGNORE_SRGB) != materialTextures.end();
 	mIterator mIt = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR, SLOT_TEXTURE_SPECULAR, WIC_FLAGS_IGNORE_SRGB);
 	for (mIterator it = mIt; it != materialTextures.end(); ++it)
 	{
 		mapLayout.hasSpecularMap = true;
-		if ((*it)->GetTextureFormat() == DXGI_FORMAT_R8G8B8A8_UNORM || (*it)->GetTextureFormat() == DXGI_FORMAT_B8G8R8A8_UNORM)
+		if ((*it)->GetFormat() == DXGI_FORMAT_R8G8B8A8_UNORM || (*it)->GetFormat() == DXGI_FORMAT_B8G8R8A8_UNORM)
 		{
 			mapLayout.hasSpecularMapColored = true;
 			(*it)->SetBindSlot(SLOT_TEXTURE_SPECULAR_COLORED);
@@ -33,11 +31,6 @@ void Material::ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial)
 	}
 	mapLayout.hasHeightMap   = LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,		SLOT_TEXTURE_HEIGHT) != materialTextures.end();
 	LoadMaterialProperties(pMaterial);
-}
-
-const std::vector<std::shared_ptr<MaterialTexture>>& Material::GetTextures() const noexcept
-{
-	return materialTextures;
 }
 
 bool Material::ShowMaterialGUI(bool* p_open)
@@ -65,21 +58,6 @@ void Material::Bind(Graphics& Gfx) noexcept
 std::string Material::GenerateID(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory) noexcept
 {
 	return std::string(typeid(Material).name()) + pMaterial->GetName().C_Str() + materialDirectory;
-}
-
-int Material::IsLoaded(const std::string& textureFileName, aiTextureType textureType) noexcept
-{
-	int i = 0;
-	for (const auto& text : loadedTextures)
-	{
-		if (text->GetTextureAiType() == textureType)
-		{
-			if (text->GetFileName() == textureFileName)
-				return i;
-		}
-		++i;
-	}
-	return -1;
 }
 
 MapLayout Material::GetMapLayout() const noexcept
@@ -142,33 +120,10 @@ Material::mIterator Material::LoadMaterialTextures
 		if (pMaterial->GetTexture(textureType, i, &textureFileName) == aiReturn_SUCCESS)
 		{
 			const std::string textureFilePath =  materialDirectory + '\\' + std::string(textureFileName.C_Str());
-			auto pTexture = PushTexture(Gfx, textureFilePath, textureType, bindSlot, wicFlags);
-			materialTextures.push_back(pTexture);
+			materialTextures.push_back(WICTexture::Resolve(Gfx, textureFilePath.c_str(), bindSlot, wicFlags));
 		}
 	}
 	return std::prev(materialTextures.end(), materialTextures.size() - prevSize);
-}
-
-std::shared_ptr<MaterialTexture> Material::PushTexture
-(
-	Graphics& Gfx, 
-	const std::string& textureFilePath, 
-	aiTextureType textureType, 
-	UINT bindSlot, 
-	wicFlg wicLoadFlags
-) 
-noexcept
-{
-	std::string textureFileName = std::filesystem::path(textureFilePath).filename().string();
-	int indx = IsLoaded(textureFileName, textureType);
-	if (indx >= 0)
-		return loadedTextures[indx];
-	else
-	{
-		std::shared_ptr<MaterialTexture> pTexure = std::make_shared<MaterialTexture>(Gfx, textureType, textureFilePath, bindSlot, wicLoadFlags);
-		loadedTextures.push_back(pTexure);
-		return pTexure;
-	}
 }
 
 void Material::LoadMaterialProperties(aiMaterial* pMaterial)

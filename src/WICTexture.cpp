@@ -37,7 +37,7 @@ std::shared_ptr<WICTexture> WICTexture::Resolve(Graphics& Gfx, const char* path,
     return BindableSystem::Resolve<WICTexture>(Gfx, path, bindSlot, loadFlags);
 }
 
-std::string WICTexture::GenerateUID(const char* path, UINT slot, DirectX::WIC_FLAGS loadFlags)
+std::string WICTexture::GenerateID(const char* path, UINT slot, DirectX::WIC_FLAGS loadFlags)
 {
     using namespace std::string_literals;
     return typeid(WICTexture).name() + "#"s + path + "#" + std::to_string( slot ) + "#" + std::to_string(loadFlags);
@@ -46,4 +46,9 @@ std::string WICTexture::GenerateUID(const char* path, UINT slot, DirectX::WIC_FL
 bool WICTexture::HasAlphaGloss() const noexcept
 {
     return hasAlphaGloss;
+}
+
+DXGI_FORMAT WICTexture::GetFormat() const noexcept
+{
+    return image.GetMetadata().format;
 }

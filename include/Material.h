@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include "IBindable.h"
 #include "Numerated.h"
-#include "MaterialTexture.h"
+#include "WICTexture.h"
 #include "MaterialPropertiesDesc.h"
 
 namespace dx = DirectX;
@@ -40,15 +40,13 @@ struct MapLayout
 
 class Material : public IBindable
 {
-	typedef std::vector<std::shared_ptr<MaterialTexture>>::iterator mIterator;
+	typedef std::vector<std::shared_ptr<WICTexture>>::iterator mIterator;
 public:
-	using wicFlg = MaterialTexture::wicFlg;
+	using wicFlg = DirectX::WIC_FLAGS;
 	using strbuff_type = MaterialDesc;
 
 	Material(Graphics& Gfx, aiMaterial* pMaterial, std::string materialDirectory);
 	
-	const std::vector<std::shared_ptr<MaterialTexture>>& GetTextures() const noexcept;
-
 	// Returns true if any property has been changed
 	bool ShowMaterialGUI(bool* p_open = (bool*)0);
 
@@ -76,16 +74,7 @@ private:
 	MapLayout   mapLayout;
 	std::string materialName;
 	std::string materialDirectory;
-	std::vector<std::shared_ptr<MaterialTexture>>		   materialTextures;
+	std::vector<std::shared_ptr<WICTexture>> materialTextures;
 	MaterialPropertiesDesc matProps;
 private:
-	static int IsLoaded(const std::string& texturePath,  aiTextureType textureType) noexcept;
-	static std::shared_ptr<MaterialTexture> PushTexture(
-		Graphics& Gfx, 
-		const std::string& texturePath,  
-		aiTextureType textureType, 
-		UINT bindSlot,
-		wicFlg wicLoadFlags) noexcept;
-private:
-	static std::vector<std::shared_ptr<MaterialTexture>> loadedTextures;
 };

@@ -45,14 +45,13 @@ Game::Game()
 	);
 	Tree2.SetRootTransform(dx::XMMatrixTranslation(10, 0, 0));
 
-	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
-		aiProcess_Triangulate
-	);
 	Sponza.Load(*gfx, R"(.\Models\Sponza\sponza.obj)", 
 		aiProcess_CalcTangentSpace |
-		aiProcess_GenNormals |
 		aiProcess_Triangulate | 
 		aiProcess_ConvertToLeftHanded
+	);
+	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
+		aiProcess_Triangulate
 	);
 	Sponza.SetRootTransform(dx::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
 

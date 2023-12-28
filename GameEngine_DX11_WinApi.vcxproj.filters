@@ -204,9 +204,6 @@
     <ClCompile Include="src\Light.cpp">
       <Filter>Файлы заголовков\LightSourses</Filter>
     </ClCompile>
-    <ClCompile Include="src\MaterialTexture.cpp">
-      <Filter>Файлы заголовков\Textures</Filter>
-    </ClCompile>
     <ClCompile Include="src\WICTexture.cpp">
       <Filter>Файлы заголовков\Textures</Filter>
     </ClCompile>
@@ -532,9 +529,6 @@
     </ClInclude>
     <ClInclude Include="include\Spotlight.h">
       <Filter>Файлы заголовков\LightSourses</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MaterialTexture.h">
-      <Filter>Файлы заголовков\Textures</Filter>
     </ClInclude>
     <ClInclude Include="include\WICTexture.h">
       <Filter>Файлы заголовков\Textures</Filter>
