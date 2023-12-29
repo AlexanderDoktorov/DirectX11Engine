@@ -25,7 +25,6 @@ struct MaterialDesc
     bool hasNormalMap;
     bool hasDiffuseMap;
     bool hasSpecularMap;
-    bool hasSpecularMapColored;
 	bool hasSpecularAlpha;
     bool hasHeightMap;
     float3 Kd; // reflected color diffuse
@@ -50,8 +49,7 @@ float4 main(in PS_INPUT input) : SV_Target0
     float3 fragWorldPos     = GBufferPosition.Sample(sampleState, input.TexCoord).xyz;
     float3 fragWorldNormal  = GBufferNormal.Sample(sampleState, input.TexCoord).xyz;
     float4 fragDiffuseColor = GBufferAlbedo.Sample(sampleState, input.TexCoord);
-    float3 fragSpecColor    = GBufferSpecular.Sample(sampleState, input.TexCoord).rgb;
-    float  fragSpecularPower = GBufferSpecular.Sample(sampleState, input.TexCoord).a;
+    float4 fragSpecSample   = GBufferSpecular.Sample(sampleState, input.TexCoord).rgba;
     
     LightInfo li = BuildLightInfo(lightParams.worldPosition, fragWorldPos);
     
@@ -98,15 +96,11 @@ float4 main(in PS_INPUT input) : SV_Target0
             ambientReflectiveColor = fragDiffuseColor.rgb;
         }
         
-        if(matDesc.hasSpecularMapColored) 
+        if(matDesc.hasSpecularMap) 
         {
-            specularReflectiveColor = fragSpecColor; // if has colored map we take it's color 
+            specularReflectiveColor = float3(fragSpecSample.r, fragSpecSample.r, fragSpecSample.r); // if has colored map we take it's color 
             if (matDesc.hasSpecularAlpha)
-                specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if colored map has alpha gloss - we take it || otherwise it is Ns
-        }
-        else if (matDesc.hasSpecularMap)
-        {
-            specularPower = pow(2.0f, fragSpecularPower * 13.0f); // if has specular map we take it's specular power
+                specularPower = pow(2.0f, fragSpecSample.a * 13.0f); // if colored map has alpha gloss - we take it || otherwise it is Ns
         }
         
         const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);

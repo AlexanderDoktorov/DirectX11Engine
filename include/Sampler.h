@@ -1,6 +1,6 @@
 #pragma once
 #include "ISlot.h"
-#include "IBindable.h"
+#include "BindableSystem.h"
 #include <string>
 #include <wrl.h>
 

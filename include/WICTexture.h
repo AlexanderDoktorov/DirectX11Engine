@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <string>
 #include <future>
+#include <iostream>
 
 class WICTexture : public TextureBase
 {
@@ -17,18 +18,6 @@ public:
 		UINT bindSlot = 0U, 
 		DirectX::WIC_FLAGS loadFlags = DirectX::WIC_FLAGS::WIC_FLAGS_NONE
 	);
-
-	static std::future<std::shared_ptr<WICTexture>> LoadTextureAsync(
-		Graphics& Gfx, 
-		const char* filePath, 
-		UINT bindSlot = 0U, 
-		DirectX::WIC_FLAGS loadFlags = DirectX::WIC_FLAGS::WIC_FLAGS_NONE
-	) 
-	{
-		return std::async(std::launch::async, [&]() {
-			return WICTexture::Resolve(Gfx, filePath, bindSlot, loadFlags);
-			});
-	}
 
 	static std::shared_ptr<WICTexture> Resolve(
 		Graphics& Gfx, 

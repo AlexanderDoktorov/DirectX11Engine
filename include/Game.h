@@ -9,9 +9,6 @@
 #include "Interfaces.h"
 #include "Model.h"
 #include "XSResourse.h"
-#include "SolidBall.h"
-#include "Sheet.h"
-#include "SolidTexturedBall.h"
 
 class Game
 {
@@ -23,7 +20,6 @@ private:
 	void UpdateFrame();
 	void ShowControlWindow();
 	void ShowItemsSubMenu();
-	void CreateBall();
 	bool LoadConfigurationFile(const char* path);
 	void UpdateConfigurationFile(const char* path);
 
@@ -36,16 +32,27 @@ private:
 	std::unique_ptr<Graphics> gfx;
 
 	std::vector<Drawable*> drawables;
-	std::unique_ptr<Sheet> sheet;
-	std::unique_ptr<Sheet> nmSheet;
 
-	Model Tree;
-	Model Tree2;
-	Model Lamp;
-	Model Sponza;
-
-	std::vector<std::unique_ptr<SolidTexturedBall>> balls;
-	std::unique_ptr<SolidBall> solidBall;
+	std::unique_ptr<Model> Tree = std::make_unique<Model>(*gfx, R"(.\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	);
+	std::unique_ptr<Model> Tree2  = std::make_unique<Model>(*gfx, R"(.\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	);
+	std::unique_ptr<Model> Lamp = std::make_unique<Model>(*gfx, R"(.\Models\bulb\bulb.obj)", 
+		aiProcess_Triangulate
+	);
+	std::unique_ptr<Model> Sponza = std::make_unique<Model>(*gfx, R"(.\Models\Sponza\sponza.obj)", 
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate | 
+		aiProcess_ConvertToLeftHanded
+	);
 
 	std::vector<std::unique_ptr<Light>> lightSources;
 };

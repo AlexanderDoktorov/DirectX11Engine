@@ -5,14 +5,13 @@ cbuffer MeshDesc : register(b0)
     bool useNormalMap;
     bool useDiffuseMap;
     bool useSpecularMap;
-    bool useSpecularMapColored;
+    bool hasSpecularAlpha;
 };
     
 Texture2D DiffuseMap                 : register(t0);
 Texture2D NormalMap                  : register(t1);
-Texture2D<float> SpecularMap         : register(t2);
+Texture2D SpecularMap                : register(t2);
 Texture2D HeightMap                  : register(t3);
-Texture2D<float4> SpecularMapColored : register(t4);
 
 SamplerState Sampler : register(s0);
 
@@ -72,20 +71,12 @@ PSOutput main(VS_OUT ps_input)
     clip(output.Albedo.a < 0.1f ? -1 : 1);
     
     // Specular map //
-    if (useSpecularMapColored)
+    if (useSpecularMap)
     {
-        output.Specular.a = SpecularMapColored.Sample(Sampler, ps_input.textCoord).a;
+        output.Specular.r = SpecularMap.Sample(Sampler, ps_input.textCoord).r;
+        if (hasSpecularAlpha)
+            output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord).a;
     }
-    else if (useSpecularMap)
-    {
-        output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord);
-    }
-    
-    if (useSpecularMapColored)
-    {
-        output.Specular.rgb = SpecularMapColored.Sample(Sampler, ps_input.textCoord).rgb * specularMapWeigth;
-    }
-        
     
     output.wPosition    = ps_input.wPosition;
     output.materialID   = matId;

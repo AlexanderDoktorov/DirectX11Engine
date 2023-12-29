@@ -210,7 +210,7 @@ void Graphics::EndLightningPass()
 
 void Graphics::PerformCombinePass()
 {
-    const float light_clear[4] = { 0.1f,0.1f,0.1f,0.3f };
+    const float light_clear[4] = { 0.f,0.f,0.f,1.f };
     
     p_Context->IASetInputLayout(nullptr);
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), light_clear);
@@ -422,20 +422,20 @@ void Graphics::CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11
 
 wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
 {
-    HRESULT hr;
-    wrl::ComPtr<ID3D11ShaderResourceView> result;
     ID3D11Texture2D* pRenderTextureCopy = nullptr;
     ID3D11Texture2D* pRenderTexture = nullptr;
     rtv->GetResource(reinterpret_cast<ID3D11Resource**>(&pRenderTexture));
+    if (!pRenderTexture)
+        return nullptr;
 
     D3D11_TEXTURE2D_DESC descText{};
     pRenderTexture->GetDesc(&descText);
-
-    D3D11_TEXTURE2D_DESC descTextCopy = descText;
-    descTextCopy.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-    descTextCopy.MipLevels = 0U;
-    descTextCopy.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-    hr = p_Device->CreateTexture2D(&descTextCopy, nullptr, &pRenderTextureCopy); CHECK_HR(hr);
+    descText.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    descText.MipLevels = 0U;
+    descText.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    HRESULT hr = p_Device->CreateTexture2D(&descText, nullptr, &pRenderTextureCopy);
+    if (FAILED(hr))
+        return nullptr;
 
     // because backbuffer haven't mipmap, we couldn't copy its texture just with 'CopyResource()', so we're update only most detailed mip-level
     p_Context->CopySubresourceRegion(pRenderTextureCopy, 0U, 0U, 0U, 0U, pRenderTexture, 0U, nullptr);
@@ -445,16 +445,70 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     resourceViewDescBuffer.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDescBuffer.Texture2D.MostDetailedMip = 0U;
     resourceViewDescBuffer.Texture2D.MipLevels = ~0U;
-    hr = p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &result); CHECK_HR(hr);
+
+    wrl::ComPtr<ID3D11ShaderResourceView> srv;
+    hr = p_Device->CreateShaderResourceView(pRenderTextureCopy, &resourceViewDescBuffer, &srv);
+    if (FAILED(hr))
+        return nullptr;
 
     // regenerate mipmap based on updated most detailed mip-level
-    p_Context->GenerateMips(result.Get());
+    p_Context->GenerateMips(srv.Get());
 
     pRenderTextureCopy->Release();
     pRenderTexture->Release();
 
-    return result;
+    return srv;
 }
+
+/*
+wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
+{
+    if (!rtv)
+        return nullptr;
+
+    // Get the description of the render target view
+    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+    rtv->GetDesc(&rtvDesc);
+    
+    if (rtvDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D)
+    {
+        ID3D11Texture2D* p_rtvResourse = nullptr;
+        rtv->GetResource(reinterpret_cast<ID3D11Resource**>(&p_rtvResourse));
+        if (!p_rtvResourse) {
+            return nullptr;
+        }
+
+        D3D11_TEXTURE2D_DESC textureDesc{};
+        p_rtvResourse->GetDesc(&textureDesc);
+        textureDesc.MipLevels = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+        ID3D11Texture2D* pTexture = nullptr;
+        HRESULT hr = p_Device->CreateTexture2D(&textureDesc, nullptr, &pTexture);
+        if (FAILED(hr)) {
+            return nullptr;
+        }
+
+        // Create the shader resource view
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+        srvDesc.Format = textureDesc.Format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+        srvDesc.Texture2D.MipLevels = 1;
+
+        wrl::ComPtr<ID3D11ShaderResourceView> pSRV = nullptr;
+        hr = p_Device->CreateShaderResourceView(pTexture, &srvDesc, &pSRV); assert(SUCCEEDED(hr));
+
+        pTexture->Release();
+
+        return pSRV;
+    }
+
+    return nullptr;
+}
+*/
 
 wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture)
 {

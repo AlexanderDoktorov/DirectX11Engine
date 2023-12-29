@@ -2,12 +2,13 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <mutex>
 #include "IBindable.h"
 #include "IGetID.h"
 
 template<class T, typename... Args>
 concept Resolvable = std::is_base_of_v<IBindable, T> && 
-requires(T a, Args... args)
+requires(Args... args)
 {
 	{ T::GenerateID(args...) } -> std::convertible_to<std::string>;
 };
@@ -32,6 +33,7 @@ private:
 	{
 		// Recieve key for such parameters we want to create bindable with
 		const std::string Key = T::GenerateID(std::forward<Args>(args)...); 
+
 		const auto i = bindableMap.find(Key);
 		if( i == bindableMap.end() )
 		{
@@ -40,9 +42,7 @@ private:
 			return bind;
 		}
 		else
-		{
 			return std::static_pointer_cast<T>( i->second );
-		}
 	}
 
 	std::unordered_map<std::string, std::shared_ptr<IBindable>> bindableMap;

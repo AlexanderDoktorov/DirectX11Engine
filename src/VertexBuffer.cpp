@@ -19,7 +19,7 @@ VertexBuffer::VertexBuffer(Graphics& gfx, std::string buff_tag, const DynamicVer
 
 std::string VertexBuffer::GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept
 {
-	return std::string(typeid(VertexBuffer).name()).append("#").append(vbuf.GetLayout().GetCode());
+	return std::string(typeid(VertexBuffer).name()).append(buff_tag).append("#").append(vbuf.GetLayout().GetCode());
 }
 
 std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept

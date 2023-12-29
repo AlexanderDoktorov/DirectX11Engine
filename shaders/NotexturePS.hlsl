@@ -3,7 +3,12 @@
 cbuffer MeshBuffer : register(b0)
 {
     float4 albedo;
-    uint matID;
+    int matID;              
+    bool useNormalMap;      /* unused */
+    bool useDiffuseMap;     /* unused */
+    bool useHeightMap;      /* unused */
+    bool useSpecularMap;    /* unused */
+    bool useSpecularAlpha;  /* unused */
 }
 
 struct VS_OUT

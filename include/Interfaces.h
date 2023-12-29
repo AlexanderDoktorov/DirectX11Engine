@@ -3,7 +3,6 @@
 #include "IAnimated.h"
 #include "IBindable.h"
 #include "IBlob.h"
-#include "IColored.h"
 #include "IMovable.h"
 #include "IObject.h"
 #include "IRotatable.h"

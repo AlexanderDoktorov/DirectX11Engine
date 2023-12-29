@@ -1,10 +1,10 @@
 #include "PointLight.h"
 
+#define POINT_LIGHT_MODEL_PATH R"(.\Models\Campanella_SP1_obj\Campanella SP1.obj)"
+
 PointLight::PointLight(Graphics& Gfx) 
 	:
-	Model(Gfx, R"(.\Models\bulb\bulb.obj)", 
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenNormals |
+	Model(Gfx, POINT_LIGHT_MODEL_PATH, 
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded
 	),

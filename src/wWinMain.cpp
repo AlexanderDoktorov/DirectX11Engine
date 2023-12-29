@@ -17,8 +17,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 	try
 	{
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); CHECK_HR(hr);
 		Game game = Game();
-		return game.Start(nCmdShow);
+		auto val =  game.Start(nCmdShow);
+		CoUninitialize();
+		return val;
 	}
 	catch (baseException& baseEx)
 	{

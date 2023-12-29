@@ -31,7 +31,7 @@ public:
 	Model() = default;
 	Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags);
 	Model(Model&& other) noexcept;
-	bool Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept; 
+	static Model Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept; 
 	void ClearData() noexcept;
 	void ShowControlWindow(Graphics& Gfx, const std::string& modelName) noexcept;
 	virtual void Draw(Graphics& Gfx) const noexcept override;
@@ -43,14 +43,13 @@ protected:
 	void UntrackRotation() noexcept;
 protected:
 	std::unique_ptr<Node>  ProcessNode(Graphics& Gfx, int& startID, aiNode* pRootNode);
-	std::unique_ptr<Mesh>  ProccesMesh(Graphics& Gfx, aiMesh* pMesh, size_t mId) const;
 private:
 	const dx::XMFLOAT3* trackPos = nullptr;
 	const dx::XMFLOAT3* trackRot = nullptr;
 	dx::XMFLOAT3  position = dx::XMFLOAT3(0.f,0.f,0.f);
 	dx::XMFLOAT3  rotation = dx::XMFLOAT3(0.f,0.f,0.f);
 	std::string directory;
-	std::vector<size_t>						materialsIndices;
-	std::vector<std::shared_ptr<Mesh>>		meshesPtrs;
+	std::vector<size_t>						m_Indices;
+	std::vector<std::unique_ptr<Mesh>>		m_MeshesPtrs;
 	std::unique_ptr<Node>			        pRootNode;
 };

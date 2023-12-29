@@ -8,58 +8,18 @@
 #define NEAR_Z 2
 #define FAR_Z 5000
 
-Game::Game()
+Game::Game() 
+	: 
+	window(std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW)),
+	gfx(std::make_unique<Graphics>(window->GetWnd()))
 {
-	HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED); CHECK_HR(hr);
-	// Graphics and window
-	window			= std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW);
-	gfx				= std::make_unique<Graphics>(window->GetWnd());
-
-	// Geometries
-	sheet			= std::make_unique<Sheet>(*gfx, dx::XMFLOAT4(0.5, 0.5, 0.5, 1.f));
-	solidBall       = std::make_unique<SolidBall>(*gfx);
-
-	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
-	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx, 1.f));
-
 	// Lights
 	lightSources.push_back(std::make_unique<PointLight>(*gfx));
 	lightSources.push_back(std::make_unique<PointLight>(*gfx));
 	lightSources.push_back(std::make_unique<Spotlight>(*gfx));
 
-	sheet->Scale(20.f, 20.f, 20.f);
-
-	// Models
-	Tree.Load(*gfx, R"(.\Models\Tree\Tree.fbx)",
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenNormals |
-		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded
-	);
-
-	Tree2.Load(*gfx, R"(.\Models\Tree\Tree.fbx)",
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenNormals |
-		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded
-	);
-	Tree2.SetRootTransform(dx::XMMatrixTranslation(10, 0, 0));
-
-	Sponza.Load(*gfx, R"(.\Models\Sponza\sponza.obj)", 
-		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate | 
-		aiProcess_ConvertToLeftHanded
-	);
-	Lamp.Load(*gfx, R"(.\Models\bulb\bulb.obj)", 
-		aiProcess_Triangulate
-	);
-	Sponza.SetRootTransform(dx::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
-
-	balls[0]->SetPosition(1.f, 5.f, 1.f);
-	balls[1]->SetPosition(1.f, 5.f, 10.f);
-
-	for (auto& ball : balls)
-		drawables.push_back(ball.get());
+	Tree2->SetRootTransform(dx::XMMatrixTranslation(10, 0, 0));
+	Sponza->SetRootTransform(dx::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
 
 	for (auto& lightsource : lightSources)
 	{
@@ -76,7 +36,6 @@ Game::Game()
 Game::~Game()
 {
 	UpdateConfigurationFile("./game.config");
-	CoUninitialize();
 }
 
 int Game::Start(int nCmdShow)
@@ -139,14 +98,10 @@ void Game::UpdateFrame()
 			drawable->Draw(*gfx);
 		}
 
-		for (auto& ball : balls)
-		{
-			ball->Draw(*gfx);
-		}
-		Tree.Draw(*gfx);
-		Tree2.Draw(*gfx);
-		Lamp.Draw(*gfx);
-		Sponza.Draw(*gfx);
+		Tree->Draw(*gfx);
+		Tree2->Draw(*gfx);
+		Lamp->Draw(*gfx);
+		Sponza->Draw(*gfx);
 #pragma endregion MODELS_DRAW
 	}
 	gfx->EndGeometryPass();
@@ -169,9 +124,9 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowItemsSubMenu();
 	cam.ShowControlWindow();
-	Tree.ShowControlWindow(*gfx, "Tree controls");
-	Tree2.ShowControlWindow(*gfx, "Tree2 controls");
-	Lamp.ShowControlWindow(*gfx, "Lamp controls");
+	Tree->ShowControlWindow(*gfx, "Tree controls");
+	Tree2->ShowControlWindow(*gfx, "Tree2 controls");
+	Lamp->ShowControlWindow(*gfx, "Lamp controls");
 	gfx->GetMaterialSystem().ShowMaterialsWindow(*gfx);
 #endif
 	gfx->EndFrame();
@@ -209,11 +164,6 @@ void Game::ShowItemsSubMenu()
 			}
 			ImGui::EndListBox();
 		}
-		
-
-		ImGui::SameLine();
-		if (ImGui::Button("Create ball"))
-			CreateBall();
 
 		if(auto movable = dynamic_cast<IMovable*>(drawables[current_item_selected]))
 		{
@@ -227,24 +177,12 @@ void Game::ShowItemsSubMenu()
 			if (ImGui::SliderFloat3("Item scale", &scale.x, 0.f, 100.f))
 				scalable->SetScale(scale);
 		}
-		if(auto colored = dynamic_cast<IColored*>(drawables[current_item_selected]))
-		{
-			dx::XMFLOAT4 color = colored->GetColor();
-			if (ImGui::ColorPicker4("Item color", &color.x))
-				colored->SetColor(color);
-		}
 		if(auto light = dynamic_cast<Light*>(drawables[current_item_selected]))
 		{
 			light->ShowLightGUI();
 		}
 	}
 	ImGui::End();
-}
-
-void Game::CreateBall()
-{
-	balls.push_back(std::make_unique<SolidTexturedBall>(*gfx));
-	drawables.push_back(balls.back().get());
 }
 
 bool Game::LoadConfigurationFile(const char* path)

@@ -9,7 +9,6 @@
 	#include "TransformBuffer.h"
 	#include "TransformBufferPS.h"
 	#include "DataBufferPS.h"
-	#include "ColorBuffer.h"
 
 	#include "StructuredBuffer.h"
 

@@ -19,14 +19,8 @@
     <Filter Include="Файлы заголовков\Pipeline">
       <UniqueIdentifier>{e6ddba4e-90cd-4201-a1fd-de8fe5a3c0e1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы заголовков\Items">
-      <UniqueIdentifier>{a2d7a4fd-2584-4511-a357-e73868b44bb9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Файлы заголовков\Devices">
       <UniqueIdentifier>{9a43bf03-4e8b-4221-8d3b-2061ec703b71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы заголовков\Items\Geometries">
-      <UniqueIdentifier>{6d3a19ce-f289-42c7-a097-30130961ca4d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Файлы заголовков\Interfaces">
       <UniqueIdentifier>{5a12d1a8-d329-462a-b1af-f2ef700bbb73}</UniqueIdentifier>
@@ -81,9 +75,6 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\Character.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\DirectXWindow.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -103,12 +94,6 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Shift.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SolidBall.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SolidTexturedBall.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\StringHelper.cpp">
@@ -135,9 +120,6 @@
     <ClCompile Include="src\MaterialPropertiesDesc.cpp">
       <Filter>Файлы заголовков\Assimp</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sheet.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\IBindable.cpp">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClCompile>
@@ -154,9 +136,6 @@
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\TransformBuffer.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ColorBuffer.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\Blob.cpp">
@@ -317,9 +296,6 @@
     <ClInclude Include="include\Blob.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\ColorBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\ConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -359,21 +335,6 @@
     <ClInclude Include="include\VertexConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\Cube.h">
-      <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Polygon.h">
-      <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Sphere.h">
-      <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Character.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Items.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
     <ClInclude Include="include\IAnimated.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -381,9 +342,6 @@
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\IBlob.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IColored.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\IMovable.h">
@@ -434,9 +392,6 @@
     <ClInclude Include="include\DataBufferPS.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\FlatRect.h">
-      <Filter>Файлы заголовков\Items\Geometries</Filter>
-    </ClInclude>
     <ClInclude Include="include\IRotatable.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
@@ -475,12 +430,6 @@
     </ClInclude>
     <ClInclude Include="include\XSResourse.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Sheet.h">
-      <Filter>Файлы заголовков\Items</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SolidTexturedBall.h">
-      <Filter>Файлы заголовков\Items</Filter>
     </ClInclude>
     <ClInclude Include="include\noxnd.h">
       <Filter>Файлы заголовков</Filter>

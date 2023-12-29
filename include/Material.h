@@ -15,7 +15,6 @@ struct MaterialDesc
 	alignas(4) bool hasNormalMap;
 	alignas(4) bool hasDiffuseMap;
 	alignas(4) bool hasSpecularMap;
-	alignas(4) bool hasSpecularMapColored;
 	alignas(4) bool hasSpecularAlpha;
 	alignas(4) bool hasHeightMap;
 	dx::XMFLOAT3 Kd; // reflected color diffuse
@@ -33,14 +32,13 @@ struct MapLayout
 	bool hasSpecularMap : 1 = 0;  // 1 bit for SpecularMap
 	bool hasHeightMap	: 1 = 0;  // 1 bit for HeightMap
 	bool hasSpecularAlpha	: 1 = 0;  // 1 bit for SpecularAlpha channel
-	bool hasSpecularMapColored	: 1 = 0;  // 1 bit for SpecularMapColored
 	// may add more maps
 };
 
+static std::mutex mtx;
 
 class Material : public IBindable
 {
-	typedef std::vector<std::shared_ptr<WICTexture>>::iterator mIterator;
 public:
 	using wicFlg = DirectX::WIC_FLAGS;
 	using strbuff_type = MaterialDesc;
@@ -57,12 +55,13 @@ public:
 	bool		 HasAnyMaps() const noexcept;
 	std::string  GetName() const noexcept;
 	std::string  GetDirectory() const noexcept;
+	std::string  GetPath() const noexcept;
 	MaterialPropertiesDesc  GetPropertiesDesc() const noexcept;
 	MaterialDesc  GetMaterialDesc() const noexcept;
 	bool operator==(const Material& rhs) const noexcept;
 private:
 	void ProcessMaterial(Graphics& Gfx, aiMaterial* pMaterial);
-	mIterator LoadMaterialTextures(
+	bool LoadMaterialTextures(
 		Graphics& Gfx,
 		aiMaterial* pMaterial, 
 		aiTextureType textureType, 
@@ -74,7 +73,8 @@ private:
 	MapLayout   mapLayout;
 	std::string materialName;
 	std::string materialDirectory;
-	std::vector<std::shared_ptr<WICTexture>> materialTextures;
+	std::vector<std::shared_ptr<WICTexture>> m_Textures;
+	std::vector<std::future<void>> m_Futures;
 	MaterialPropertiesDesc matProps;
 private:
 };
