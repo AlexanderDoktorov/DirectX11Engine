@@ -1,8 +1,9 @@
 #include "VertexBuffer.h"
 
-VertexBuffer::VertexBuffer(Graphics& gfx, const DynamicVertex::VertexBuffer& vbuf)
+VertexBuffer::VertexBuffer(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf)
 	:
-	stride( (UINT)vbuf.GetLayout().Size() )
+	stride( (UINT)vbuf.GetLayout().Size() ),
+	v_Tag(buff_tag)
 {
 	D3D11_BUFFER_DESC bd = {};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -13,7 +14,17 @@ VertexBuffer::VertexBuffer(Graphics& gfx, const DynamicVertex::VertexBuffer& vbu
 	bd.StructureByteStride = stride;
 	D3D11_SUBRESOURCE_DATA sd = {};
 	sd.pSysMem = vbuf.GetData();
-	CHECK_HR( GetDevice( gfx )->CreateBuffer( &bd,&sd,&pVertexBuffer ) );
+	CHECK_EXPR_DEFINE_HR( GetDevice( gfx )->CreateBuffer( &bd,&sd,&pVertexBuffer ) );
+}
+
+std::string VertexBuffer::GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept
+{
+	return std::string(typeid(VertexBuffer).name()).append("#").append(vbuf.GetLayout().GetCode());
+}
+
+std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept
+{
+	return BindableSystem::Resolve<VertexBuffer>(gfx, buff_tag, vbuf);
 }
 
 void VertexBuffer::Bind( Graphics& gfx ) noexcept
