@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "StringHelper.h"
 #include <fstream>
 #include <regex>
 #include "DirectXTex.h"
@@ -8,7 +7,7 @@
 #define NEAR_Z 2
 #define FAR_Z 5000
 
-Game::Game() 
+Game::Game()
 	: 
 	window(std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW)),
 	gfx(std::make_unique<Graphics>(window->GetWnd()))
@@ -18,8 +17,7 @@ Game::Game()
 	lightSources.push_back(std::make_unique<PointLight>(*gfx));
 	lightSources.push_back(std::make_unique<Spotlight>(*gfx));
 
-	Tree2->SetRootTransform(dx::XMMatrixTranslation(10, 0, 0));
-	Sponza->SetRootTransform(dx::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
+	LoadModels();
 
 	for (auto& lightsource : lightSources)
 	{
@@ -92,17 +90,17 @@ void Game::UpdateFrame()
 				cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
 		}
 
-#pragma region MODELS_DRAW
+#pragma region OBJECTS_DRAW
 		for (auto& drawable : drawables)
 		{
-			drawable->Draw(*gfx);
+			if(drawable)
+				drawable->Draw(*gfx);
 		}
 
-		Tree->Draw(*gfx);
-		Tree2->Draw(*gfx);
-		Lamp->Draw(*gfx);
-		Sponza->Draw(*gfx);
-#pragma endregion MODELS_DRAW
+		std::ranges::for_each(m_Models, [this](auto& model) {
+			model->Draw(*gfx);
+		});
+#pragma endregion OBJECTS_DRAW
 	}
 	gfx->EndGeometryPass();
 
@@ -111,10 +109,12 @@ void Game::UpdateFrame()
 	{
 		for (auto& lightsrc : lightSources)
 		{
-			lightsrc->Bind(*gfx);
-			gfx->Draw(3U);
+			if (lightsrc)
+			{
+				lightsrc->Bind(*gfx);
+				gfx->Draw(3U);
+			}
 		}
-
 	}
 	gfx->EndLightningPass();
 
@@ -124,12 +124,40 @@ void Game::UpdateFrame()
 #ifndef _NOIMGUI
 	ShowItemsSubMenu();
 	cam.ShowControlWindow();
-	Tree->ShowControlWindow(*gfx, "Tree controls");
-	Tree2->ShowControlWindow(*gfx, "Tree2 controls");
-	Lamp->ShowControlWindow(*gfx, "Lamp controls");
-	gfx->GetMaterialSystem().ShowMaterialsWindow(*gfx);
+	for (size_t i = 0; i < m_Models.size(); i++) {
+		m_Models[i]->ShowControlWindow(*gfx, m_Models[i]->GetName().append("##").append(std::to_string(i)));
+	}
 #endif
 	gfx->EndFrame();
+}
+
+void Game::LoadModels()
+{
+	m_Models.push_back(std::make_unique<Model>(*gfx, R"(.\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	));
+
+	m_Models.push_back(std::make_unique<Model>(*gfx, R"(.\Models\Tree\Tree.fbx)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	));
+
+	m_Models.push_back(std::make_unique<Model>(*gfx, R"(.\Models\bulb\bulb.obj)",
+		aiProcess_Triangulate
+	));
+
+	m_Models.push_back(std::make_unique<Model>(*gfx, R"(.\Models\Sponza\sponza.obj)",
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded
+	));
+	m_Models.back()->SetRootTransform(DirectX::XMMatrixScaling(1 / 20.f, 1 / 20.f, 1 / 20.f));
+
 }
 
 void Game::ShowControlWindow()
@@ -165,6 +193,10 @@ void Game::ShowItemsSubMenu()
 			ImGui::EndListBox();
 		}
 
+		if (drawables.empty()) {
+			ImGui::End();
+			return;
+		}
 		if(auto movable = dynamic_cast<IMovable*>(drawables[current_item_selected]))
 		{
 			dx::XMFLOAT3 pos = movable->GetPosition();

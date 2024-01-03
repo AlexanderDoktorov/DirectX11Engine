@@ -419,9 +419,6 @@
     <ClInclude Include="include\Vertex.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\Numerated.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="include\MaterialPropertiesDesc.h">
       <Filter>Файлы заголовков\Assimp</Filter>
     </ClInclude>

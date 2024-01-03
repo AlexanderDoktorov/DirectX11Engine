@@ -5,7 +5,8 @@ std::unique_ptr<VertexConstantBuffer<TransformBuffer::Transformations>> Transfor
 
 TransformBuffer::TransformBuffer(Graphics& Gfx, Drawable& object) : object(object)
 {
-	if (!Cbuff) Cbuff = std::make_unique<VertexConstantBuffer<Transformations>>(Gfx);
+	if (!Cbuff) 
+		Cbuff = std::make_unique<VertexConstantBuffer<Transformations>>(Gfx);
 }
 
 void TransformBuffer::Bind(Graphics& Gfx) noexcept

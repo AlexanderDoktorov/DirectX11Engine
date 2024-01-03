@@ -1,28 +1,34 @@
-cbuffer MeshDesc : register(b0)
+cbuffer MaterialDesc : register(b0)
 {   
-    float4 albedoColor;
-    uint  matId;
     bool useNormalMap;
     bool useDiffuseMap;
-    bool useSpecularMap;
+    bool useHeightMap;
+    bool useSpecOnlyRed;
+    bool useSpecColored;
     bool hasSpecularAlpha;
+    int    illum;
+    float  Ns;  // shininess
+    float3 Kd;  // reflected color diffuse
+    float3 Ks;  // reflected color specular
+    float3 Ka;  // reflected color ambient
+    float3 Ke;  // color emissive 
 };
-    
-Texture2D DiffuseMap                 : register(t0);
-Texture2D NormalMap                  : register(t1);
-Texture2D SpecularMap                : register(t2);
-Texture2D HeightMap                  : register(t3);
 
-SamplerState Sampler : register(s0);
+Texture2D DiffuseMap  : register(t0);
+Texture2D NormalMap   : register(t1);
+Texture2D SpecularMap : register(t2);
+Texture2D HeightMap   : register(t3);
+
+SamplerState sampleState : register(s0);
 
 struct VS_OUT
 {
-    float4 Position     : SV_POSITION; // Position in homogeneous clip space
-    float4 wPosition    : POSITION0; // Vertex position in world space (for G-buffer)
+    float4 Position     : SV_POSITION;  // Position in homogeneous clip space
+    float4 wPosition    : POSITION0;    // Vertex position in world space (for G-buffer)
     float3 wNormal      : NORMAL0;
     float3 wBitangent   : BITANGENT0;
     float3 wTangent     : TANGENT0;
-    float2 textCoord    : TEXCOORD; // Texture coordinates
+    float2 textCoord    : TEXCOORD;     // Texture coordinates
 };
 
 struct PSOutput
@@ -31,7 +37,6 @@ struct PSOutput
     float4 wNormal      : SV_TARGET1;
     float4 Albedo       : SV_TARGET2;
     float4 Specular     : SV_TARGET3;
-    int    materialID   : SV_TARGET4;
 };
 
 static const float specularMapWeigth = 1.f;
@@ -49,8 +54,8 @@ PSOutput main(VS_OUT ps_input)
             normalize(ps_input.wBitangent),
             normalize(ps_input.wNormal)
         );
-        // unpack the normal from map into tangent space                           --> textID
-        const float3 normalSample = NormalMap.Sample(Sampler, ps_input.textCoord).xyz;
+        // unpack the normal from map into tangent space                 --> textID
+        const float3 normalSample = NormalMap.Sample(sampleState, ps_input.textCoord).xyz;
         float3 worldNormal = normalSample * 2.0f - 1.0f;
         // bring normal from tanspace into world space
         worldNormal = normalize(mul(worldNormal, tanToWorld));
@@ -61,25 +66,45 @@ PSOutput main(VS_OUT ps_input)
         output.wNormal = float4(ps_input.wNormal, 0.f);
     }
     
+    output.Albedo = float4(Kd, 1.f);
     // Diffuse map //
-    if(useDiffuseMap)
-        output.Albedo = DiffuseMap.Sample(Sampler, ps_input.textCoord);
-    else
-        output.Albedo = albedoColor;
+    if (useDiffuseMap)
+    {
+        float4 diffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
+        if (any(Kd))
+        {
+            output.Albedo.rgb = Kd * diffuseSample.rgb;
+            output.Albedo.a = diffuseSample.a;
+        }
+        else
+        {
+            output.Albedo = diffuseSample;
+        }
+    }
+    
+    output.Specular = float4(Ks, Ns);
+    if (useSpecOnlyRed)
+    {
+        output.Specular.a *= SpecularMap.Sample(sampleState, ps_input.textCoord).r;
+    }
+    else if(useSpecColored)
+    {
+        if(any(Ks))
+            output.Specular.rgb *= SpecularMap.Sample(sampleState, ps_input.textCoord).rgb;
+        else
+            output.Specular.rgb = SpecularMap.Sample(sampleState, ps_input.textCoord).rgb;
+        
+        if(hasSpecularAlpha)
+            output.Specular.a *= SpecularMap.Sample(sampleState, ps_input.textCoord).a;
+    }
+    output.Specular.a /= 1000.f;
+    
+    
     
     // Alpha testing { Pixel discarded if alpha is too small }
     clip(output.Albedo.a < 0.1f ? -1 : 1);
     
-    // Specular map //
-    if (useSpecularMap)
-    {
-        output.Specular.r = SpecularMap.Sample(Sampler, ps_input.textCoord).r;
-        if (hasSpecularAlpha)
-            output.Specular.a = SpecularMap.Sample(Sampler, ps_input.textCoord).a;
-    }
-    
     output.wPosition    = ps_input.wPosition;
-    output.materialID   = matId;
     
     return output;
 }

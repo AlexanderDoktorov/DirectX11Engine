@@ -8,20 +8,18 @@ WICTexture::WICTexture(Graphics& Gfx, const char* filePath, UINT bindSlot, Direc
     : 
     TextureBase(bindSlot)
 {
-    HRESULT hr = LoadFromWICFile(to_wstring(filePath).c_str(), loadFlags, nullptr, image); CHECK_HR(hr);
+    HRESULT hr = DirectX::LoadFromWICFile(to_wstring(filePath).c_str(), loadFlags, nullptr, image); CHECK_HR(hr);
 
     // Generate mip maps
     DirectX::ScratchImage mipChain;
     hr = DirectX::GenerateMipMaps(
-        image.GetImages(), 
-        image.GetImageCount(), 
-        image.GetMetadata(), 
-        DirectX::TEX_FILTER_FORCE_NON_WIC, 
-        /* all levels? */ 0ull, 
+        image.GetImages(),
+        image.GetImageCount(),
+        image.GetMetadata(),
+        DirectX::TEX_FILTER_DEFAULT,
+        /* all levels? */ 0ull,
         mipChain
     ); CHECK_HR(hr);
-
-    hasAlphaGloss = image.IsAlphaAllOpaque();
 
     hr = CreateShaderResourceView(
         GetDevice(Gfx), 
@@ -43,9 +41,9 @@ std::string WICTexture::GenerateID(const char* path, UINT slot, DirectX::WIC_FLA
     return typeid(WICTexture).name() + "#"s + path + "#" + std::to_string( slot ) + "#" + std::to_string(loadFlags);
 }
 
-bool WICTexture::HasAlphaGloss() const noexcept
+bool WICTexture::AlphaLoaded() const noexcept
 {
-    return hasAlphaGloss;
+    return !image.IsAlphaAllOpaque();
 }
 
 DXGI_FORMAT WICTexture::GetFormat() const noexcept

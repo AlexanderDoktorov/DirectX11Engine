@@ -12,8 +12,7 @@ public:
 			aiProcess_CalcTangentSpace |
 			aiProcess_GenNormals |
 			aiProcess_Triangulate |
-			aiProcess_ConvertToLeftHanded
-		)
+			aiProcess_ConvertToLeftHanded)
 	{
 		Model::TrackPosition(data.worldPosition);
 		Model::TrackRotation(data.spotlightWorldDirection); // questionable

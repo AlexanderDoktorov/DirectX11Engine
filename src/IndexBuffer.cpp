@@ -8,7 +8,7 @@ IndexBuffer::IndexBuffer(Graphics& Gfx, const std::string& nameTag, const std::v
 {
 	D3D11_BUFFER_DESC IBD = {};
 	IBD.ByteWidth = (UINT)(sizeof(unsigned short) * Count);
-	IBD.Usage = D3D11_USAGE_DEFAULT;
+	IBD.Usage = D3D11_USAGE_IMMUTABLE;
 	IBD.StructureByteStride = sizeof(unsigned short);
 	IBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 

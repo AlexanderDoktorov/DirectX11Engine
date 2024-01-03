@@ -7,7 +7,7 @@ VertexBuffer::VertexBuffer(Graphics& gfx, std::string buff_tag, const DynamicVer
 {
 	D3D11_BUFFER_DESC bd = {};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_IMMUTABLE;
 	bd.CPUAccessFlags = 0u;
 	bd.MiscFlags = 0u;
 	bd.ByteWidth = UINT( vbuf.SizeBytes() );

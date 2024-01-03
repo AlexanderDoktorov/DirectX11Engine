@@ -1,10 +1,5 @@
-#include "HPipelineElements.h"
-#include "ITexture2D.h"
-#include "IBindable.h"
 #include "hrException.h"
 #include "Graphics.h"
-#include "Material.h"
-#include "XSResourse.h"
 #include "DOK_DX11.h"
 #include <algorithm>
 #include <assert.h>
@@ -27,7 +22,6 @@ Graphics::Graphics(HWND hwnd) :
 
     // Setup swap chain
     DXGI_SWAP_CHAIN_DESC swap_chain_desc = {};
-    ZeroMemory(&swap_chain_desc, sizeof(swap_chain_desc));
     swap_chain_desc.BufferCount = 2;
     swap_chain_desc.BufferDesc.Width = 0;
     swap_chain_desc.BufferDesc.Height = 0;
@@ -64,7 +58,7 @@ Graphics::Graphics(HWND hwnd) :
 
     assert(S_OK == hr && p_SwapChain && p_Device && p_Context);
 
-    // Create depth stencil state (to next create texture)
+    // Create depth stencil state
     D3D11_DEPTH_STENCIL_DESC DSD = {};
     DSD.DepthEnable = TRUE;
     DSD.DepthFunc = D3D11_COMPARISON_LESS; // means that object is overwritten when it's Z is closer - LOGIC
@@ -101,7 +95,7 @@ Graphics::Graphics(HWND hwnd) :
     PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
     AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM      ,rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_UNORM, rc.bottom - rc.top, rc.right - rc.left);
     LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
     pLinearSampler          = std::make_unique<Sampler>(*this);
     
@@ -115,10 +109,6 @@ Graphics::Graphics(HWND hwnd) :
     pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
     pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
     pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
-
-    // Initilize material system
-    pMatSys = std::make_unique<MaterialSystem>(*this, rc);
-    pMatSys->InitilizeMaterialBuffer(*this, MAX_MATERIALS);
 
     pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
 
@@ -139,7 +129,7 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[5] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get(), pMatSys->pRtv_mId.Get() };
+    ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get() };
     
     // Clear render targets
     const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
@@ -147,13 +137,12 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     {
         p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
     }
-    pMatSys->ClearRenderTarget(*this);
 
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
 }
 
-void Graphics::EndGeometryPass()
+void Graphics::EndGeometryPass() noexcept
 {
     ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
@@ -168,12 +157,9 @@ void Graphics::BeginLightningPass()
     SetAdditiveBlendingState();
 
     // Bind shader resourses
-    ID3D11ShaderResourceView* srvs[5] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV(), pMatSys->pSrv_mId.Get() };
+    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV() };
     p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
     p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
-
-    // Set materials structured buffer
-    p_Context->PSSetShaderResources(SLOT_MATERIAL_STRUCTURED_BUFFER, 1U, pMatSys->pSrv_strbuff.GetAddressOf());
 
     // Bind CameraBuffer
     const dx::XMFLOAT3 camPos = cam.GetPos();
@@ -188,7 +174,7 @@ void Graphics::BeginLightningPass()
     pLinearSampler->Bind(*this);
 }
 
-void Graphics::EndLightningPass()
+void Graphics::EndLightningPass() noexcept
 {
     // Unbind resourses
     ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
@@ -210,6 +196,7 @@ void Graphics::EndLightningPass()
 
 void Graphics::PerformCombinePass()
 {
+
     const float light_clear[4] = { 0.f,0.f,0.f,1.f };
     
     p_Context->IASetInputLayout(nullptr);
@@ -307,13 +294,9 @@ void Graphics::EndFrame()
     if (FAILED(hr = p_SwapChain->Present(1U, 0U)))
     {
         if (hr == DXGI_ERROR_DEVICE_REMOVED)
-        {
             throw hrException(__LINE__, __FILE__, p_Device->GetDeviceRemovedReason());
-        }
         else
-        {
             throw hrException(__LINE__, __FILE__, hr);
-        }
     }
 }
 
@@ -330,12 +313,6 @@ void Graphics::Draw(UINT vertex_count)
 void Graphics::RenderToImGui(const bool& state)
 {
     IsRenderingToImGui = state;
-}
-
-MaterialSystem& Graphics::GetMaterialSystem() noexcept
-{
-    assert(pMatSys != nullptr);
-    return *pMatSys;
 }
 
 Graphics::~Graphics()
@@ -533,7 +510,6 @@ void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
     {
         RecreateMainViews(w, h);
         RecreateGBufferViews(w, h);
-        pMatSys->OnResize(*this, pWnd->GetWndRect());
         pWnd->ZeroResizeInfo();
         RECT rc;
         GetClientRect(pWnd->GetWnd(), &rc);

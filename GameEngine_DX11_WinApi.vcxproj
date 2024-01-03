@@ -318,7 +318,6 @@
     <ClInclude Include="include\MaterialPropertiesDesc.h" />
     <ClInclude Include="include\MaterialSystem.h" />
     <ClInclude Include="include\noxnd.h" />
-    <ClInclude Include="include\Numerated.h" />
     <ClInclude Include="include\DataBufferPS.h" />
     <ClInclude Include="include\Device.h" />
     <ClInclude Include="include\DirectXWindow.h" />

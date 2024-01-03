@@ -1,7 +1,9 @@
 #include "Model.h"
-#include <ranges>
+#include "Timer.h"
 
 // ********** Model **********
+
+#define ASYNC 1
 
 Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 {
@@ -13,17 +15,12 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 
 	directory = fileName.substr(0, fileName.find_last_of('\\'));
 
-	// Fill materialPtrs array with all scene materials and push them to structured buffer
-	m_Indices.reserve(pScene->mNumMaterials);
-	for (size_t i = 0; i < pScene->mNumMaterials; i++)
-	{
-		m_Indices.push_back(Gfx.GetMaterialSystem().ResolveMaterial(Gfx, pScene->mMaterials[i], directory));
-	}
-
 	// Fill meshesPtrs array with all scene meshes
 	m_MeshesPtrs.reserve(pScene->mNumMeshes);
 	for (size_t i = 0; i < pScene->mNumMeshes; i++) {
-		m_MeshesPtrs.emplace_back(Mesh::Load(Gfx, pScene->mMeshes[i], m_Indices[pScene->mMeshes[i]->mMaterialIndex]));
+		auto aiMesh = pScene->mMeshes[i];
+		auto aiMaterial = pScene->mMaterials[aiMesh->mMaterialIndex];
+		m_MeshesPtrs.push_back(Mesh::Load(Gfx, aiMesh, aiMaterial, directory));
 	}
 
 	int StartId = 0;
@@ -35,20 +32,13 @@ Model::Model(Model&& other) noexcept
 	position		 = std::move(other.position);
 	rotation		 = std::move(other.rotation);
 	directory		 = std::move(other.directory);
-	m_Indices		 = std::move(other.m_Indices);
 	m_MeshesPtrs	 = std::move(other.m_MeshesPtrs);
 	pRootNode		 = std::move(other.pRootNode);
-}
-
-Model Model::Load(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags) noexcept
-{
-	return Model(Gfx, fileName, aippFlags);
 }
 
 void Model::ClearData() noexcept
 {
 	m_MeshesPtrs.clear();
-	m_Indices.clear();
 	if (pRootNode)
 		pRootNode->Clear();
 	directory.clear();
@@ -99,6 +89,23 @@ Model& Model::SetRootTransform( DirectX::FXMMATRIX tf ) noexcept
 {
 	pRootNode->SetAppliedTransform( tf );
 	return *this;
+}
+
+std::string Model::GetName() const noexcept
+{
+	// Find the last occurrence of the directory separator
+	size_t lastSlash = directory.find_last_of("/\\");
+
+	// Extract the substring after the last separator to get the file name
+	std::string fileName = directory.substr(lastSlash + 1);
+
+	// Remove the file extension (if any)
+	size_t lastDot = fileName.find_last_of(".");
+	if (lastDot != std::string::npos) {
+		fileName = fileName.substr(0, lastDot);
+	}
+
+	return fileName;
 }
 
 void Model::TrackPosition(dx::XMFLOAT3& posToTrack) noexcept

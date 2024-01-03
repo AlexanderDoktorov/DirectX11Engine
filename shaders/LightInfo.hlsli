@@ -50,7 +50,7 @@ float Attenuate(float Catt, float Latt, float Qatt, float distToL)
 float Speculate(float3 fragWorldNormal, float3 fragWorldPos, float3 camWorldPos, float3 dirToL, float specularPower)
 {
     const float3 viewDir = normalize(camWorldPos - fragWorldPos);
-    return pow(saturate(dot(viewDir, reflect(-dirToL, fragWorldNormal))), specularPower);
+    return pow(max(0.f, (dot(viewDir, reflect(-dirToL, fragWorldNormal)))), specularPower);
 }
 
 // diffAngle

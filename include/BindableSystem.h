@@ -2,7 +2,6 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include <mutex>
 #include "IBindable.h"
 #include "IGetID.h"
 
@@ -32,18 +31,19 @@ private:
 	std::shared_ptr<T> ResolveImpl(Graphics& Gfx, Args&&... args)
 	{
 		// Recieve key for such parameters we want to create bindable with
-		const std::string Key = T::GenerateID(std::forward<Args>(args)...); 
+		const std::string Key = T::GenerateID(std::forward<Args>(args)...);
 
 		const auto i = bindableMap.find(Key);
 		if( i == bindableMap.end() )
 		{
-			auto bind = std::make_shared<T>(Gfx,std::forward<Args>(args)...);
+			std::shared_ptr<T> bind = std::make_shared<T>(Gfx,std::forward<Args>(args)...);
 			bindableMap[Key] = bind;
 			return bind;
 		}
 		else
+		{
 			return std::static_pointer_cast<T>( i->second );
+		}
 	}
-
 	std::unordered_map<std::string, std::shared_ptr<IBindable>> bindableMap;
 };

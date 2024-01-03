@@ -1,10 +1,11 @@
 #pragma once
-#include "TextureBase.h"
-#include "DirectXTex.h"
-#include <wrl.h>
-#include <string>
-#include <future>
-#include <iostream>
+#include <TextureBase.h>
+#include <DirectXTex.h>
+
+namespace std {
+	template<class T>
+	class shared_ptr;
+}
 
 class WICTexture : public TextureBase
 {
@@ -27,9 +28,8 @@ public:
 
 	static std::string GenerateID(const char* path, UINT slot, DirectX::WIC_FLAGS loadFlags);
 
-	bool HasAlphaGloss() const noexcept; 
+	bool AlphaLoaded() const noexcept; 
 	DXGI_FORMAT GetFormat() const noexcept;
 private:
-	bool hasAlphaGloss = false;
 	DirectX::ScratchImage image{};
 };

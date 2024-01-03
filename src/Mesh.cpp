@@ -4,30 +4,19 @@
 
 // ********** Mesh **********
 
-Mesh::Mesh(Graphics& Gfx, aiMesh* p_Mesh, size_t v_id)
+Mesh::Mesh(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, std::string directory) 
+	:
+	p_MeshMaterial(std::make_shared<Material>(Gfx, p_aiMaterial, directory))
 {
-	// Get material index from material system in gfx (or create new and get index)
-	std::shared_ptr<Material> pMat = Gfx.GetMaterialSystem().GetMaterialByIndex(v_id); assert(pMat);
-	// Add material as bindable (binds material textures to pipeline when drawing mesh) if has some
-	AddBindable(pMat);
+	AddBindable(p_MeshMaterial);
 
-	// Set mesh desc according to maps layout of material
-	MapLayout v_mapLayout = pMat->GetMapLayout();
-	v_MeshDesc.matId = (int)v_id;
-	v_MeshDesc.useNormalMap		= v_mapLayout.hasNormalMap;
-	v_MeshDesc.useDiffuseMap	= v_mapLayout.hasDiffuseMap;
-	v_MeshDesc.useSpecularMap	= v_mapLayout.hasSpecularMap;
-	v_MeshDesc.useHeightMap		= v_mapLayout.hasHeightMap;
-	v_MeshDesc.useSpecularAlpha	= v_mapLayout.hasSpecularAlpha;
-	AddBindable(PixelConstantBuffer<MeshDesc>::Resolve(Gfx, v_MeshDesc, 0U));
-
-	if (pMat->HasAnyMaps())
+	if (p_MeshMaterial->HasAnyMaps())
 		AddBindable(Sampler::Resolve(Gfx));
 
 	std::shared_ptr<VertexShaderCommon> vertexShader = nullptr;
 	DynamicVertex::VertexBuffer vertexBuffer;
 
-	if (!pMat->HasAnyMaps())
+	if (!p_MeshMaterial->HasAnyMaps())
 	{
 		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
 			DynamicVertex::VertexLayout{}
@@ -84,7 +73,7 @@ Mesh::Mesh(Graphics& Gfx, aiMesh* p_Mesh, size_t v_id)
 		}
 	}
 
-	std::string meshTag = pMat->GetPath() + "#" + p_Mesh->mName.C_Str();
+	std::string meshTag = p_MeshMaterial->GetPath() + "#" + p_Mesh->mName.C_Str();
 	AddBindable( IndexBuffer::Resolve(Gfx, meshTag, indices) );
 	AddBindable( VertexBuffer::Resolve(Gfx, meshTag, vertexBuffer));
 	AddBindable( InputLayout::Resolve(Gfx, vertexBuffer.GetLayout(), (IShader*)vertexShader.get()));
@@ -95,43 +84,18 @@ Mesh::Mesh(Graphics& Gfx, aiMesh* p_Mesh, size_t v_id)
 
 void Mesh::Draw(Graphics& Gfx, DirectX::FXMMATRIX rusultTransform) const
 {
-	if (auto p_Buffer = QueryBindable<PixelConstantBuffer<MeshDesc>>())
-		p_Buffer->Update(Gfx, v_MeshDesc); /* update buffer */
-
 	dx::XMStoreFloat4x4(&this->rusultiveTransform, rusultTransform); // set resultive transform
 	Drawable::Draw(Gfx);
 }
 
-std::unique_ptr<Mesh> Mesh::Load(Graphics& Gfx, aiMesh* p_Mesh, size_t v_id)
+std::unique_ptr<Mesh> Mesh::Load(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, std::string directory)
 {
-	return std::make_unique<Mesh>(Gfx, p_Mesh, v_id);
+	return std::make_unique<Mesh>(Gfx, p_Mesh, p_aiMaterial, std::move(directory));
 }
 
 bool Mesh::ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept
 {
-	auto makeHashed = [](std::string str, const std::string& hash) -> std::string
-	{
-		return str.append("##").append(hash);
-	};
-	bool changed = false;
-	auto pMeshMaterial = Gfx.GetMaterialSystem().GetMaterialByIndex(v_MeshDesc.matId);
-	MapLayout mapLayout = pMeshMaterial->GetMapLayout();
-
-	if(mapLayout.hasDiffuseMap)
-		changed |= ImGui::Checkbox(makeHashed("Use diffuse map", hash).c_str(), &v_MeshDesc.useDiffuseMap);
-	if(!v_MeshDesc.useDiffuseMap)
-		changed |= ImGui::ColorEdit4(makeHashed("Material albedo color", hash).c_str(), &v_MeshDesc.albedoColor.x);
-	if(mapLayout.hasNormalMap)
-		changed |= ImGui::Checkbox(makeHashed("Use normal map", hash).c_str(), &v_MeshDesc.useNormalMap);
-	if(mapLayout.hasSpecularMap)
-		changed |= ImGui::Checkbox(makeHashed("Use specular map", hash).c_str(), &v_MeshDesc.useSpecularMap);
-
-	return changed;
-}
-
-int Mesh::GetMaterialIndex() const noexcept
-{
-	return v_MeshDesc.matId;
+	return p_MeshMaterial->ShowMaterialGUI();
 }
 
 DirectX::XMMATRIX Mesh::GetTransform() const noexcept

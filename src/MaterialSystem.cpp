@@ -61,9 +61,11 @@ const ID3D11ShaderResourceView* MaterialSystem::GetMaterialBuffer(Graphics& Gfx)
 	return pSrv_strbuff.Get(); 
 }
 
-std::shared_ptr<MaterialSystem::m_type> MaterialSystem::GetMaterialByIndex(const size_t& index) const noexcept
+std::shared_ptr<Material> MaterialSystem::GetMaterialByIndex(const size_t& index) const noexcept
 {
-	return vMaterials.at(index);
+	if (index < m_Materials.size())
+		return m_Materials.at(index);
+	return nullptr;
 }
 
 void MaterialSystem::UpdateMaterialAt(Graphics& Gfx, const size_t& index) noexcept
@@ -73,7 +75,21 @@ void MaterialSystem::UpdateMaterialAt(Graphics& Gfx, const size_t& index) noexce
 
 size_t MaterialSystem::ResolveMaterial(Graphics& Gfx, aiMaterial* pMaterial, const std::string& materialDirectory) noexcept
 {
-	return ResolveMaterialImpl(Gfx, pMaterial, materialDirectory);
+	std::string mStrId{}; //= Material::GenerateID(pMaterial, materialDirectory);
+
+	if (auto it = mapIndex.find(mStrId); it != mapIndex.end())
+		return it->second;
+	else
+	{
+		assert(m_Materials.size() < maxSize);
+		const size_t newIndx = m_Materials.size();
+		std::shared_ptr<Material> p_Material = std::make_shared<Material>(Gfx, pMaterial, materialDirectory);
+
+		mapIndex.emplace(std::make_pair(std::move(mStrId), newIndx));
+		m_Materials.push_back(p_Material);
+		UpdateBuffAt(Gfx, m_Materials.back()->GetMaterialDesc(), newIndx);
+		return newIndx;
+	}
 }
 
 MaterialSystem& MaterialSystem::ClearRenderTarget(Graphics& Gfx, const buff_format_type& clearValue) noexcept
@@ -125,9 +141,9 @@ void MaterialSystem::ShowMaterialsWindow(Graphics& Gfx, bool* p_open) noexcept
 {
 	if (ImGui::Begin("Loaded materials", p_open))
 	{
-		for (size_t i = 0; i < vMaterials.size(); i++)
+		for (size_t i = 0; i < m_Materials.size(); i++)
 		{
-			if (vMaterials[i]->ShowMaterialGUI())
+			if (m_Materials[i]->ShowMaterialGUI())
 				UpdateMaterialAt(Gfx, i);
 			ImGui::Separator();
 		}

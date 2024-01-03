@@ -13,15 +13,16 @@ public:
 	virtual DirectX::XMMATRIX GetTransform() const noexcept override;
 
 protected:
+
 	void AddBindable(std::shared_ptr<IBindable> element) noexcept;
 
 	template <class T>
 	static void RemoveBindable()
 	{
-		for (auto it = PipelineElements.begin(); it != PipelineElements.end();) {
+		for (auto it = m_Bindables.begin(); it != m_Bindables.end();) {
 			if(T* ptr = dynamic_cast<T*>(it->get())) {
 				it->reset();
-				it = PipelineElements.erase(it);
+				it = m_Bindables.erase(it);
 			}
 			else {
 				++it;
@@ -32,7 +33,7 @@ protected:
 	template <class T>
 	T* QueryBindable() const noexcept
 	{
-		for (auto& bindable : PipelineElements)
+		for (auto& bindable : m_Bindables)
 		{
 			if (auto pt = dynamic_cast<T*>(bindable.get()))
 			{
@@ -42,6 +43,6 @@ protected:
 		return nullptr;
 	}
 
-	std::vector<std::shared_ptr<IBindable>> PipelineElements;
+	std::vector<std::shared_ptr<IBindable>> m_Bindables;
 	IndexBuffer* pIndexBuffer = nullptr;
 };

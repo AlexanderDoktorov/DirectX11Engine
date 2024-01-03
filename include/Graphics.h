@@ -42,11 +42,9 @@ public:
 	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
 
 	void			BeginGeometryPass(const DirectXWindow* pWnd);
-	void			EndGeometryPass();
-
+	void			EndGeometryPass() noexcept;
 	void			BeginLightningPass();
-	void			EndLightningPass();
-
+	void			EndLightningPass() noexcept;
 	void			PerformCombinePass();
 
 	void			SetProjection(dx::XMMATRIX projection) noexcept;
@@ -58,9 +56,6 @@ public:
 	void			DrawIndexed(UINT Count);
 	void			Draw(UINT vertex_count);
 	void			RenderToImGui(const bool& state);
-
-	// Materials
-	MaterialSystem& GetMaterialSystem() noexcept;
 
 	// Render targets
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
@@ -116,8 +111,6 @@ private:
 	std::unique_ptr<Sampler>												   pLinearSampler;
 	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
 
-	// Material system
-	std::unique_ptr<MaterialSystem> pMatSys;
 	class DefferedRendering
 	{
 		// Maybe put all the deffered rendering stuff here
