@@ -5,114 +5,127 @@
 #include <d3d11.h>
 #include <memory>
 #include "material.h"
-#include "DirectXWindow.h"
 #include "Camera.h"
 
-#include "imgui_impl_dx11.h"
-
-#include "IBindable.h"
-#include "VertexShaderCommon.h"
-#include "PixelShaderCommon.h"
-#include "PixelConstantBuffer.h"
-#include "RenderTexture.h"
-#include "Interfaces.h"
-#include "Sampler.h"
-#include "MaterialSystem.h"
 #include "noxnd.h"
 #include "DOK_traits.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
 
-#define MAX_MATERIALS (size_t)100
+#pragma region forward_declarations
+class DirectXWindow;
+class RenderTexture;
+class Sampler;
+class PixelShaderCommon;
+class VertexShaderCommon;
+template <class T> class PixelConstantBuffer;
+#pragma endregion forward_declarations
+
+enum RENDERER_TYPE
+{
+	RENDERER_TYPE_DEFFERED,
+	RENDERER_TYPE_FORWARD,
+	RENDERER_TYPE_MIXED // unused
+};
 
 class Graphics
 {
-public:
-	// Meta info
-	using window_type = DirectXWindow;
-private:
+	struct SceneBuffer
+	{
+		uint32_t	 numLights{};
+		dx::XMFLOAT3 worldCameraPos{};
+	};
+	using window_type		= DirectXWindow;
+	using scene_buffer_type = PixelConstantBuffer<SceneBuffer>;
 	friend class GraphicsChild;
 public:
 	Graphics(HWND hwnd);
+	void OnResize(const RECT& winRect);
 
-	void BeginFrame(const DirectXWindow* pWnd, const float clear_color[4]);
+	void BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass = nullptr, std::function<void()> _FLightPass = nullptr);
+	void BeginGeometryPass(const window_type* pWnd);
+	void BeginLightningPass();
+	void BeginForwardFrame(const window_type* pWnd, const float clear_color[4]);
+	void AddLightSource() noexcept;
+	void DrawIndexed(UINT index_count);
+	void Draw(UINT vertex_count);
+	void EndLightningPass();
+	void EndGeometryPass();
+	void EndFrame();
+	void PerformCombinePass();
+	void ResetBlendingState() noexcept;
+	void RenderToImGui(const bool& state);
+	void SetProjection(dx::XMMATRIX projection) noexcept;
+	void SetRendererType(RENDERER_TYPE rt) noexcept;
+	void SetCamera(const Camera& cam);
+	void SetAdditiveBlendingState();
 
-	// Deffered Rendering
-	void			ResizeRenderTargetViews(const DirectXWindow* pWnd);
-
-	void			BeginGeometryPass(const DirectXWindow* pWnd);
-	void			EndGeometryPass() noexcept;
-	void			BeginLightningPass();
-	void			EndLightningPass() noexcept;
-	void			PerformCombinePass();
-
-	void			SetProjection(dx::XMMATRIX projection) noexcept;
-	void			SetCamera(const Camera& cam);
-
-	void			SetAdditiveBlendingState();
-	void			ResetBlendingState();
-	void			EndFrame();
-	void			DrawIndexed(UINT Count);
-	void			Draw(UINT vertex_count);
-	void			RenderToImGui(const bool& state);
+	Camera		  GetCamera() const;
+	dx::XMMATRIX  GetProjection() const noexcept;
+	RENDERER_TYPE GetRendererType() const noexcept;
 
 	// Render targets
 	wrl::ComPtr<ID3D11ShaderResourceView> MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv);
 	static wrl::ComPtr<ID3D11RenderTargetView> MakeRTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture);
 
-	Camera			GetCamera()		const;
-	dx::XMMATRIX	GetProjection() const noexcept;
-
 	~Graphics();
-
 private:
-	dx::XMMATRIX	projection = dx::XMMatrixIdentity();
-	Camera			cam = Camera();
+	void ResizeViews(const UINT& width, const UINT& height);
+	void CreateDepthStencilView();
+	void CreateBackBufferView();
+	void CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
+	void ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open = (bool*)0);
 
-	void			RecreateMainViews(const UINT& width, const UINT& height);
-	void			RecreateGBufferViews(const UINT& width, const UINT& height);
-	void			CreateDepthStencilView();
-	void			CreateBackBufferView();
-	void			CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
-
-	// ImGuiStuff
-	void			ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open = (bool*)0);
-	bool			IsRenderingToImGui	= false;
-	bool			ImGuiEnabled		= false;
-
+	RENDERER_TYPE	rendererType		= RENDERER_TYPE_FORWARD;
+	dx::XMMATRIX	projectionMatrix	= dx::XMMatrixIdentity();
+	Camera			camera				= Camera();
+	bool			IsRenderingToImGui	= true;
+	bool			ImGuiEnabled		= true;
+	uint32_t		numLights			= 0;
 
 	wrl::ComPtr<ID3D11Device>			p_Device;
 	wrl::ComPtr<ID3D11DeviceContext>	p_Context;
 	wrl::ComPtr<IDXGISwapChain>			p_SwapChain;
 	wrl::ComPtr<ID3D11RasterizerState>  p_RSState;
 	wrl::ComPtr<ID3D11BlendState>		p_BlendState;
+	std::unique_ptr<scene_buffer_type>	p_SceneBuffer;
 
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;
 
-private:
-	// G-buffer
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvPosition;
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvNormal;
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvSpecular;
-	wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
-
-	std::unique_ptr<RenderTexture>			PositionTexture;
-	std::unique_ptr<RenderTexture>			NormalTexture;
-	std::unique_ptr<RenderTexture>			AlbedoTexture;
-	std::unique_ptr<RenderTexture>			SpecularTexture;
-	std::unique_ptr<RenderTexture>			LightTexture;
-
-	std::unique_ptr<PixelShaderCommon>										   pCombinePS;
-	std::unique_ptr<PixelShaderCommon>										   pLightPassPixelShader;
-	std::unique_ptr<VertexShaderCommon>										   pScreenSpaceVS;
-	std::unique_ptr<Sampler>												   pLinearSampler;
-	std::unique_ptr<PixelConstantBuffer<dx::XMFLOAT4>>						   pPixelCameraBuffer;
-
-	class DefferedRendering
+	struct DefferedRenderer
 	{
-		// Maybe put all the deffered rendering stuff here
-	};
+		DefferedRenderer() = default;
+		void Initilize(Graphics& Gfx, const RECT& rc);
+		void OnResize(Graphics& Gfx, const RECT& winRect);
+		// Passes
+		void PerformCombinePass(Graphics& Gfx, ID3D11RenderTargetView** outputRtv) const;
+		void BeginLightPass(Graphics& Gfx) const;
+		void EndLightPass(Graphics& Gfx) const;
+		void BeginGeometryPass(Graphics& Gfx) noexcept;
+		void EndGeometryPass(Graphics& Gfx) const noexcept;
+
+		// Shaders
+		std::unique_ptr<PixelShaderCommon>		pCombinePS;
+		std::unique_ptr<PixelShaderCommon>		pLightPassPixelShader;
+		std::unique_ptr<VertexShaderCommon>		pScreenSpaceVS;
+
+		// Render targets
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvPosition;
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvNormal;
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvAlbedo;
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvSpecular;
+		wrl::ComPtr<ID3D11RenderTargetView>		rtvLight;
+
+		// Textures
+		std::unique_ptr<RenderTexture>			PositionTexture;
+		std::unique_ptr<RenderTexture>			NormalTexture;
+		std::unique_ptr<RenderTexture>			AlbedoTexture;
+		std::unique_ptr<RenderTexture>			SpecularTexture;
+		std::unique_ptr<RenderTexture>			LightTexture;
+
+		// Sampler
+		std::shared_ptr<Sampler> p_Sampler;
+	} defferedRenderer;
 };

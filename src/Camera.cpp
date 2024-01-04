@@ -54,8 +54,7 @@ void Camera::ShowControlWindow(bool *p_open) noexcept
         ImGui::Text("Orientation");
         ImGui::SliderAngle("Pitch", &pitch, 0.995f * -90.0f, 0.995f * 90.0f);
         ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
-        if (ImGui::Button("Reset"))
-        {
+        if (ImGui::Button("Camera reset")) {
             Reset();
         }
     }

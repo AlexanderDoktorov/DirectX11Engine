@@ -4,8 +4,7 @@
 class Camera
 {
 public:
-	Camera()
-	{
+	Camera() {
 		Reset();
 	}
 
@@ -28,8 +27,6 @@ public:
 	DirectX::XMFLOAT3	GetPos()				const noexcept;
 	float				GetPitch()				const noexcept;
 	float				GetYaw()				const noexcept;
-
-	
 private:
 	DirectX::XMFLOAT3 pos;
 	float pitch;

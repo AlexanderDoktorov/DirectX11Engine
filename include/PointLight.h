@@ -2,6 +2,8 @@
 #include "IAnimated.h"
 #include "Model.h"
 #include "Light.h"
+#include "IToString.h"
+#include "IMovable.h"
 
 class PointLight : public Light, public Model, public IAnimated, public IMovable, public IToString
 {

@@ -16,6 +16,11 @@ private:
 	mutable ResizeInfo res_info;
 public:
 	ResizeInfo	GetResizeInfo() const noexcept { return res_info; }
+	ResizeInfo	ResetResizeInfo() const noexcept {
+		auto infoCopy = res_info;
+		ZeroResizeInfo(); 
+		return infoCopy;
+	}
 	void		ZeroResizeInfo() const noexcept { res_info.g_ResizeHeight = 0U; res_info.g_ResizeWidth = 0U; }
 protected:
 	virtual void SetResizeInfo(const ResizeInfo& rinfo) { res_info = rinfo; }

@@ -1,9 +1,9 @@
 #pragma once
 #include <DirectXMath.h>
 
-class IObject
+class ITransformable
 {
 public:
-	virtual ~IObject() = default;
+	virtual ~ITransformable() = default;
 	virtual DirectX::XMMATRIX GetTransform() const noexcept = 0;
 };

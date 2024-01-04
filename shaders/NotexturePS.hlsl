@@ -1,5 +1,3 @@
-#include "DefaultValues.hlsli"
-
 cbuffer MaterialDesc : register(b0)
 {
     bool useNormalMap;

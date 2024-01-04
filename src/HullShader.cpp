@@ -1,5 +1,6 @@
 #include "HullShader.h"
 #include "hrException.h"
+#include <d3dcompiler.h>
 
 HullShader::HullShader(Graphics& Gfx, const wchar_t* FileName)
 {

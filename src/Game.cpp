@@ -53,19 +53,19 @@ int Game::Start(int nCmdShow)
 			open = false;
 			return r.value();
 		}
-		UpdateFrame();
+		UpdateFrameForwardly();
 	}
 
 	return 0;
 }
 
-void Game::UpdateFrame()
+void Game::UpdateFrameForwardly()
 {
-	// Graphics
 	auto dt = timer.Check();
+	const float backgroundColor[4] = {0.05f, 0.05f, 0.05f , 1.f};
 
 	// Fill G-buffer
-	gfx->BeginGeometryPass(window.get());
+	gfx->BeginForwardFrame(window.get(), backgroundColor);
 	{
 		if (window->MouseCaptured())
 		{
@@ -97,6 +97,58 @@ void Game::UpdateFrame()
 				drawable->Draw(*gfx);
 		}
 
+		std::ranges::for_each(m_Models, [this](auto& model) {
+			model->Draw(*gfx);
+			});
+#pragma endregion OBJECTS_DRAW
+	}
+#ifndef _NOIMGUI
+	ShowItemsSubMenu();
+	cam.ShowControlWindow();
+	for (size_t i = 0; i < m_Models.size(); i++) {
+		m_Models[i]->ShowControlWindow(*gfx, m_Models[i]->GetName().append("##").append(std::to_string(i)));
+	}
+#endif
+	gfx->EndFrame();
+}
+
+void Game::UpdateFrameDefferdly()
+{
+	// Graphics
+	auto dt = timer.Check();
+
+	// Fill G-buffer
+	gfx->BeginGeometryPass(window.get());
+	{
+		if (window->MouseCaptured())
+		{
+			while (const auto deltaraw = window->ReadRawDelta())
+			{
+				cam.Rotate((float)deltaraw->rawX, (float)deltaraw->rawY);
+			}
+
+			if (window->GetKeyboard().IsKeyDown(BUTTON_W)) // forward
+				cam.Translate({ 0.0f,0.0f,dt });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_S))
+				cam.Translate({ 0.0f,0.0f,-dt });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_A))
+				cam.Translate({ -dt,0.0f,0.0f });
+			if (window->GetKeyboard().IsKeyDown(BUTTON_D))
+				cam.Translate({ dt,0.0f,0.0f });
+			if (window->GetKeyboard().IsKeyDown(VK_SPACE))
+				cam.Translate({ 0.0f,dt,0.0f });
+			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
+				cam.Translate({ 0.0f,-dt,0.0f });
+		}
+		if (std::optional<int> zDelta = window->ReadZDelta())
+			cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
+
+#pragma region OBJECTS_DRAW
+		for (auto& drawable : drawables)
+		{
+			if(drawable)
+				drawable->Draw(*gfx);
+		}
 		std::ranges::for_each(m_Models, [this](auto& model) {
 			model->Draw(*gfx);
 		});

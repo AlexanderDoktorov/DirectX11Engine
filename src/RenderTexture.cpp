@@ -6,11 +6,6 @@ RenderTexture::RenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT Text
     CreateRenderTextureImpl(GetDevice(Gfx), textureFormat, TextureHeight, TextureWidth);
 }
 
-RenderTexture::RenderTexture(Graphics& Gfx, const RenderTexture& otherTexture)
-{
-    CreateRenderTextureImpl(GetDevice(Gfx), otherTexture.GetDesc().Format, otherTexture.GetDesc().Height, otherTexture.GetDesc().Width);
-}
-
 void RenderTexture::CreateRenderTexture(Graphics& Gfx, DXGI_FORMAT textureFormat, UINT TextureHeight, UINT TextureWidth)
 {
     CreateRenderTextureImpl(GetDevice(Gfx), textureFormat, TextureHeight, TextureWidth);

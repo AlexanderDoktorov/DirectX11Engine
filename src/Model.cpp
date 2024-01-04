@@ -1,9 +1,8 @@
 #include "Model.h"
 #include "Timer.h"
+#include <ranges>
 
 // ********** Model **********
-
-#define ASYNC 1
 
 Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 {
@@ -20,7 +19,7 @@ Model::Model(Graphics& Gfx, const std::string& fileName, unsigned int aippFlags)
 	for (size_t i = 0; i < pScene->mNumMeshes; i++) {
 		auto aiMesh = pScene->mMeshes[i];
 		auto aiMaterial = pScene->mMaterials[aiMesh->mMaterialIndex];
-		m_MeshesPtrs.push_back(Mesh::Load(Gfx, aiMesh, aiMaterial, directory));
+		m_MeshesPtrs.push_back(std::make_unique<Mesh>(Gfx, aiMesh, aiMaterial, directory));
 	}
 
 	int StartId = 0;

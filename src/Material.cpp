@@ -6,8 +6,6 @@
 #include "DOK_assimp.h"
 #include <BindableSystem.h>
 
-#define SLOT_MATERIAL_DESC 0U
-
 std::shared_ptr<PixelConstantBuffer<MaterialDesc>> Material::sp_MaterialBuffer{};
 
 Material::Material(Graphics& Gfx, const aiMaterial* pMaterial, std::string materialDirectory) 
@@ -16,7 +14,7 @@ Material::Material(Graphics& Gfx, const aiMaterial* pMaterial, std::string mater
 	materialDirectory(materialDirectory)
 {
 	if (!sp_MaterialBuffer)
-		sp_MaterialBuffer = PixelConstantBuffer<MaterialDesc>::Resolve(Gfx, SLOT_MATERIAL_DESC);
+		sp_MaterialBuffer = PixelConstantBuffer<MaterialDesc>::Resolve(Gfx, SLOT_BUFFER_MATERIAL);
 	ProcessMaterial(Gfx, pMaterial);
 }
 

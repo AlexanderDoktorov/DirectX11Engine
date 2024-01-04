@@ -44,10 +44,10 @@ float4 main(in PS_INPUT input) : SV_Target0
     switch (lightParams.typeId)
     {
         case LIGHT_TYPE_POINT_LIGHT:
-            diff = Diffusate(fragWorldNormal, li.dirToL);
+            diff = DiffusePointLight(fragWorldNormal, li.dirToL);
             break;
         case LIGHT_TYPE_SPOTLIGHT:
-            diff = Diffusate(lightParams.spotlightDirection, li.dirToL, lightParams.spotlightAngle);
+            diff = DiffuseSpotlight(lightParams.spotlightDirection, li.dirToL, lightParams.spotlightAngle);
             break;
     }
     

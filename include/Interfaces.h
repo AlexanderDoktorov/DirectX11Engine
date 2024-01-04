@@ -4,7 +4,6 @@
 #include "IBindable.h"
 #include "IBlob.h"
 #include "IMovable.h"
-#include "IObject.h"
 #include "IRotatable.h"
 #include "IScalable.h"
 #include "IShader.h"

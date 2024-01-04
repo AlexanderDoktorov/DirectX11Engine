@@ -1,18 +1,22 @@
 #pragma once
 
-// Textures //
-#define SLOT_TEXTURE_DIFFUSE 0
-#define SLOT_TEXTURE_NORMALMAP 1
-#define SLOT_TEXTURE_SPECULAR 2
-#define SLOT_TEXTURE_HEIGHT 3
-#define SLOT_TEXTURE_SPECULAR_COLORED 4
+#pragma once
 
-#define SLOT_TEXTURE2D_ARRAY_DIFFUSE 4
-#define SLOT_TEXTURE2D_ARRAY_NORMALMAP 5
-#define SLOT_TEXTURE2D_ARRAY_SPECULAR 6
-#define SLOT_TEXTURE2D_ARRAY_HEIGHT 7
+#define t(slot) slot
+#define b(slot) slot
+#define s(slot) slot
+
+// Textures //
+#define SLOT_TEXTURE_DIFFUSE         t(0)
+#define SLOT_TEXTURE_NORMALMAP       t(1)
+#define SLOT_TEXTURE_SPECULAR        t(2)
+#define SLOT_TEXTURE_HEIGHT          t(3)
+#define SLOT_LIGHT_STRUCTURED_BUFFER t(4)
+
+#define SLOT_SAMPLER_LINEAR	 s(0)
 
 // Buffers //
-#define SLOT_TRANSFORM_BUFFER 0
-#define SLOT_MATERIAL_STRUCTURED_BUFFER 5
-#define SLOT_SAMPLER 0
+#define SLOT_BUFFER_SCENE				b(0)
+#define SLOT_TRANSFORM_BUFFER			b(0)
+#define SLOT_BUFFER_MATERIAL			b(1)
+#define SLOT_MATERIAL_STRUCTURED_BUFFER b(5)

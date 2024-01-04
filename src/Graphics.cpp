@@ -1,15 +1,20 @@
-#include "hrException.h"
 #include "Graphics.h"
+#include "hrException.h"
 #include "DOK_DX11.h"
 #include <algorithm>
 #include <assert.h>
+#include "imgui_impl_dx11.h"
+#include "SlotLayout.h"
+#include "DirectXWindow.h"
+#include "RenderTexture.h"
+#include "Sampler.h"
+#include "PixelShaderCommon.h"
+#include "VertexShaderCommon.h"
+#include "PixelConstantBuffer.h"
 
 #pragma comment(lib, "d3d11")
 
-Graphics::Graphics(HWND hwnd) : 
-    projection(dx::XMMATRIX()),
-    ImGuiEnabled(true),
-    IsRenderingToImGui(true)
+Graphics::Graphics(HWND hwnd)
 {
     // Set flags
     UINT device_flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
@@ -92,32 +97,58 @@ Graphics::Graphics(HWND hwnd) :
     p_Context->RSSetState(p_RSState.Get());
 
     // Create G-Buffer
-    PositionTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    NormalTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    AlbedoTexture           = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    SpecularTexture         = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R16G16B16A16_UNORM, rc.bottom - rc.top, rc.right - rc.left);
-    LightTexture            = std::make_unique<RenderTexture>(*this, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    pLinearSampler          = std::make_unique<Sampler>(*this);
-    
-    // Create render targets for textures
-    CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
-    CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
-    CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
-    CreateRTVForTexture(SpecularTexture.get(),   rtvSpecular);
-    CreateRTVForTexture(LightTexture.get(),      rtvLight);
+    defferedRenderer.Initilize(*this, rc);
 
-    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\LightPS.cso");
-    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*this,   L"shaders\\ScreenSpaceVS.cso");
-    pCombinePS              = std::make_unique<PixelShaderCommon>(*this,    L"shaders\\CombinePS.cso");
-
-    pPixelCameraBuffer      = std::make_unique<PixelConstantBuffer<dx::XMFLOAT4>>(*this);
+    p_SceneBuffer = std::make_unique<scene_buffer_type>(*this, SceneBuffer{}, SLOT_BUFFER_SCENE);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
 
-void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
+void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass, std::function<void()> _FLightPass)
 {
-    ResizeRenderTargetViews(pWnd);
+    ResizeInfo resInfo = pWnd->ResetResizeInfo();
+    if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
+        if (rendererType == RENDERER_TYPE_DEFFERED) {
+            defferedRenderer.OnResize(*this, pWnd->GetWndRect());
+        }
+        OnResize(pWnd->GetWndRect());
+    }
+
+    switch (rendererType)
+    {
+    case RENDERER_TYPE_DEFFERED:
+        BeginGeometryPass(pWnd);
+        if(_FGeomPass)
+            _FGeomPass();
+        EndGeometryPass();
+        BeginLightningPass();
+        if (_FLightPass)
+            _FLightPass();
+        EndLightningPass();
+        PerformCombinePass();
+        break;
+    case RENDERER_TYPE_FORWARD:
+    {
+        const float clear_color[4] = { 0.f,0.f,0.f,1.f };
+        BeginForwardFrame(pWnd, clear_color);
+        break;
+    }
+    [[unlikely]] 
+    case RENDERER_TYPE_MIXED:
+        break;
+    default:
+        break;
+    }
+
+}
+
+void Graphics::BeginGeometryPass(const window_type* pWnd)
+{
+    ResizeInfo resInfo = pWnd->ResetResizeInfo();
+    if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
+        defferedRenderer.OnResize(*this, pWnd->GetWndRect());
+        OnResize(pWnd->GetWndRect());
+    }
 
     if (ImGuiEnabled)
     {
@@ -129,99 +160,27 @@ void Graphics::BeginGeometryPass(const DirectXWindow* pWnd)
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get() };
-    
-    // Clear render targets
-    const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
-    for (size_t i = 0; i < ARRAYSIZE(rtvs); i++)
-    {
-        p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
-    }
-
-    p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
-    p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, g_mainDepthStencilView.Get());
+    defferedRenderer.BeginGeometryPass(*this);
 }
 
-void Graphics::EndGeometryPass() noexcept
+void Graphics::EndGeometryPass()
 {
-    ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-    p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
+    defferedRenderer.EndGeometryPass(*this);
 }
 
 void Graphics::BeginLightningPass()
 {
-    // Clear render target before fill the light info
-    const float light_clear[4] = { 0.f,0.f,0.f,0.f };
-    p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
-    // Set additive blending state to sum up results from all lights
-    SetAdditiveBlendingState();
-
-    // Bind shader resourses
-    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV() };
-    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
-    p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
-
-    // Bind CameraBuffer
-    const dx::XMFLOAT3 camPos = cam.GetPos();
-    pPixelCameraBuffer->Update(*this, dx::XMFLOAT4(camPos.x, camPos.y, camPos.z, 0.f));
-    pPixelCameraBuffer->Bind(*this);
-
-    // Bind shaders
-    pScreenSpaceVS->Bind(*this);
-    pLightPassPixelShader->Bind(*this);
-
-    // Bind linear sampler
-    pLinearSampler->Bind(*this);
+    defferedRenderer.BeginLightPass(*this);
 }
 
-void Graphics::EndLightningPass() noexcept
+void Graphics::EndLightningPass()
 {
-    // Unbind resourses
-    ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-    p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
-
-    // Unbind render targets
-    ID3D11RenderTargetView* nullRTV = nullptr;
-    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
-
-    // Unbind buffers
-    pPixelCameraBuffer->Unbind(*this);
-
-    // Unbind shaders
-    pScreenSpaceVS->Unbind(*this);
-    pLightPassPixelShader->Unbind(*this);
-
-    ResetBlendingState();
+    defferedRenderer.EndLightPass(*this);
 }
 
 void Graphics::PerformCombinePass()
 {
-
-    const float light_clear[4] = { 0.f,0.f,0.f,1.f };
-    
-    p_Context->IASetInputLayout(nullptr);
-    p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), light_clear);
-
-    ID3D11ShaderResourceView* srvs[2] = { AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
-
-    p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
-    p_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), nullptr);
-    pCombinePS->Bind(*this);
-    pScreenSpaceVS->Bind(*this);
-    Draw(3U);
-
-    // Unbind shader resourses
-    ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
-    p_Context->PSSetShaderResources(0U, 2U, nullSRV);
-
-    // Unbind render targets
-    ID3D11RenderTargetView* nullRTV = nullptr;
-    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
-
-    // Unbind shaders
-    pCombinePS->Unbind(*this);
-    pScreenSpaceVS->Unbind(*this);
+    defferedRenderer.PerformCombinePass(*this, g_mainRenderTargetView.GetAddressOf());
 }
 
 void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
@@ -234,9 +193,15 @@ void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
     ImGui::End();
 }
 
-void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
+void Graphics::BeginForwardFrame(const window_type* pWnd, const float clear_color[4])
 {
-    ResizeRenderTargetViews(pWnd);
+    ResizeInfo resInfo = pWnd->ResetResizeInfo();
+    if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
+        OnResize(pWnd->GetWndRect());
+    }
+
+    p_SceneBuffer->Update(*this, SceneBuffer(numLights, camera.GetPos()) );
+    p_SceneBuffer->Bind(*this);
 
     if (ImGuiEnabled)
     {
@@ -254,7 +219,6 @@ void Graphics::BeginFrame(const DirectXWindow* pWnd, const float clear_color[4])
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
 }
-
 
 void Graphics::EndFrame()
 {
@@ -300,9 +264,9 @@ void Graphics::EndFrame()
     }
 }
 
-void Graphics::DrawIndexed(UINT Count)
+void Graphics::DrawIndexed(UINT index_count)
 {
-    p_Context->DrawIndexed(Count, 0U, 0U);
+    p_Context->DrawIndexed(index_count, 0U, 0U);
 }
 
 void Graphics::Draw(UINT vertex_count)
@@ -320,28 +284,13 @@ Graphics::~Graphics()
     ImGui_ImplDX11_Shutdown();
 }
 
-void Graphics::RecreateMainViews(const UINT& width, const UINT& height)
+void Graphics::ResizeViews(const UINT& width, const UINT& height)
 {
     g_mainDepthStencilView.Reset();
     g_mainRenderTargetView.Reset();
     p_SwapChain->ResizeBuffers(0U, width, height, DXGI_FORMAT_UNKNOWN, 0);
     CreateDepthStencilView();
     CreateBackBufferView();
-}
-
-void Graphics::RecreateGBufferViews(const UINT& width, const UINT& height)
-{
-    PositionTexture->Resize(*this, height, width);
-    NormalTexture->Resize(*this, height, width);
-    AlbedoTexture->Resize(*this, height, width);
-    LightTexture->Resize(*this, height, width);
-    SpecularTexture->Resize(*this, height, width);
-
-    CreateRTVForTexture(PositionTexture.get(), rtvPosition);
-    CreateRTVForTexture(NormalTexture.get(), rtvNormal);
-    CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
-    CreateRTVForTexture(LightTexture.get(), rtvLight);
-    CreateRTVForTexture(SpecularTexture.get(), rtvSpecular);
 }
 
 void Graphics::CreateDepthStencilView()
@@ -437,56 +386,6 @@ wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D1
     return srv;
 }
 
-/*
-wrl::ComPtr<ID3D11ShaderResourceView> Graphics::MakeSRVFromRTV(wrl::ComPtr<ID3D11RenderTargetView> rtv)
-{
-    if (!rtv)
-        return nullptr;
-
-    // Get the description of the render target view
-    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-    rtv->GetDesc(&rtvDesc);
-    
-    if (rtvDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D)
-    {
-        ID3D11Texture2D* p_rtvResourse = nullptr;
-        rtv->GetResource(reinterpret_cast<ID3D11Resource**>(&p_rtvResourse));
-        if (!p_rtvResourse) {
-            return nullptr;
-        }
-
-        D3D11_TEXTURE2D_DESC textureDesc{};
-        p_rtvResourse->GetDesc(&textureDesc);
-        textureDesc.MipLevels = 1;
-        textureDesc.ArraySize = 1;
-        textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-        ID3D11Texture2D* pTexture = nullptr;
-        HRESULT hr = p_Device->CreateTexture2D(&textureDesc, nullptr, &pTexture);
-        if (FAILED(hr)) {
-            return nullptr;
-        }
-
-        // Create the shader resource view
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-        srvDesc.Format = textureDesc.Format;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.MipLevels = 1;
-
-        wrl::ComPtr<ID3D11ShaderResourceView> pSRV = nullptr;
-        hr = p_Device->CreateShaderResourceView(pTexture, &srvDesc, &pSRV); assert(SUCCEEDED(hr));
-
-        pTexture->Release();
-
-        return pSRV;
-    }
-
-    return nullptr;
-}
-*/
-
 wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p_Device, const ITexture2D* texture)
 {
     assert(texture->GetDesc().BindFlags | D3D11_BIND_RENDER_TARGET);
@@ -502,42 +401,45 @@ wrl::ComPtr<ID3D11RenderTargetView> Graphics::MakeRTVFromTexture(ID3D11Device* p
     return rtv;
 }
 
-void Graphics::ResizeRenderTargetViews(const DirectXWindow* pWnd)
+void Graphics::OnResize(const RECT& winRect)
 {
-    UINT w = pWnd->GetResizeInfo().g_ResizeWidth;
-    UINT h = pWnd->GetResizeInfo().g_ResizeHeight;
-    if (w != 0 && h != 0)
-    {
-        RecreateMainViews(w, h);
-        RecreateGBufferViews(w, h);
-        pWnd->ZeroResizeInfo();
-        RECT rc;
-        GetClientRect(pWnd->GetWnd(), &rc);
-        D3D11_VIEWPORT viewport = D3D11_VIEWPORT{
-            (FLOAT)rc.left,
-            (FLOAT)rc.top,
-            (FLOAT)(rc.right - rc.left),
-            (FLOAT)(rc.bottom - rc.top),
-            0.f,
-            1.f
-        };
-        p_Context->RSSetViewports(1U, &viewport);
-    }
+    long width = winRect.right - winRect.left;
+    long height = winRect.bottom - winRect.top;
+    ResizeViews(width, height);
+    D3D11_VIEWPORT viewport = D3D11_VIEWPORT{
+        (FLOAT)winRect.left,
+        (FLOAT)winRect.top,
+        (FLOAT)(width),
+        (FLOAT)(height),
+        0.f,
+        1.f
+    };
+    p_Context->RSSetViewports(1U, &viewport);
 }
 
 void Graphics::SetProjection(dx::XMMATRIX projection) noexcept
 {
-    this->projection = projection;
+    this->projectionMatrix = projection;
+}
+
+void Graphics::SetRendererType(RENDERER_TYPE rt) noexcept
+{
+    rendererType = rt;
 }
 
 dx::XMMATRIX Graphics::GetProjection() const noexcept
 {
-    return projection;
+    return projectionMatrix;
+}
+
+RENDERER_TYPE Graphics::GetRendererType() const noexcept
+{
+    return rendererType;
 }
 
 void Graphics::SetCamera(const Camera& new_cam)
 {
-    this->cam = new_cam;
+    camera = new_cam;
 }
 
 void Graphics::SetAdditiveBlendingState()
@@ -574,12 +476,142 @@ void Graphics::SetAdditiveBlendingState()
     p_Context->OMSetBlendState(p_BlendState.Get(), nullptr, UINT_MAX);
 }
 
-void Graphics::ResetBlendingState()
+void Graphics::ResetBlendingState() noexcept
 {
     p_Context->OMSetBlendState(nullptr, nullptr, UINT_MAX);
 }
 
 Camera Graphics::GetCamera() const
 {
-    return this->cam;
+    return camera;
+}
+
+                                                                                        /************ DefferedRenderer ************/
+                                                                                        /*||||||||||| DefferedRenderer |||||||||||*/
+                                                                                        /*VVVVVVVVVVV DefferedRenderer VVVVVVVVVVV*/
+
+void Graphics::DefferedRenderer::Initilize(Graphics& Gfx, const RECT& rc)
+{
+    // Create textures
+    PositionTexture         = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    NormalTexture           = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    AlbedoTexture           = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    LightTexture            = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+
+    // Create render targets for textures
+    Gfx.CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
+    Gfx.CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
+    Gfx.CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
+    Gfx.CreateRTVForTexture(SpecularTexture.get(),   rtvSpecular);
+    Gfx.CreateRTVForTexture(LightTexture.get(),      rtvLight);
+
+    // Create shaders
+    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(Gfx,  L"shaders\\LightPS.cso");
+    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\ScreenSpaceVS.cso");
+    pCombinePS              = std::make_unique<PixelShaderCommon>(Gfx,  L"shaders\\CombinePS.cso");
+
+    // Sampler
+    p_Sampler = Sampler::Resolve(Gfx);
+}
+
+void Graphics::DefferedRenderer::OnResize(Graphics& Gfx, const RECT& winRect)
+{
+    auto width = winRect.right - winRect.left;
+    auto height = winRect.bottom - winRect.top;
+    PositionTexture->Resize(Gfx, height, width);
+    NormalTexture->Resize(Gfx, height, width);
+    AlbedoTexture->Resize(Gfx, height, width);
+    LightTexture->Resize(Gfx, height, width);
+    SpecularTexture->Resize(Gfx, height, width);
+
+    Gfx.CreateRTVForTexture(PositionTexture.get(), rtvPosition);
+    Gfx.CreateRTVForTexture(NormalTexture.get(), rtvNormal);
+    Gfx.CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
+    Gfx.CreateRTVForTexture(LightTexture.get(), rtvLight);
+    Gfx.CreateRTVForTexture(SpecularTexture.get(), rtvSpecular);
+}
+void Graphics::DefferedRenderer::PerformCombinePass(Graphics& Gfx, ID3D11RenderTargetView** outputRtv) const
+{
+    auto& p_Context = Gfx.p_Context;
+    const float colorClear[4] = { 0.f,0.f,0.f,1.f };
+    p_Context->ClearRenderTargetView( *(outputRtv), colorClear);
+    p_Context->IASetInputLayout(nullptr);
+
+    ID3D11ShaderResourceView* srvs[2] = { AlbedoTexture->GetSRV(), LightTexture->GetSRV() };
+
+    p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
+    p_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    p_Context->OMSetRenderTargets(1U, outputRtv, nullptr);
+    pCombinePS->Bind(Gfx);
+    pScreenSpaceVS->Bind(Gfx);
+    p_Sampler->Bind(Gfx);
+    Gfx.Draw(3U);
+
+    // Unbind shader resourses
+    ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
+    p_Context->PSSetShaderResources(0U, 2U, nullSRV);
+
+    // Unbind render targets
+    ID3D11RenderTargetView* nullRTV = nullptr;
+    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
+}
+
+void Graphics::DefferedRenderer::BeginLightPass(Graphics& Gfx) const
+{
+    auto& p_Context = Gfx.p_Context;
+    // Clear render target before fill the light info
+    const float light_clear[4] = { 0.f,0.f,0.f,0.f };
+    p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
+    // Set additive blending state to sum up results from all lights
+    Gfx.SetAdditiveBlendingState();
+
+    // Bind shader resourses
+    ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV() };
+    p_Context->OMSetRenderTargets(1U, rtvLight.GetAddressOf(), nullptr);
+    p_Context->PSSetShaderResources(0U , ARRAYSIZE(srvs), srvs);
+
+    // Bind CameraBuffer
+    //Gfx.BindCameraBuffer();
+
+    // Bind shaders
+    pScreenSpaceVS->Bind(Gfx);
+    pLightPassPixelShader->Bind(Gfx);
+
+    // Bind linear sampler
+    p_Sampler->Bind(Gfx);
+}
+
+void Graphics::DefferedRenderer::EndLightPass(Graphics& Gfx) const
+{
+    auto& p_Context = Gfx.p_Context;
+    // Unbind resourses
+    ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+    p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
+
+    // Unbind render targets
+    ID3D11RenderTargetView* nullRTV = nullptr;
+    p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
+
+    Gfx.ResetBlendingState();
+}
+
+void Graphics::DefferedRenderer::BeginGeometryPass(Graphics& Gfx) noexcept
+{
+    ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get() };
+
+    // Clear render targets
+    const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
+    for (size_t i = 0; i < ARRAYSIZE(rtvs); i++) {
+        Gfx.p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
+    }
+
+    Gfx.p_Context->ClearDepthStencilView(Gfx.g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
+    Gfx.p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, Gfx.g_mainDepthStencilView.Get());
+}
+
+void Graphics::DefferedRenderer::EndGeometryPass(Graphics& Gfx) const noexcept
+{
+    ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+    Gfx.p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
 }

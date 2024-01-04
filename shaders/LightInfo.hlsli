@@ -53,13 +53,12 @@ float Speculate(float3 fragWorldNormal, float3 fragWorldPos, float3 camWorldPos,
     return pow(max(0.f, (dot(viewDir, reflect(-dirToL, fragWorldNormal)))), specularPower);
 }
 
-// diffAngle
-float Diffusate(float3 fragWorldNormal, float3 dirToL)
+float DiffusePointLight(float3 fragWorldNormal, float3 dirToL)
 {
     return max(0.0f, dot(dirToL, fragWorldNormal));
 }
 
-float Diffusate(float3 spotlightDirection, float3 dirToL, float spotlightAngle)
+float DiffuseSpotlight(float3 spotlightDirection, float3 dirToL, float spotlightAngle)
 {
     float theta = saturate(dot(spotlightDirection, dirToL));
     if (theta > cos(spotlightAngle))

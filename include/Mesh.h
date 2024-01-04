@@ -1,6 +1,6 @@
 #pragma once
 #include "Graphics.h"
-#include "HPipelineElements.h"
+#include "Drawable.h"
 #include "Material.h"
 #include "imgui.h"
 #include <assimp\mesh.h>
@@ -17,8 +17,6 @@ public:
 	Mesh(Mesh&& other) = default;
 	Mesh& operator=(Mesh&& other) = default;
 	~Mesh() = default;
-
-	static std::unique_ptr<Mesh> Load(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, std::string directory); 
 
 	bool ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept;
 	virtual void Draw(Graphics& Gfx, DirectX::FXMMATRIX rusultiveTransform) const;

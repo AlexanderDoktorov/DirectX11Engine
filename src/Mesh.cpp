@@ -1,6 +1,13 @@
 #include "Mesh.h"
 #include "hrException.h"
 #include "DataBufferPS.h"
+#include "VertexBuffer.h"
+#include "InputLayout.h"
+#include "Topology.h"
+#include "TransformBuffer.h"
+#include "PixelShaderCommon.h"
+#include "VertexShaderCommon.h"
+#include "Sampler.h"
 
 // ********** Mesh **********
 
@@ -86,11 +93,6 @@ void Mesh::Draw(Graphics& Gfx, DirectX::FXMMATRIX rusultTransform) const
 {
 	dx::XMStoreFloat4x4(&this->rusultiveTransform, rusultTransform); // set resultive transform
 	Drawable::Draw(Gfx);
-}
-
-std::unique_ptr<Mesh> Mesh::Load(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, std::string directory)
-{
-	return std::make_unique<Mesh>(Gfx, p_Mesh, p_aiMaterial, std::move(directory));
 }
 
 bool Mesh::ShowMeshGUI(Graphics& Gfx, std::string hash) noexcept

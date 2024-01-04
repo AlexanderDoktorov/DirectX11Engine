@@ -49,6 +49,15 @@
     <Filter Include="Файлы заголовков\Textures">
       <UniqueIdentifier>{34a67683-989e-4ff6-9ac1-5fd74471d83e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы ресурсов\Deffered">
+      <UniqueIdentifier>{a02da721-eb42-466d-b99a-3189b659281e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\Forward">
+      <UniqueIdentifier>{a7530ab1-dd8b-471e-8dc9-611578dbe44a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\Common">
+      <UniqueIdentifier>{a061bf80-3ecd-4942-b2ca-e12a35cf6ce5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -305,9 +314,6 @@
     <ClInclude Include="include\DrawableBase.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\HPipelineElements.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\IndexBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
@@ -350,7 +356,7 @@
     <ClInclude Include="include\Interfaces.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\IObject.h">
+    <ClInclude Include="include\ITransformable.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="include\IScalable.h">
@@ -496,57 +502,33 @@
     <None Include="game.config">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="shaders\DefaultValues.hlsli">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
     <None Include="cpp.hint">
       <Filter>Файлы указаний</Filter>
     </None>
     <None Include="shaders\LightInfo.hlsli">
-      <Filter>Файлы ресурсов</Filter>
+      <Filter>Файлы ресурсов\Common</Filter>
+    </None>
+    <None Include="shaders\MapsOperations.hlsli">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </None>
+    <None Include="shaders\SlotsLayout.hlsli">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </None>
+    <None Include="shaders\MaterialBuffer.hlsli">
+      <Filter>Файлы ресурсов\Common</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\CombinePS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DefaultVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\GeometryPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\GeometryTexturedPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\GeometryTexturedVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\GeometryVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\LightComputeShader.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\LightPS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\LightSourceVertexShader.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\SolidPS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\SolidVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\NormalTexturePS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\NormalTextureVS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="shaders\PS_DNS.hlsl">
@@ -557,6 +539,48 @@
     </FxCompile>
     <FxCompile Include="shaders\NotexturePS.hlsl">
       <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\CombinePS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\LightPS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalTexturePS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalTextureVS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryTexturedPS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\GeometryTexturedVS.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NormalVS.hlsl">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NotexVS.hlsl">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\TexturedVS.hlsl">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
+      <Filter>Файлы ресурсов\Common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffSpecularPS_deffered.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffNormalPS_forward.hlsl">
+      <Filter>Файлы ресурсов\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffSpecularPS_forward.hlsl">
+      <Filter>Файлы ресурсов\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffNormalSpecularPS_forward.hlsl">
+      <Filter>Файлы ресурсов\Forward</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
