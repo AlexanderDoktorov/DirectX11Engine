@@ -1,4 +1,4 @@
-#include "Graphics.h"
+﻿#include "Graphics.h"
 #include "hrException.h"
 #include "DOK_DX11.h"
 #include <algorithm>
@@ -11,6 +11,7 @@
 #include "PixelShaderCommon.h"
 #include "VertexShaderCommon.h"
 #include "PixelConstantBuffer.h"
+#include "Light.h"
 
 #pragma comment(lib, "d3d11")
 
@@ -104,49 +105,13 @@ Graphics::Graphics(HWND hwnd)
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
 
-void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass, std::function<void()> _FLightPass)
+void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass)
 {
     ResizeInfo resInfo = pWnd->ResetResizeInfo();
     if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
         if (rendererType == RENDERER_TYPE_DEFFERED) {
             defferedRenderer.OnResize(*this, pWnd->GetWndRect());
         }
-        OnResize(pWnd->GetWndRect());
-    }
-
-    switch (rendererType)
-    {
-    case RENDERER_TYPE_DEFFERED:
-        BeginGeometryPass(pWnd);
-        if(_FGeomPass)
-            _FGeomPass();
-        EndGeometryPass();
-        BeginLightningPass();
-        if (_FLightPass)
-            _FLightPass();
-        EndLightningPass();
-        PerformCombinePass();
-        break;
-    case RENDERER_TYPE_FORWARD:
-    {
-        const float clear_color[4] = { 0.f,0.f,0.f,1.f };
-        BeginForwardFrame(pWnd, clear_color);
-        break;
-    }
-    [[unlikely]] 
-    case RENDERER_TYPE_MIXED:
-        break;
-    default:
-        break;
-    }
-
-}
-
-void Graphics::BeginGeometryPass(const window_type* pWnd)
-{
-    ResizeInfo resInfo = pWnd->ResetResizeInfo();
-    if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
-        defferedRenderer.OnResize(*this, pWnd->GetWndRect());
         OnResize(pWnd->GetWndRect());
     }
 
@@ -160,27 +125,50 @@ void Graphics::BeginGeometryPass(const window_type* pWnd)
     if (IsRenderingToImGui)
         ImGui::DockSpaceOverViewport();
 
-    defferedRenderer.BeginGeometryPass(*this);
-}
+    p_SceneBuffer->Update(*this, SceneBuffer(static_cast<uint32_t>(m_Lights.size()), camera.GetPos()));
+    p_SceneBuffer->Bind(*this);
 
-void Graphics::EndGeometryPass()
-{
-    defferedRenderer.EndGeometryPass(*this);
-}
+    switch (rendererType)
+    {
+    case RENDERER_TYPE_DEFFERED:
+    {
+        // ↓↓↓↓ GEOMETRY PASS ↓↓↓↓
+        defferedRenderer.BeginGeometryPass(*this);
+        {
+            if(_FGeomPass)
+                _FGeomPass();
+            std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
+                if (Drawable* drawableLightSource = dynamic_cast<Drawable*>(lightSource.get()))
+                    drawableLightSource->Draw(*this);
+            });
+        }
+        defferedRenderer.EndGeometryPass(*this);
+        // ↓↓↓↓ LIGHT PASS ↓↓↓↓
+        defferedRenderer.BeginLightPass(*this);
+        {
+            std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
+                lightSource->Bind(*this);
+                Draw(3U);
+            });
+        }
+        defferedRenderer.EndLightPass(*this);
+        // ↓↓↓↓ COMINE PASS ↓↓↓↓
+        defferedRenderer.PerformCombinePass(*this, g_mainRenderTargetView.GetAddressOf());
+    }
+    break;
+    case RENDERER_TYPE_FORWARD:
+    {
+        const float clear_color[4] = { 0.f,0.f,0.f,1.f };
+        BeginForwardFrame(pWnd, clear_color);
+    }
+    break;
+    [[unlikely]] 
+    case RENDERER_TYPE_MIXED:
+        break;
+    default:
+        break;
+    }
 
-void Graphics::BeginLightningPass()
-{
-    defferedRenderer.BeginLightPass(*this);
-}
-
-void Graphics::EndLightningPass()
-{
-    defferedRenderer.EndLightPass(*this);
-}
-
-void Graphics::PerformCombinePass()
-{
-    defferedRenderer.PerformCombinePass(*this, g_mainRenderTargetView.GetAddressOf());
 }
 
 void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
@@ -195,29 +183,14 @@ void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
 
 void Graphics::BeginForwardFrame(const window_type* pWnd, const float clear_color[4])
 {
-    ResizeInfo resInfo = pWnd->ResetResizeInfo();
-    if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
-        OnResize(pWnd->GetWndRect());
-    }
-
-    p_SceneBuffer->Update(*this, SceneBuffer(numLights, camera.GetPos()) );
-    p_SceneBuffer->Bind(*this);
-
-    if (ImGuiEnabled)
-    {
-        ImGui_ImplDX11_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    if (IsRenderingToImGui)
-    {
-        ImGui::DockSpaceOverViewport();
-    }
-
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
+}
+
+void Graphics::AddLightSource(std::unique_ptr<Light> p_Light)
+{
+    m_Lights.push_back(std::move(p_Light));
 }
 
 void Graphics::EndFrame()

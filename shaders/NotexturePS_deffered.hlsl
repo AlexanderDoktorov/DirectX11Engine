@@ -1,19 +1,4 @@
-cbuffer MaterialDesc : register(b0)
-{
-    bool useNormalMap;
-    bool useDiffuseMap;
-    bool useHeightMap;
-    bool useSpecOnlyRed;
-    bool useSpecColored;
-    bool hasSpecularAlpha;
-    int illum;
-    float Ns; // shininess
-    float3 Kd; // reflected color diffuse
-    float3 Ks; // reflected color specular
-    float3 Ka; // reflected color ambient
-    float3 Ke; // color emissive 
-};
-
+#include "MaterialBuffer.hlsli"
 
 struct VS_OUT
 {
@@ -30,14 +15,14 @@ struct PSOutput
     float4 Specular : SV_TARGET3;
 };
 
-PSOutput main(VS_OUT ps_input)
+PSOutput ps_main(VS_OUT ps_input)
 {
     PSOutput output = (PSOutput) 0;
 
     output.wPosition    = ps_input.wPosition;
     output.wNormal      = float4(ps_input.wNormal, 0.f);
-    output.Albedo       = float4(Kd, 1.f);
-    output.Specular     = float4(Ks, Ns / 1000.f);
+    output.Albedo       = float4(matDesc.Kd, 1.f);
+    output.Specular     = float4(matDesc.Ks, matDesc.Ns / 1000.f);
     
     return output;
 }

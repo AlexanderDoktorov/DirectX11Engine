@@ -3,6 +3,7 @@
 #include "MaterialBuffer.hlsli"
 
 Texture2D DiffuseMap : register(SLOT_DIFFUSE_MAP);
+Texture2D NormalMap : register(SLOT_NORMAL_MAP);
 Texture2D SpecularMap : register(SLOT_SPECULAR_MAP);
 
 SamplerState sampleState : register(SLOT_SAMPLER_LINEAR);
@@ -12,6 +13,8 @@ struct VS_OUT
     float4 Position : SV_POSITION; // Position in homogeneous clip space
     float4 wPosition : POSITION0; // Vertex position in world space (for G-buffer)
     float3 wNormal : NORMAL0;
+    float3 wBitangent : BITANGENT0;
+    float3 wTangent : TANGENT0;
     float2 textCoord : TEXCOORD; // Texture coordinates
 };
 
@@ -48,6 +51,16 @@ PSOutput ps_main(VS_OUT ps_input)
     
     /* Normal map */
     output.wNormal = float4(ps_input.wNormal, 0.f);
+    if (matDesc.useNormalMap)
+    {
+        // build the tranform (rotation) into world space
+        const float3x3 tanToWorld = float3x3(
+            normalize(ps_input.wTangent),
+            normalize(ps_input.wBitangent),
+            normalize(ps_input.wNormal)
+        );
+        output.wNormal = float4(ApplyNormalMap(NormalMap.Sample(sampleState, ps_input.textCoord).xyz, tanToWorld), 0.f);
+    }
     
     /* Specular map */
     output.Specular = float4(matDesc.Ks, matDesc.Ns);

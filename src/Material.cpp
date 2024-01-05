@@ -21,21 +21,32 @@ Material::Material(Graphics& Gfx, const aiMaterial* pMaterial, std::string mater
 void Material::ProcessMaterial(Graphics& Gfx, const aiMaterial* pMaterial)
 {
 	using enum WICTexture::wicFlg;
-	mapLayout.hasDiffuseMap =  LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE,	SLOT_TEXTURE_DIFFUSE);
-	mapLayout.hasNormalMap	=  LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS,	SLOT_TEXTURE_NORMALMAP, WIC_FLAGS_IGNORE_SRGB);
-	mapLayout.hasHeightMap	=  LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT,	SLOT_TEXTURE_HEIGHT,    WIC_FLAGS_IGNORE_SRGB);
-
+	if (LoadMaterialTextures(Gfx, pMaterial, aiTextureType_DIFFUSE, SLOT_TEXTURE_DIFFUSE)) {
+		mapsFlags |= MAP_FLAG_DIFF;
+	}
+	if (LoadMaterialTextures(Gfx, pMaterial, aiTextureType_NORMALS, SLOT_TEXTURE_NORMALMAP, WIC_FLAGS_IGNORE_SRGB)) {
+		mapsFlags |= MAP_FLAG_NORMAL;
+	}
+	if (LoadMaterialTextures(Gfx, pMaterial, aiTextureType_HEIGHT, SLOT_TEXTURE_HEIGHT, WIC_FLAGS_IGNORE_SRGB)) {
+		mapsFlags |= MAP_FLAG_HEIGHT;
+	}
 	// Fill specular info
 	if (LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,	SLOT_TEXTURE_SPECULAR,  WIC_FLAGS_IGNORE_SRGB))
 	{
 		auto& p_SpecularTexture = m_Textures.back();
-		mapLayout.hasSpecularColorMap = p_SpecularTexture->GetFormat() == DXGI_FORMAT_B8G8R8A8_UNORM || p_SpecularTexture->GetFormat() == DXGI_FORMAT_R8G8B8A8_UNORM;
-		mapLayout.hasSpecularPowerMap = !mapLayout.hasSpecularColorMap; // if isn't colored -> it is only red channel map (probably)
-		mapLayout.hasSpecularAlpha	  = p_SpecularTexture->AlphaLoaded();
+		if (p_SpecularTexture->GetFormat() == DXGI_FORMAT_B8G8R8A8_UNORM || p_SpecularTexture->GetFormat() == DXGI_FORMAT_R8G8B8A8_UNORM) {
+			mapsFlags |= MAP_FLAG_SPEC_COLOR;
+		}
+		else {
+			mapsFlags |= MAP_FLAG_SPEC_POWER;
+		}
+		if (p_SpecularTexture->AlphaLoaded()) {
+			mapsFlags |= MAP_FLAG_SPEC_ALPHA;
+		}
 	}
 
 	// Fill material desc
-	matDesc.FillMapsInfo(mapLayout);
+	matDesc.FillMapsInfo(mapsFlags);
 	LoadMaterialProperties(pMaterial);
 }
 
@@ -49,23 +60,23 @@ bool Material::ShowMaterialGUI(bool* p_open)
 		return str.append("##").append(hash);
 	};
 
-	if(mapLayout.hasDiffuseMap)
+	if(mapsFlags & MAP_FLAG_DIFF)
 		changed |= ImGui::Checkbox(makeHashed("Use diffuse map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useDiffuseMap));
 	if(!matDesc.useDiffuseMap)
 		changed |= ImGui::ColorEdit3(makeHashed("Material albedo color", materialName).c_str(), &matDesc.Kd.x);
-	if(mapLayout.hasNormalMap)
+	if(mapsFlags & MAP_FLAG_NORMAL)
 		changed |= ImGui::Checkbox(makeHashed("Use normal map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useNormalMap));
-	if(mapLayout.hasSpecularPowerMap)
+	if(mapsFlags & MAP_FLAG_SPEC_POWER)
 		changed |= ImGui::Checkbox(makeHashed("Specular power map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useSpecOnlyRed));
-	if(mapLayout.hasSpecularColorMap)
+	if(mapsFlags & MAP_FLAG_SPEC_COLOR)
 		changed |= ImGui::Checkbox(makeHashed("Specular color map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useSpecColored));
 	
-	ImGui::TextColored(mapLayout.hasDiffuseMap ? yellow : red, "Diffuse map");
-	ImGui::TextColored(mapLayout.hasHeightMap ? yellow : red, "Height map");
-	ImGui::TextColored(mapLayout.hasNormalMap ? yellow : red, "Normal map");
-	ImGui::TextColored(mapLayout.hasSpecularPowerMap ? yellow : red, "Specular power map");
-	ImGui::TextColored(mapLayout.hasSpecularColorMap ? yellow : red, "Specular color map");
-	ImGui::TextColored(mapLayout.hasSpecularAlpha ? yellow : red, "Alpha used");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_DIFF ? yellow : red, "Diffuse map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_HEIGHT ? yellow : red, "Height map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_NORMAL ? yellow : red, "Normal map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_POWER ? yellow : red, "Specular power map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_COLOR ? yellow : red, "Specular color map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_ALPHA ? yellow : red, "Alpha used");
 	return changed;
 }
 
@@ -78,14 +89,14 @@ void Material::Bind(Graphics& Gfx) noexcept
 	sp_MaterialBuffer->Bind(Gfx);
 }
 
-MapLayout Material::GetMapLayout() const noexcept
+MAP_FLAG Material::GetMapsFlags() const noexcept
 {
-	return mapLayout;
+	return mapsFlags;
 }
 
 bool Material::HasAnyMaps() const noexcept
 {
-	return mapLayout.hasDiffuseMap || mapLayout.hasHeightMap || mapLayout.hasNormalMap || mapLayout.hasSpecularColorMap || mapLayout.hasSpecularPowerMap;
+	return mapsFlags != 0;
 }
 
 std::string Material::GetName() const noexcept

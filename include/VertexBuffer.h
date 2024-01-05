@@ -9,8 +9,8 @@ class VertexBuffer : public IBindable
 public:
 	VertexBuffer( Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf );
 
-	static std::string GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept;
-	static std::shared_ptr<VertexBuffer> Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept;
+	static std::string GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf);
+	static std::shared_ptr<VertexBuffer> Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf);
 
 	void Bind( Graphics& gfx ) noexcept override;
 

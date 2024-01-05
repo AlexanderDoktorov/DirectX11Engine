@@ -84,7 +84,7 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         // depends on: color of light, color of material, intensity of light, att, and lambertian
         const float3 diffuse = diffuseReflectiveColor * diff * lightDesc.diffuseIntensity * lightDesc.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
-        const float3 specular = specularReflectiveColor * spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
+        const float3 specular = specularReflectiveColor * diff * spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
         
         switch (matDesc.illum)
         {

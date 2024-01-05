@@ -19,6 +19,7 @@ class RenderTexture;
 class Sampler;
 class PixelShaderCommon;
 class VertexShaderCommon;
+class Light;
 template <class T> class PixelConstantBuffer;
 #pragma endregion forward_declarations
 
@@ -43,17 +44,12 @@ public:
 	Graphics(HWND hwnd);
 	void OnResize(const RECT& winRect);
 
-	void BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass = nullptr, std::function<void()> _FLightPass = nullptr);
-	void BeginGeometryPass(const window_type* pWnd);
-	void BeginLightningPass();
+	void BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass = nullptr);
 	void BeginForwardFrame(const window_type* pWnd, const float clear_color[4]);
-	void AddLightSource() noexcept;
+	void AddLightSource(std::unique_ptr<Light> p_Light);
 	void DrawIndexed(UINT index_count);
 	void Draw(UINT vertex_count);
-	void EndLightningPass();
-	void EndGeometryPass();
 	void EndFrame();
-	void PerformCombinePass();
 	void ResetBlendingState() noexcept;
 	void RenderToImGui(const bool& state);
 	void SetProjection(dx::XMMATRIX projection) noexcept;
@@ -82,7 +78,6 @@ private:
 	Camera			camera				= Camera();
 	bool			IsRenderingToImGui	= true;
 	bool			ImGuiEnabled		= true;
-	uint32_t		numLights			= 0;
 
 	wrl::ComPtr<ID3D11Device>			p_Device;
 	wrl::ComPtr<ID3D11DeviceContext>	p_Context;
@@ -90,6 +85,7 @@ private:
 	wrl::ComPtr<ID3D11RasterizerState>  p_RSState;
 	wrl::ComPtr<ID3D11BlendState>		p_BlendState;
 	std::unique_ptr<scene_buffer_type>	p_SceneBuffer;
+	std::vector<std::unique_ptr<Light>>	m_Lights;
 
 	wrl::ComPtr<ID3D11RenderTargetView>		g_mainRenderTargetView;
 	wrl::ComPtr<ID3D11DepthStencilView>		g_mainDepthStencilView;

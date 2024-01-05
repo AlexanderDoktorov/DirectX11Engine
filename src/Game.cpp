@@ -12,18 +12,13 @@ Game::Game()
 	window(std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW)),
 	gfx(std::make_unique<Graphics>(window->GetWnd()))
 {
+	gfx->SetRendererType(RENDERER_TYPE_DEFFERED);
 	// Lights
-	lightSources.push_back(std::make_unique<PointLight>(*gfx));
-	lightSources.push_back(std::make_unique<PointLight>(*gfx));
-	lightSources.push_back(std::make_unique<Spotlight>(*gfx));
+	gfx->AddLightSource(std::make_unique<PointLight>(*gfx));
+	gfx->AddLightSource(std::make_unique<PointLight>(*gfx));
+	//gfx->AddLightSource(std::make_unique<Spotlight>(*gfx));
 
 	LoadModels();
-
-	for (auto& lightsource : lightSources)
-	{
-		if(Drawable* drawableLightSource = dynamic_cast<Drawable*>(lightsource.get()))
-			drawables.push_back(drawableLightSource);
-	}
 
 #pragma region TEST
 #pragma endregion TEST
@@ -53,72 +48,30 @@ int Game::Start(int nCmdShow)
 			open = false;
 			return r.value();
 		}
-		UpdateFrameForwardly();
+		UpdateFrame();
 	}
 
 	return 0;
 }
 
-void Game::UpdateFrameForwardly()
+void Game::UpdateFrame()
 {
+	// Graphics
 	auto dt = timer.Check();
-	const float backgroundColor[4] = {0.05f, 0.05f, 0.05f , 1.f};
 
-	// Fill G-buffer
-	gfx->BeginForwardFrame(window.get(), backgroundColor);
-	{
-		if (window->MouseCaptured())
-		{
-			while (const auto deltaraw = window->ReadRawDelta())
-			{
-				cam.Rotate((float)deltaraw->rawX, (float)deltaraw->rawY);
-			}
-
-			if (window->GetKeyboard().IsKeyDown(BUTTON_W)) // forward
-				cam.Translate({ 0.0f,0.0f,dt });
-			if (window->GetKeyboard().IsKeyDown(BUTTON_S))
-				cam.Translate({ 0.0f,0.0f,-dt });
-			if (window->GetKeyboard().IsKeyDown(BUTTON_A))
-				cam.Translate({ -dt,0.0f,0.0f });
-			if (window->GetKeyboard().IsKeyDown(BUTTON_D))
-				cam.Translate({ dt,0.0f,0.0f });
-			if (window->GetKeyboard().IsKeyDown(VK_SPACE))
-				cam.Translate({ 0.0f,dt,0.0f });
-			if (window->GetKeyboard().IsKeyDown(VK_SHIFT))
-				cam.Translate({ 0.0f,-dt,0.0f });
-			if (std::optional<int> zDelta = window->ReadZDelta())
-				cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
-		}
-
-#pragma region OBJECTS_DRAW
+	const auto geomPass = [this]() {
 		for (auto& drawable : drawables)
 		{
 			if(drawable)
 				drawable->Draw(*gfx);
 		}
-
 		std::ranges::for_each(m_Models, [this](auto& model) {
 			model->Draw(*gfx);
-			});
-#pragma endregion OBJECTS_DRAW
-	}
-#ifndef _NOIMGUI
-	ShowItemsSubMenu();
-	cam.ShowControlWindow();
-	for (size_t i = 0; i < m_Models.size(); i++) {
-		m_Models[i]->ShowControlWindow(*gfx, m_Models[i]->GetName().append("##").append(std::to_string(i)));
-	}
-#endif
-	gfx->EndFrame();
-}
-
-void Game::UpdateFrameDefferdly()
-{
-	// Graphics
-	auto dt = timer.Check();
+		});
+	};
 
 	// Fill G-buffer
-	gfx->BeginGeometryPass(window.get());
+	gfx->BeginFrame(window.get(), geomPass);
 	{
 		if (window->MouseCaptured())
 		{
@@ -142,37 +95,7 @@ void Game::UpdateFrameDefferdly()
 		}
 		if (std::optional<int> zDelta = window->ReadZDelta())
 			cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
-
-#pragma region OBJECTS_DRAW
-		for (auto& drawable : drawables)
-		{
-			if(drawable)
-				drawable->Draw(*gfx);
-		}
-		std::ranges::for_each(m_Models, [this](auto& model) {
-			model->Draw(*gfx);
-		});
-#pragma endregion OBJECTS_DRAW
 	}
-	gfx->EndGeometryPass();
-
-	// Apply light
-	gfx->BeginLightningPass();
-	{
-		for (auto& lightsrc : lightSources)
-		{
-			if (lightsrc)
-			{
-				lightsrc->Bind(*gfx);
-				gfx->Draw(3U);
-			}
-		}
-	}
-	gfx->EndLightningPass();
-
-	// Combine textures
-	gfx->PerformCombinePass();
-
 #ifndef _NOIMGUI
 	ShowItemsSubMenu();
 	cam.ShowControlWindow();

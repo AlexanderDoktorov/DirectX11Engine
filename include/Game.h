@@ -18,8 +18,7 @@ public:
 	~Game();
 	int Start(int nCmdShow);
 private:
-	void UpdateFrameForwardly();
-	void UpdateFrameDefferdly();
+	void UpdateFrame();
 	void LoadModels();
 	void ShowControlWindow();
 	void ShowItemsSubMenu();

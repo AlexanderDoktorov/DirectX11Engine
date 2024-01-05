@@ -44,7 +44,6 @@ protected:
 public:
 	using data_type   = decltype(data);
 	using buffer_type = PixelConstantBuffer<data_type>;
-	static constexpr inline UINT light_desc_bind_slot = 1U;
 public:
 	Light(Graphics& Gfx, LIGHT_TYPE typeID);
 

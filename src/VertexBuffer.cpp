@@ -17,12 +17,12 @@ VertexBuffer::VertexBuffer(Graphics& gfx, std::string buff_tag, const DynamicVer
 	CHECK_EXPR_DEFINE_HR( GetDevice( gfx )->CreateBuffer( &bd,&sd,&pVertexBuffer ) );
 }
 
-std::string VertexBuffer::GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept
+std::string VertexBuffer::GenerateID(std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf)
 {
 	return std::string(typeid(VertexBuffer).name()).append(buff_tag).append("#").append(vbuf.GetLayout().GetCode());
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf) noexcept
+std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, std::string buff_tag, const DynamicVertex::VertexBuffer& vbuf)
 {
 	return BindableSystem::Resolve<VertexBuffer>(gfx, buff_tag, vbuf);
 }

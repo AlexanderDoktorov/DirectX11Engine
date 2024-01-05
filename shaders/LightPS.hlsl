@@ -1,4 +1,5 @@
 #include "LightInfo.hlsli"
+#include "SlotsLayout.hlsli"
 
 // Texture resources containing G-buffer data
 Texture2D<float4> GBufferPosition   : register(t0);
@@ -7,14 +8,15 @@ Texture2D<float4> GBufferAlbedo     : register(t2);
 Texture2D<float4> GBufferSpecular   : register(t3);
 SamplerState      sampleState       : register(s0);
 
-cbuffer CameraBuffer : register(b0)
+// INVALID
+cbuffer SceneBuffer : register(SLOT_BUFFER_SCENE)
 {
-    float3 worldCameraPosition;
-    float  padding[1];
+    uint numLights;
+    float3 worldCameraPos;
 };
 
 // Constant buffer for lighting parameters
-cbuffer LightingBuffer : register(b1)
+cbuffer LightingBuffer : register(SLOT_BUFFER_LIGHT)
 {
     LightDesc lightParams;
 };
@@ -55,14 +57,14 @@ float4 main(in PS_INPUT input) : SV_Target0
     const float3 specularReflectiveColor = fragSpecSample.rgb;
     const double specularPower           = fragSpecSample.a * 1000.f;
     
-    const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPosition, li.dirToL, specularPower);
+    const float spec = Speculate(fragWorldNormal, fragWorldPos, worldCameraPos, li.dirToL, specularPower);
     
     // depends on: ambient color of material and light ambient intensity
     const float3 ambient = ambientReflectiveColor * lightParams.ambientIntensity;
     // depends on: color of light, color of material, intensity of light, att, and lambertian
     const float3 diffuse = diffuseReflectiveColor * diff * lightParams.diffuseIntensity * lightParams.diffuseColor * att;
     // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
-    const float3 specular = specularReflectiveColor * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
+    const float3 specular = specularReflectiveColor * diff * spec * lightParams.specularIntensity * lightParams.diffuseColor * att;
     
     return float4(saturate(ambient + diffuse + specular), fragDiffuseColor.a); // Highlight on
 }

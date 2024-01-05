@@ -23,6 +23,8 @@ Mesh::Mesh(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, 
 	std::shared_ptr<VertexShaderCommon> vertexShader = nullptr;
 	DynamicVertex::VertexBuffer vertexBuffer;
 
+	MAP_FLAG mapFlags = p_MeshMaterial->GetMapsFlags();
+
 	if (!p_MeshMaterial->HasAnyMaps())
 	{
 		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
@@ -39,10 +41,37 @@ Mesh::Mesh(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, 
 		}
 
 		// Add shaders
-		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NotextureVS.cso");
-		AddBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\NotexturePS.cso"));
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NotexVS.cso");
+		AddDefferedBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\NotexturePS_deffered.cso"));
+		AddForwardBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\NotexturePS_forward.cso"));
 	}
-	else
+	else if(mapFlags & (MAP_FLAG_DIFF | MAP_FLAG_NORMAL | MAP_FLAG_SPEC))
+	{ // DiffNormalSpec case
+		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
+			DynamicVertex::VertexLayout{}
+			.Append(DynamicVertex::VertexLayout::Position3D)
+			.Append(DynamicVertex::VertexLayout::Normal)
+			.Append(DynamicVertex::VertexLayout::Texture2D)
+			.Append(DynamicVertex::VertexLayout::Tangent)
+			.Append(DynamicVertex::VertexLayout::Bitangent)
+		));
+
+		for (unsigned int i = 0; i < p_Mesh->mNumVertices; i++)
+		{
+			vertexBuffer.EmplaceBack(
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mVertices[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mNormals[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT2*>(&p_Mesh->mTextureCoords[0][i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mTangents[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mBitangents[i]))
+			);
+		}
+
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NormalVS.cso");
+		AddDefferedBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffNormalSpecularPS_deffered.cso"));
+		AddForwardBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffNormalSpecularPS_forward.cso"));
+	}
+	else if (mapFlags & (MAP_FLAG_DIFF | MAP_FLAG_NORMAL))
 	{
 		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
 			DynamicVertex::VertexLayout{}
@@ -64,8 +93,31 @@ Mesh::Mesh(Graphics& Gfx, const aiMesh* p_Mesh, const aiMaterial* p_aiMaterial, 
 			);
 		}
 
-		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NormalTextureVS.cso");
-		AddBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\NormalTexturePS.cso"));
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\NormalVS.cso");
+		AddDefferedBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffNormalPS_deffered.cso"));
+		AddForwardBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffNormalPS_forward.cso"));
+	}
+	else if (mapFlags & (MAP_FLAG_DIFF | MAP_FLAG_SPEC))
+	{
+		vertexBuffer = DynamicVertex::VertexBuffer(std::move(
+			DynamicVertex::VertexLayout{}
+			.Append(DynamicVertex::VertexLayout::Position3D)
+			.Append(DynamicVertex::VertexLayout::Normal)
+			.Append(DynamicVertex::VertexLayout::Texture2D)
+		));
+
+		for (unsigned int i = 0; i < p_Mesh->mNumVertices; i++)
+		{
+			vertexBuffer.EmplaceBack(
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mVertices[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT3*>(&p_Mesh->mNormals[i])),
+				*(reinterpret_cast<DirectX::XMFLOAT2*>(&p_Mesh->mTextureCoords[0][i]))
+			);
+		}
+
+		vertexShader = VertexShaderCommon::Resolve(Gfx, L"shaders\\AbnormalVS.cso");
+		AddDefferedBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffSpecularPS_deffered.cso"));
+		AddForwardBindable(PixelShaderCommon::Resolve(Gfx, L"shaders\\DiffSpecularPS_forward.cso"));
 	}
 	// Fill index buffer
 	std::vector<unsigned short> indices;

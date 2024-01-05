@@ -1,4 +1,6 @@
-cbuffer MaterialDesc : register(b0)
+#include "SlotsLayout.hlsli"
+
+cbuffer MaterialDesc : register(SLOT_BUFFER_MATERIAL)
 {   
     bool useNormalMap;
     bool useDiffuseMap;
@@ -14,12 +16,12 @@ cbuffer MaterialDesc : register(b0)
     float3 Ke;  // color emissive 
 };
 
-Texture2D DiffuseMap  : register(t0);
-Texture2D NormalMap   : register(t1);
-Texture2D SpecularMap : register(t2);
-Texture2D HeightMap   : register(t3);
+Texture2D DiffuseMap  : register(SLOT_DIFFUSE_MAP);
+Texture2D NormalMap   : register(SLOT_NORMAL_MAP);
+Texture2D SpecularMap : register(SLOT_SPECULAR_MAP);
+Texture2D HeightMap   : register(SLOT_HEIGHT_MAP);
 
-SamplerState sampleState : register(s0);
+SamplerState sampleState : register(SLOT_SAMPLER_LINEAR);
 
 struct VS_OUT
 {

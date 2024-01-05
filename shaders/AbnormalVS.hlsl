@@ -20,7 +20,7 @@ struct VS_OUT
     float2 textCoord : TEXCOORD; // Texture coordinates
 };
     
-VS_OUT main(VS_IN input)
+VS_OUT vs_main(VS_IN input)
 {
     VS_OUT output;
 

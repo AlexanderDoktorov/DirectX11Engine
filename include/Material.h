@@ -9,16 +9,22 @@
 
 namespace dx = DirectX;
 
-struct MapLayout
+enum MAP_FLAG : uint32_t
 {
-	bool hasNormalMap			: 1 = 0;  // 1 bit for NormalMap
-	bool hasDiffuseMap			: 1 = 0;  // 1 bit for DiffuseMap
-	bool hasHeightMap			: 1 = 0;  // 1 bit for HeightMap
-	bool hasSpecularPowerMap	: 1 = 0;  // 1 bit for SpecularPowerMap
-	bool hasSpecularColorMap	: 1 = 0;  // 1 bit for SpecularColorMap channel
-	bool hasSpecularAlpha		: 1 = 0;  // 1 bit for SpecularAlpha channel
-	// may add more maps
+	MAP_FLAG_DIFF		= 1 << 0,
+	MAP_FLAG_NORMAL		= 1 << 1,
+	MAP_FLAG_SPEC_POWER	= 1 << 2,
+	MAP_FLAG_SPEC_COLOR	= 1 << 3,
+	MAP_FLAG_SPEC_ALPHA	= 1 << 4,
+	MAP_FLAG_HEIGHT		= 1 << 5,
+	MAP_FLAG_SPEC		= MAP_FLAG_SPEC_POWER | MAP_FLAG_SPEC_COLOR,
 };
+
+static inline MAP_FLAG& operator|=(MAP_FLAG& lhs, MAP_FLAG rhs) {
+	using T = std::underlying_type_t<MAP_FLAG>;
+	lhs = static_cast<MAP_FLAG>(static_cast<T>(lhs) | static_cast<T>(rhs));
+	return lhs;
+}
 
 struct MaterialDesc
 {
@@ -36,14 +42,14 @@ struct MaterialDesc
 	alignas(16) dx::XMFLOAT3 Ke{}; //	color emissive 
 
 	MaterialDesc() = default;
-	void FillMapsInfo(const MapLayout& mapLayout) noexcept
+	void FillMapsInfo(const MAP_FLAG& mapsFlags) noexcept
 	{
-		useNormalMap	 = mapLayout.hasNormalMap;
-		useDiffuseMap	 = mapLayout.hasDiffuseMap;
-		useHeightMap	 = mapLayout.hasHeightMap;
-		useSpecOnlyRed	 = mapLayout.hasSpecularPowerMap;
-		useSpecColored	 = mapLayout.hasSpecularColorMap;
-		hasSpecularAlpha = mapLayout.hasSpecularAlpha;
+		useNormalMap	 = mapsFlags & MAP_FLAG_NORMAL;
+		useDiffuseMap	 = mapsFlags & MAP_FLAG_DIFF;
+		useHeightMap	 = mapsFlags & MAP_FLAG_HEIGHT;
+		useSpecOnlyRed	 = mapsFlags & MAP_FLAG_SPEC_POWER;
+		useSpecColored	 = mapsFlags & MAP_FLAG_SPEC_COLOR;
+		hasSpecularAlpha = mapsFlags & MAP_FLAG_SPEC_ALPHA;
 	}
 };
 
@@ -61,7 +67,7 @@ public:
 
 	virtual void Bind(Graphics& Gfx) noexcept override;
 	
-	MapLayout	 GetMapLayout() const noexcept;
+	MAP_FLAG	 GetMapsFlags() const noexcept;
 	bool		 HasAnyMaps() const noexcept;
 	std::string  GetName() const noexcept;
 	std::string  GetDirectory() const noexcept;
@@ -84,5 +90,5 @@ private:
 	MaterialDesc matDesc;
 	std::vector<std::shared_ptr<WICTexture>> m_Textures;
 	static std::shared_ptr<PixelConstantBuffer<MaterialDesc>> sp_MaterialBuffer;
-	MapLayout mapLayout;
+	MAP_FLAG mapsFlags{};
 };

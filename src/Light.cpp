@@ -1,4 +1,5 @@
 #include "Light.h"
+#include "SlotLayout.h"
 
 std::shared_ptr<Light::buffer_type> Light::pLightBuffer{};
 
@@ -6,7 +7,7 @@ Light::Light(Graphics& Gfx, LIGHT_TYPE typeID)
 { 
 	SetLightType(typeID);
 	if (!pLightBuffer)
-		pLightBuffer = buffer_type::Resolve(Gfx, data, light_desc_bind_slot);
+		pLightBuffer = buffer_type::Resolve(Gfx, data, SLOT_BUFFER_LIGHT);
 }
 
 void Light::Bind(Graphics& Gfx) noexcept

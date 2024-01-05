@@ -1,13 +1,9 @@
-#include "MapsOperations.hlsli"
 #include "LightInfo.hlsli"
 #include "SlotsLayout.hlsli"
 #include "MaterialBuffer.hlsli"
 
-Texture2D DiffuseMap                     : register(SLOT_DIFFUSE_MAP);
-Texture2D NormalMap                      : register(SLOT_NORMAL_MAP);
 StructuredBuffer<LightDesc> lightsBuffer : register(SLOT_LIGHT_STRUCTURED_BUFFER);
-
-SamplerState sampleState : register(SLOT_SAMPLER_LINEAR);
+SamplerState                sampleState  : register(SLOT_SAMPLER_LINEAR);
 
 cbuffer sceneBuffer : register(SLOT_BUFFER_SCENE)
 {
@@ -17,28 +13,15 @@ cbuffer sceneBuffer : register(SLOT_BUFFER_SCENE)
 
 struct VS_OUT
 {
-    float4 Position     : SV_POSITION;
-    float4 wPosition    : POSITION0;
-    float3 wNormal      : NORMAL0;
-    float3 wBitangent   : BITANGENT0;
-    float3 wTangent     : TANGENT0;
-    float2 textCoord    : TEXCOORD;
+    float4 Position : SV_POSITION;
+    float4 wPosition : POSITION0;
+    float3 wNormal : NORMAL0;
 };
 
 float4 ps_main(VS_OUT ps_input) : SV_TARGET0
 {
-    /* Normal map */
-    const float3x3 tanToWorld = float3x3(
-        normalize(ps_input.wTangent),
-        normalize(ps_input.wBitangent),
-        normalize(ps_input.wNormal)
-    );
-    const float3 fragWorldNormal = ApplyNormalMap(NormalMap.Sample(sampleState, ps_input.textCoord).xyz, tanToWorld);
-    const float3 fragWorldPosition = ps_input.wPosition.xyz;
-    const float4 fragDiffuseColor = DiffuseMap.Sample(sampleState, ps_input.textCoord);
-    
-    // Alpha test
-    AlphaTest(fragDiffuseColor.a);
+    const float3 fragWorldNormal    = ps_input.wNormal;
+    const float3 fragWorldPosition  = ps_input.wPosition.xyz;
     
     float3 resultiveColor = float3(0.0, 0.0, 0.0);
     for (uint i = 0; i < numLights; ++i)
@@ -61,14 +44,6 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
                 //ApplyDirectionalLight();
                 break;
         }
-        float3 diffuseReflectiveColor = matDesc.Kd;
-        if(matDesc.useDiffuseMap)
-        {
-            if(any(matDesc.Kd))
-                diffuseReflectiveColor *= fragDiffuseColor.rgb;
-            else
-                diffuseReflectiveColor = fragDiffuseColor.rgb;
-        }
         
         /* Specular */
         const float3 spec = Speculate(fragWorldNormal, fragWorldPosition, cameraWorldPosition, li.dirToL, matDesc.Ns); // as we don't have specular map Ns is specular power
@@ -76,9 +51,9 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         // depends on: ambient color of material and light ambient intensity
         const float3 ambient = matDesc.Ka * lightDesc.ambientIntensity;
         // depends on: color of light, color of material, intensity of light, att, and lambertian
-        const float3 diffuse = diffuseReflectiveColor * diff * lightDesc.diffuseIntensity * lightDesc.diffuseColor * att;
+        const float3 diffuse = matDesc.Kd * diff * lightDesc.diffuseIntensity * lightDesc.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
-        const float3 specular = matDesc.Ks * spec * diff * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
+        const float3 specular = matDesc.Ks * diff *spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
         
         switch (matDesc.illum)
         {
@@ -93,5 +68,5 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
                 break;
         }
     }
-    return float4(saturate(resultiveColor), fragDiffuseColor.a);
+    return float4(saturate(resultiveColor), 1.f);
 }

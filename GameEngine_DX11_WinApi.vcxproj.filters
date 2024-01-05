@@ -534,12 +534,6 @@
     <FxCompile Include="shaders\PS_DNS.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\NotextureVS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\NotexturePS.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
     <FxCompile Include="shaders\CombinePS.hlsl">
       <Filter>Файлы ресурсов\Deffered</Filter>
     </FxCompile>
@@ -564,7 +558,7 @@
     <FxCompile Include="shaders\NotexVS.hlsl">
       <Filter>Файлы ресурсов\Common</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\TexturedVS.hlsl">
+    <FxCompile Include="shaders\AbnormalVS.hlsl">
       <Filter>Файлы ресурсов\Common</Filter>
     </FxCompile>
     <FxCompile Include="shaders\ScreenSpaceVS.hlsl">
@@ -581,6 +575,18 @@
     </FxCompile>
     <FxCompile Include="shaders\DiffNormalSpecularPS_forward.hlsl">
       <Filter>Файлы ресурсов\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NotexturePS_deffered.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\NotexturePS_forward.hlsl">
+      <Filter>Файлы ресурсов\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffNormalSpecularPS_deffered.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DiffNormalPS_deffered.hlsl">
+      <Filter>Файлы ресурсов\Deffered</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
