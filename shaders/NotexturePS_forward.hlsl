@@ -1,4 +1,5 @@
 #include "LightInfo.hlsli"
+#include "MapsOperations.hlsli"
 #include "SlotsLayout.hlsli"
 #include "MaterialBuffer.hlsli"
 
@@ -9,6 +10,11 @@ cbuffer sceneBuffer : register(SLOT_BUFFER_SCENE)
 {
     uint numLights;
     float3 cameraWorldPosition;
+};
+
+cbuffer lightBuffer : register(SLOT_BUFFER_LIGHT)
+{
+    LightDesc lightParams;
 };
 
 struct VS_OUT
@@ -26,7 +32,7 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
     float3 resultiveColor = float3(0.0, 0.0, 0.0);
     for (uint i = 0; i < numLights; ++i)
     {
-        LightDesc lightDesc = lightsBuffer[i];
+        /* HARDCODED */ LightDesc lightDesc = lightParams; /* HARDCODED */
         LightInfo li = BuildLightInfo(lightDesc.worldPosition, fragWorldPosition);
         const float3 att = Attenuate(lightDesc.Catt, lightDesc.Latt, lightDesc.Qatt, li.distToL);
         
@@ -49,24 +55,13 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         const float3 spec = Speculate(fragWorldNormal, fragWorldPosition, cameraWorldPosition, li.dirToL, matDesc.Ns); // as we don't have specular map Ns is specular power
         
         // depends on: ambient color of material and light ambient intensity
-        const float3 ambient = matDesc.Ka * lightDesc.ambientIntensity;
+        const float3 ambient = ambient_default * lightDesc.ambientIntensity;
         // depends on: color of light, color of material, intensity of light, att, and lambertian
         const float3 diffuse = matDesc.Kd * diff * lightDesc.diffuseIntensity * lightDesc.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
         const float3 specular = matDesc.Ks * diff *spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
         
-        switch (matDesc.illum)
-        {
-            case 1:
-                resultiveColor += saturate(diffuse); // Color on and Ambient off
-                break;
-            case 2:
-                resultiveColor += saturate(ambient + diffuse); // Color on and Ambient on
-                break;
-            case 3:
-                resultiveColor += saturate(ambient + diffuse + specular); // Highlight on
-                break;
-        }
+        resultiveColor += ApplyIlluminationModel(matDesc.illum, ambient, diffuse, specular);
     }
     return float4(saturate(resultiveColor), 1.f);
 }

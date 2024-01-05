@@ -98,21 +98,21 @@ Graphics::Graphics(HWND hwnd)
     p_Context->RSSetState(p_RSState.Get());
 
     // Create G-Buffer
-    defferedRenderer.Initilize(*this, rc);
-
+    defferedRenderer.Initilize(this, rc);
     p_SceneBuffer = std::make_unique<scene_buffer_type>(*this, SceneBuffer{}, SLOT_BUFFER_SCENE);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
 }
 
-void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass)
+void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FDrawObjects)
 {
     ResizeInfo resInfo = pWnd->ResetResizeInfo();
     if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
-        if (rendererType == RENDERER_TYPE_DEFFERED) {
-            defferedRenderer.OnResize(*this, pWnd->GetWndRect());
+        RECT winRect = pWnd->GetWndRect();
+        if (rendererType == RENDERER_TYPE_DEFFERED || defferedRenderer.NeedsResizing(winRect)) {
+            defferedRenderer.OnResize(winRect);
         }
-        OnResize(pWnd->GetWndRect());
+        OnResize(winRect);
     }
 
     if (ImGuiEnabled)
@@ -133,42 +133,38 @@ void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FGeomP
     case RENDERER_TYPE_DEFFERED:
     {
         // ↓↓↓↓ GEOMETRY PASS ↓↓↓↓
-        defferedRenderer.BeginGeometryPass(*this);
+        defferedRenderer.BeginGeometryPass();
         {
-            if(_FGeomPass)
-                _FGeomPass();
+            if(_FDrawObjects)
+                _FDrawObjects();
             std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
                 if (Drawable* drawableLightSource = dynamic_cast<Drawable*>(lightSource.get()))
                     drawableLightSource->Draw(*this);
             });
         }
-        defferedRenderer.EndGeometryPass(*this);
+        defferedRenderer.EndGeometryPass();
         // ↓↓↓↓ LIGHT PASS ↓↓↓↓
-        defferedRenderer.BeginLightPass(*this);
+        defferedRenderer.BeginLightPass();
         {
             std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
                 lightSource->Bind(*this);
                 Draw(3U);
             });
         }
-        defferedRenderer.EndLightPass(*this);
-        // ↓↓↓↓ COMINE PASS ↓↓↓↓
-        defferedRenderer.PerformCombinePass(*this, g_mainRenderTargetView.GetAddressOf());
+        defferedRenderer.EndLightPass();
+        // ↓↓↓↓ COMBINE PASS ↓↓↓↓
+        defferedRenderer.PerformCombinePass(g_mainRenderTargetView.GetAddressOf());
     }
     break;
     case RENDERER_TYPE_FORWARD:
     {
         const float clear_color[4] = { 0.f,0.f,0.f,1.f };
         BeginForwardFrame(pWnd, clear_color);
+        if(_FDrawObjects)
+            _FDrawObjects();
     }
     break;
-    [[unlikely]] 
-    case RENDERER_TYPE_MIXED:
-        break;
-    default:
-        break;
     }
-
 }
 
 void Graphics::ShowRenderWindow(ID3D11ShaderResourceView* srv, bool* p_open)
@@ -186,6 +182,10 @@ void Graphics::BeginForwardFrame(const window_type* pWnd, const float clear_colo
     p_Context->ClearDepthStencilView(g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
     p_Context->OMSetRenderTargets(1U, g_mainRenderTargetView.GetAddressOf(), g_mainDepthStencilView.Get());
     p_Context->ClearRenderTargetView(g_mainRenderTargetView.Get(), clear_color);
+
+    std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
+        lightSource->Bind(*this);
+    });
 }
 
 void Graphics::AddLightSource(std::unique_ptr<Light> p_Light)
@@ -449,6 +449,28 @@ void Graphics::SetAdditiveBlendingState()
     p_Context->OMSetBlendState(p_BlendState.Get(), nullptr, UINT_MAX);
 }
 
+void Graphics::ShowControlWindow(const char* label)
+{
+    if (ImGui::Begin(label))
+    {
+        if (ImGui::BeginCombo("Render model", ToString(rendererType))) {
+            for (int i = 0; i < RENDERER_TYPE_MAX; ++i) {
+                bool isSelected = (rendererType == static_cast<RENDERER_TYPE>(i));
+                if (ImGui::Selectable(ToString(static_cast<RENDERER_TYPE>(i)), isSelected))
+                    rendererType = static_cast<RENDERER_TYPE>(i);
+
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus(); // Set the default focus to the currently selected item
+            }
+            ImGui::EndCombo();
+        }
+        std::for_each(m_Lights.begin(), m_Lights.end(), [this](std::unique_ptr<Light>& lightSource) {
+            lightSource->ShowLightGUI();
+        });
+    }
+    ImGui::End();
+}
+
 void Graphics::ResetBlendingState() noexcept
 {
     p_Context->OMSetBlendState(nullptr, nullptr, UINT_MAX);
@@ -463,50 +485,58 @@ Camera Graphics::GetCamera() const
                                                                                         /*||||||||||| DefferedRenderer |||||||||||*/
                                                                                         /*VVVVVVVVVVV DefferedRenderer VVVVVVVVVVV*/
 
-void Graphics::DefferedRenderer::Initilize(Graphics& Gfx, const RECT& rc)
+void Graphics::DefferedRenderer::Initilize(Graphics* pGfx, const RECT& rc)
 {
+    this->pGfx = pGfx;
     // Create textures
-    PositionTexture         = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    NormalTexture           = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
-    AlbedoTexture           = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
-    SpecularTexture         = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R16G16B16A16_UNORM, rc.bottom - rc.top, rc.right - rc.left);
-    LightTexture            = std::make_unique<RenderTexture>(Gfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    PositionTexture         = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    NormalTexture           = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);
+    AlbedoTexture           = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
+    SpecularTexture         = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R16G16B16A16_UNORM, rc.bottom - rc.top, rc.right - rc.left);
+    LightTexture            = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R8G8B8A8_UNORM,     rc.bottom - rc.top, rc.right - rc.left);
 
     // Create render targets for textures
-    Gfx.CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
-    Gfx.CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
-    Gfx.CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
-    Gfx.CreateRTVForTexture(SpecularTexture.get(),   rtvSpecular);
-    Gfx.CreateRTVForTexture(LightTexture.get(),      rtvLight);
+    pGfx->CreateRTVForTexture(PositionTexture.get(),   rtvPosition);
+    pGfx->CreateRTVForTexture(NormalTexture.get(),     rtvNormal);
+    pGfx->CreateRTVForTexture(AlbedoTexture.get(),     rtvAlbedo);
+    pGfx->CreateRTVForTexture(SpecularTexture.get(),   rtvSpecular);
+    pGfx->CreateRTVForTexture(LightTexture.get(),      rtvLight);
 
     // Create shaders
-    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(Gfx,  L"shaders\\LightPS.cso");
-    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(Gfx, L"shaders\\ScreenSpaceVS.cso");
-    pCombinePS              = std::make_unique<PixelShaderCommon>(Gfx,  L"shaders\\CombinePS.cso");
+    pLightPassPixelShader   = std::make_unique<PixelShaderCommon>(*pGfx,  L"shaders\\LightPS.cso");
+    pScreenSpaceVS          = std::make_unique<VertexShaderCommon>(*pGfx, L"shaders\\ScreenSpaceVS.cso");
+    pCombinePS              = std::make_unique<PixelShaderCommon>(*pGfx,  L"shaders\\CombinePS.cso");
 
     // Sampler
-    p_Sampler = Sampler::Resolve(Gfx);
+    p_Sampler = Sampler::Resolve(*pGfx);
 }
 
-void Graphics::DefferedRenderer::OnResize(Graphics& Gfx, const RECT& winRect)
+void Graphics::DefferedRenderer::OnResize(const RECT& winRect)
 {
-    auto width = winRect.right - winRect.left;
-    auto height = winRect.bottom - winRect.top;
-    PositionTexture->Resize(Gfx, height, width);
-    NormalTexture->Resize(Gfx, height, width);
-    AlbedoTexture->Resize(Gfx, height, width);
-    LightTexture->Resize(Gfx, height, width);
-    SpecularTexture->Resize(Gfx, height, width);
+    long width = winRect.right - winRect.left;
+    long height = winRect.bottom - winRect.top;
+    PositionTexture->Resize(*pGfx, height, width);
+    NormalTexture->Resize(*pGfx, height, width);
+    AlbedoTexture->Resize(*pGfx, height, width);
+    LightTexture->Resize(*pGfx, height, width);
+    SpecularTexture->Resize(*pGfx, height, width);
 
-    Gfx.CreateRTVForTexture(PositionTexture.get(), rtvPosition);
-    Gfx.CreateRTVForTexture(NormalTexture.get(), rtvNormal);
-    Gfx.CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
-    Gfx.CreateRTVForTexture(LightTexture.get(), rtvLight);
-    Gfx.CreateRTVForTexture(SpecularTexture.get(), rtvSpecular);
+    pGfx->CreateRTVForTexture(PositionTexture.get(), rtvPosition);
+    pGfx->CreateRTVForTexture(NormalTexture.get(), rtvNormal);
+    pGfx->CreateRTVForTexture(AlbedoTexture.get(), rtvAlbedo);
+    pGfx->CreateRTVForTexture(LightTexture.get(), rtvLight);
+    pGfx->CreateRTVForTexture(SpecularTexture.get(), rtvSpecular);
 }
-void Graphics::DefferedRenderer::PerformCombinePass(Graphics& Gfx, ID3D11RenderTargetView** outputRtv) const
+bool Graphics::DefferedRenderer::NeedsResizing(const RECT& winRect) const
 {
-    auto& p_Context = Gfx.p_Context;
+    long width = winRect.right - winRect.left;
+    long height = winRect.bottom - winRect.top;
+    auto textureDesc = PositionTexture->GetDesc();
+    return !(textureDesc.Height == height && textureDesc.Width == width);
+}
+void Graphics::DefferedRenderer::PerformCombinePass(ID3D11RenderTargetView** outputRtv) const
+{
+    auto& p_Context = pGfx->p_Context;
     const float colorClear[4] = { 0.f,0.f,0.f,1.f };
     p_Context->ClearRenderTargetView( *(outputRtv), colorClear);
     p_Context->IASetInputLayout(nullptr);
@@ -516,10 +546,10 @@ void Graphics::DefferedRenderer::PerformCombinePass(Graphics& Gfx, ID3D11RenderT
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(srvs), srvs);
     p_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     p_Context->OMSetRenderTargets(1U, outputRtv, nullptr);
-    pCombinePS->Bind(Gfx);
-    pScreenSpaceVS->Bind(Gfx);
-    p_Sampler->Bind(Gfx);
-    Gfx.Draw(3U);
+    pCombinePS->Bind(*pGfx);
+    pScreenSpaceVS->Bind(*pGfx);
+    p_Sampler->Bind(*pGfx);
+    pGfx->Draw(3U);
 
     // Unbind shader resourses
     ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
@@ -530,14 +560,14 @@ void Graphics::DefferedRenderer::PerformCombinePass(Graphics& Gfx, ID3D11RenderT
     p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
 }
 
-void Graphics::DefferedRenderer::BeginLightPass(Graphics& Gfx) const
+void Graphics::DefferedRenderer::BeginLightPass() const
 {
-    auto& p_Context = Gfx.p_Context;
+    auto& p_Context = pGfx->p_Context;
     // Clear render target before fill the light info
     const float light_clear[4] = { 0.f,0.f,0.f,0.f };
     p_Context->ClearRenderTargetView(rtvLight.Get(), light_clear);
     // Set additive blending state to sum up results from all lights
-    Gfx.SetAdditiveBlendingState();
+    pGfx->SetAdditiveBlendingState();
 
     // Bind shader resourses
     ID3D11ShaderResourceView* srvs[4] = { PositionTexture->GetSRV(), NormalTexture->GetSRV(), AlbedoTexture->GetSRV(), SpecularTexture->GetSRV() };
@@ -548,16 +578,16 @@ void Graphics::DefferedRenderer::BeginLightPass(Graphics& Gfx) const
     //Gfx.BindCameraBuffer();
 
     // Bind shaders
-    pScreenSpaceVS->Bind(Gfx);
-    pLightPassPixelShader->Bind(Gfx);
+    pScreenSpaceVS->Bind(*pGfx);
+    pLightPassPixelShader->Bind(*pGfx);
 
     // Bind linear sampler
-    p_Sampler->Bind(Gfx);
+    p_Sampler->Bind(*pGfx);
 }
 
-void Graphics::DefferedRenderer::EndLightPass(Graphics& Gfx) const
+void Graphics::DefferedRenderer::EndLightPass() const
 {
-    auto& p_Context = Gfx.p_Context;
+    auto& p_Context = pGfx->p_Context;
     // Unbind resourses
     ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     p_Context->PSSetShaderResources(0U, ARRAYSIZE(nullSRVs), nullSRVs);
@@ -566,25 +596,26 @@ void Graphics::DefferedRenderer::EndLightPass(Graphics& Gfx) const
     ID3D11RenderTargetView* nullRTV = nullptr;
     p_Context->OMSetRenderTargets(1U, &nullRTV, nullptr);
 
-    Gfx.ResetBlendingState();
+    pGfx->ResetBlendingState();
 }
 
-void Graphics::DefferedRenderer::BeginGeometryPass(Graphics& Gfx) noexcept
+void Graphics::DefferedRenderer::BeginGeometryPass() noexcept
 {
+    auto& p_Context = pGfx->p_Context;
     ID3D11RenderTargetView* rtvs[4] = { rtvPosition.Get(), rtvNormal.Get(), rtvAlbedo.Get(), rtvSpecular.Get() };
 
     // Clear render targets
     const float rtvClear [4] = { 0.f,0.f,0.f,0.f };
     for (size_t i = 0; i < ARRAYSIZE(rtvs); i++) {
-        Gfx.p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
+        p_Context->ClearRenderTargetView(rtvs[i], rtvClear);
     }
 
-    Gfx.p_Context->ClearDepthStencilView(Gfx.g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
-    Gfx.p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, Gfx.g_mainDepthStencilView.Get());
+    p_Context->ClearDepthStencilView(pGfx->g_mainDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0U);
+    p_Context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, pGfx->g_mainDepthStencilView.Get());
 }
 
-void Graphics::DefferedRenderer::EndGeometryPass(Graphics& Gfx) const noexcept
+void Graphics::DefferedRenderer::EndGeometryPass() const noexcept
 {
     ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-    Gfx.p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
+    pGfx->p_Context->OMSetRenderTargets(ARRAYSIZE(nullRTVs), nullRTVs, nullptr);
 }

@@ -8,4 +8,4 @@
 
 #define SLOT_BUFFER_SCENE    b0
 #define SLOT_BUFFER_MATERIAL b1
-#define SLOT_BUFFER_LIGHT    b1
+#define SLOT_BUFFER_LIGHT    b2

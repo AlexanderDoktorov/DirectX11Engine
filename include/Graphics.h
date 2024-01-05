@@ -27,8 +27,18 @@ enum RENDERER_TYPE
 {
 	RENDERER_TYPE_DEFFERED,
 	RENDERER_TYPE_FORWARD,
-	RENDERER_TYPE_MIXED // unused
+	RENDERER_TYPE_MAX // unused
 };
+
+constexpr const char* ToString(RENDERER_TYPE rt) noexcept
+{
+	switch (rt) 
+	{
+		case RENDERER_TYPE_DEFFERED: return "[RT] Deffered";
+		case RENDERER_TYPE_FORWARD:  return "[RT] Forward";
+	}
+	return "[RT] Undefined";
+}
 
 class Graphics
 {
@@ -43,19 +53,20 @@ class Graphics
 public:
 	Graphics(HWND hwnd);
 	void OnResize(const RECT& winRect);
+	Graphics& operator=(const Graphics& gfx) = default;
 
-	void BeginFrame(const window_type* pWnd, std::function<void()> _FGeomPass = nullptr);
+	void BeginFrame(const window_type* pWnd, std::function<void()> _FDrawObjects = nullptr);
 	void BeginForwardFrame(const window_type* pWnd, const float clear_color[4]);
 	void AddLightSource(std::unique_ptr<Light> p_Light);
 	void DrawIndexed(UINT index_count);
 	void Draw(UINT vertex_count);
 	void EndFrame();
-	void ResetBlendingState() noexcept;
 	void RenderToImGui(const bool& state);
 	void SetProjection(dx::XMMATRIX projection) noexcept;
 	void SetRendererType(RENDERER_TYPE rt) noexcept;
 	void SetCamera(const Camera& cam);
 	void SetAdditiveBlendingState();
+	void ShowControlWindow(const char* label);
 
 	Camera		  GetCamera() const;
 	dx::XMMATRIX  GetProjection() const noexcept;
@@ -68,6 +79,7 @@ public:
 	~Graphics();
 private:
 	void ResizeViews(const UINT& width, const UINT& height);
+	void ResetBlendingState() noexcept;
 	void CreateDepthStencilView();
 	void CreateBackBufferView();
 	void CreateRTVForTexture(const ITexture2D* texture, wrl::ComPtr<ID3D11RenderTargetView>& rtv);
@@ -93,14 +105,15 @@ private:
 	struct DefferedRenderer
 	{
 		DefferedRenderer() = default;
-		void Initilize(Graphics& Gfx, const RECT& rc);
-		void OnResize(Graphics& Gfx, const RECT& winRect);
+		void Initilize(Graphics* pGfx, const RECT& rc);
+		void OnResize(const RECT& winRect);
+		bool NeedsResizing(const RECT& winRect) const;
 		// Passes
-		void PerformCombinePass(Graphics& Gfx, ID3D11RenderTargetView** outputRtv) const;
-		void BeginLightPass(Graphics& Gfx) const;
-		void EndLightPass(Graphics& Gfx) const;
-		void BeginGeometryPass(Graphics& Gfx) noexcept;
-		void EndGeometryPass(Graphics& Gfx) const noexcept;
+		void PerformCombinePass(ID3D11RenderTargetView** outputRtv) const;
+		void BeginGeometryPass()	  noexcept;
+		void EndGeometryPass()	const noexcept;
+		void BeginLightPass()	const;
+		void EndLightPass()		const;
 
 		// Shaders
 		std::unique_ptr<PixelShaderCommon>		pCombinePS;
@@ -123,5 +136,7 @@ private:
 
 		// Sampler
 		std::shared_ptr<Sampler> p_Sampler;
+		// Parent
+		Graphics* pGfx = nullptr;
 	} defferedRenderer;
 };

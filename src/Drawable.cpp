@@ -19,10 +19,6 @@ void Drawable::Draw(Graphics& Gfx) const noexcept
 			p_Bind->Bind(Gfx);
 		});
 		break;
-	[[unlikely]] case RENDERER_TYPE_MIXED:
-		break;
-	default:
-		break;
 	}
 
 	std::for_each(m_Bindables.begin(), m_Bindables.end(), [&Gfx](auto& p_Bind) {

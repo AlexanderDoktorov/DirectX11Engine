@@ -12,7 +12,7 @@ Game::Game()
 	window(std::make_unique<DirectXWindow>(L"Game", WS_OVERLAPPEDWINDOW)),
 	gfx(std::make_unique<Graphics>(window->GetWnd()))
 {
-	gfx->SetRendererType(RENDERER_TYPE_DEFFERED);
+	gfx->SetRendererType(RENDERER_TYPE_FORWARD);
 	// Lights
 	gfx->AddLightSource(std::make_unique<PointLight>(*gfx));
 	gfx->AddLightSource(std::make_unique<PointLight>(*gfx));
@@ -59,19 +59,14 @@ void Game::UpdateFrame()
 	// Graphics
 	auto dt = timer.Check();
 
-	const auto geomPass = [this]() {
-		for (auto& drawable : drawables)
-		{
-			if(drawable)
-				drawable->Draw(*gfx);
-		}
+	const auto drawModels = [this]() {
 		std::ranges::for_each(m_Models, [this](auto& model) {
 			model->Draw(*gfx);
 		});
 	};
 
 	// Fill G-buffer
-	gfx->BeginFrame(window.get(), geomPass);
+	gfx->BeginFrame(window.get(), drawModels);
 	{
 		if (window->MouseCaptured())
 		{
@@ -102,6 +97,7 @@ void Game::UpdateFrame()
 	for (size_t i = 0; i < m_Models.size(); i++) {
 		m_Models[i]->ShowControlWindow(*gfx, m_Models[i]->GetName().append("##").append(std::to_string(i)));
 	}
+	gfx->ShowControlWindow("Graphics settings");
 #endif
 	gfx->EndFrame();
 }
