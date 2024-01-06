@@ -14,9 +14,7 @@ enum MAP_FLAG : uint32_t
 	MAP_FLAG_DIFF		= 1 << 0,
 	MAP_FLAG_NORMAL		= 1 << 1,
 	MAP_FLAG_SPEC		= 1 << 2,
-	MAP_FLAG_SPEC_COLOR	= 1 << 3,
-	MAP_FLAG_SPEC_ALPHA	= 1 << 4,
-	MAP_FLAG_HEIGHT		= 1 << 5,
+	MAP_FLAG_HEIGHT		= 1 << 3,
 };
 
 static inline MAP_FLAG& operator|=(MAP_FLAG& lhs, MAP_FLAG rhs) {
@@ -35,13 +33,6 @@ struct MaterialDesc
 	float		 Ns{}; // shininess
 	dx::XMFLOAT3 Ke{};
 	int32_t		 illum{3};
-
-	MaterialDesc() = default;
-	void FillMapsInfo(const MAP_FLAG& mapsFlags) noexcept
-	{
-		useSpecColored	 = mapsFlags & MAP_FLAG_SPEC_COLOR;
-		hasSpecularAlpha = mapsFlags & MAP_FLAG_SPEC_ALPHA;
-	}
 };
 
 class Material : public IBindable

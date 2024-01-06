@@ -36,15 +36,14 @@ void Material::ProcessMaterial(Graphics& Gfx, const aiMaterial* pMaterial)
 		mapsFlags |= MAP_FLAG_SPEC;
 		auto& p_SpecularTexture = m_Textures.back();
 		if (p_SpecularTexture->GetFormat() == DXGI_FORMAT_B8G8R8A8_UNORM || p_SpecularTexture->GetFormat() == DXGI_FORMAT_R8G8B8A8_UNORM) {
-			mapsFlags |= MAP_FLAG_SPEC_COLOR;
+			matDesc.useSpecColored = true;
 		}
 		if (p_SpecularTexture->AlphaLoaded()) {
-			mapsFlags |= MAP_FLAG_SPEC_ALPHA;
+			matDesc.hasSpecularAlpha = true;
 		}
 	}
 
 	// Fill material desc
-	matDesc.FillMapsInfo(mapsFlags);
 	LoadMaterialProperties(pMaterial);
 }
 
@@ -54,12 +53,13 @@ bool Material::ShowMaterialGUI(bool* p_open)
 	static constexpr ImVec4 red = {1.f,0.f,0.f,1.f};
 	static constexpr ImVec4 yellow = {1.f,1.f,0.f,1.f}; 
 
-	ImGui::TextColored(mapsFlags & MAP_FLAG_DIFF ? yellow : red, "Diffuse map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_DIFF   ? yellow : red, "Diffuse map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_HEIGHT ? yellow : red, "Height map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_NORMAL ? yellow : red, "Normal map");
-	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC ? yellow : red, "Specular map");
-	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_COLOR ? yellow : red, "Specular color map");
-	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_ALPHA ? yellow : red, "Alpha used");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC   ? yellow : red, "Specular map");
+
+	ImGui::TextColored(matDesc.useSpecColored      ? yellow : red, "Specular color map");
+	ImGui::TextColored(matDesc.hasSpecularAlpha    ? yellow : red, "Alpha used");
 	return changed;
 }
 
