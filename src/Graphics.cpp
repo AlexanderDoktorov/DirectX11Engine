@@ -98,7 +98,6 @@ Graphics::Graphics(HWND hwnd)
     p_Context->RSSetState(p_RSState.Get());
 
     // Create G-Buffer
-    defferedRenderer.Initilize(this, rc);
     p_SceneBuffer = std::make_unique<scene_buffer_type>(*this, SceneBuffer{}, SLOT_BUFFER_SCENE);
 
     ImGui_ImplDX11_Init(p_Device.Get(), p_Context.Get());
@@ -107,9 +106,9 @@ Graphics::Graphics(HWND hwnd)
 void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FDrawObjects)
 {
     ResizeInfo resInfo = pWnd->ResetResizeInfo();
+    RECT       winRect = pWnd->GetWndRect();
     if (resInfo.g_ResizeWidth != 0 && resInfo.g_ResizeHeight != 0) {
-        RECT winRect = pWnd->GetWndRect();
-        if (rendererType == RENDERER_TYPE_DEFFERED || defferedRenderer.NeedsResizing(winRect)) {
+        if (rendererType == RENDERER_TYPE_DEFFERED || (defferedRenderer.isInitilized && defferedRenderer.NeedsResizing(winRect))) {
             defferedRenderer.OnResize(winRect);
         }
         OnResize(winRect);
@@ -132,6 +131,9 @@ void Graphics::BeginFrame(const window_type* pWnd, std::function<void()> _FDrawO
     {
     case RENDERER_TYPE_DEFFERED:
     {
+        if (!defferedRenderer.isInitilized) {
+            defferedRenderer.Initilize(this, winRect);
+        }
         // ↓↓↓↓ GEOMETRY PASS ↓↓↓↓
         defferedRenderer.BeginGeometryPass();
         {
@@ -481,12 +483,15 @@ Camera Graphics::GetCamera() const
     return camera;
 }
 
-                                                                                        /************ DefferedRenderer ************/
-                                                                                        /*||||||||||| DefferedRenderer |||||||||||*/
-                                                                                        /*VVVVVVVVVVV DefferedRenderer VVVVVVVVVVV*/
+/********************************************/
+/*↓↓↓↓↓↓↓↓↓↓↓↓ DefferedRenderer ↓↓↓↓↓↓↓↓↓↓↓↓*/
+/********************************************/
 
 void Graphics::DefferedRenderer::Initilize(Graphics* pGfx, const RECT& rc)
 {
+    if (isInitilized)
+        return;
+    isInitilized = true;
     this->pGfx = pGfx;
     // Create textures
     PositionTexture         = std::make_unique<RenderTexture>(*pGfx, DXGI_FORMAT_R16G16B16A16_FLOAT, rc.bottom - rc.top, rc.right - rc.left);

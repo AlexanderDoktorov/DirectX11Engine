@@ -28,22 +28,11 @@ static const float specularMapWeigth = 1.f;
 PSOutput ps_main(VS_OUT ps_input)
 {
     PSOutput output = (PSOutput) 0;
+    const float4 fragDiffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
+    const float4 fragSpecularSample = SpecularMap.Sample(sampleState, ps_input.textCoord);
     
     /* Diffuse map */
-    output.Albedo = float4(matDesc.Kd, 1.f);
-    if (matDesc.useDiffuseMap)
-    {
-        float4 diffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
-        if (any(matDesc.Kd))
-        {
-            output.Albedo.rgb = matDesc.Kd * diffuseSample.rgb;
-            output.Albedo.a = diffuseSample.a;
-        }
-        else
-        {
-            output.Albedo = diffuseSample;
-        }
-    }
+    output.Albedo = float4(ApplyDiffuseMap(matDesc.Kd, fragDiffuseSample.rgb), fragDiffuseSample.a);
     AlphaTest(output.Albedo.a);
     
     /* Normal map */
@@ -51,19 +40,13 @@ PSOutput ps_main(VS_OUT ps_input)
     
     /* Specular map */
     output.Specular = float4(matDesc.Ks, matDesc.Ns);
-    if (matDesc.useSpecOnlyRed)
+    if (matDesc.useSpecColored)
     {
-        output.Specular.a *= SpecularMap.Sample(sampleState, ps_input.textCoord).r;
+        output.Specular = ApplySpecularColored(output.Specular, fragSpecularSample, matDesc.hasSpecularAlpha);
     }
-    else if (matDesc.useSpecColored)
+    else
     {
-        if (any(matDesc.Ks))
-            output.Specular.rgb *= SpecularMap.Sample(sampleState, ps_input.textCoord).rgb;
-        else
-            output.Specular.rgb = SpecularMap.Sample(sampleState, ps_input.textCoord).rgb;
-        
-        if (matDesc.hasSpecularAlpha)
-            output.Specular.a *= SpecularMap.Sample(sampleState, ps_input.textCoord).a;
+        output.Specular = ApplySpecularRed(output.Specular, fragSpecularSample);
     }
     output.Specular.a /= 1000.f;
     

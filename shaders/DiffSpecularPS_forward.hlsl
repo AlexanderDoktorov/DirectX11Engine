@@ -64,7 +64,7 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         if (matDesc.useSpecColored) {
             specularMapped = ApplySpecularColored(specularMapped, fragSpecularSample, matDesc.hasSpecularAlpha);
         }
-        else if (matDesc.useSpecOnlyRed) {
+        else {
             specularMapped = ApplySpecularRed(specularMapped, fragSpecularSample);
         }
         

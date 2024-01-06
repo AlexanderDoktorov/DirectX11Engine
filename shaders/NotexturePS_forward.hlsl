@@ -59,7 +59,7 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         // depends on: color of light, color of material, intensity of light, att, and lambertian
         const float3 diffuse = matDesc.Kd * diff * lightDesc.diffuseIntensity * lightDesc.diffuseColor * att;
         // depends on: specular color of material, Kspec, specular intesity of light, and color of light (color of light and specular color of material are blend)
-        const float3 specular = matDesc.Ks * diff *spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
+        const float3 specular = matDesc.Ks * diff * spec * lightDesc.specularIntensity * lightDesc.diffuseColor * att;
         
         resultiveColor += ApplyIlluminationModel(matDesc.illum, ambient, diffuse, specular);
     }

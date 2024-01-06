@@ -33,12 +33,10 @@ void Material::ProcessMaterial(Graphics& Gfx, const aiMaterial* pMaterial)
 	// Fill specular info
 	if (LoadMaterialTextures(Gfx, pMaterial, aiTextureType_SPECULAR,	SLOT_TEXTURE_SPECULAR,  WIC_FLAGS_IGNORE_SRGB))
 	{
+		mapsFlags |= MAP_FLAG_SPEC;
 		auto& p_SpecularTexture = m_Textures.back();
 		if (p_SpecularTexture->GetFormat() == DXGI_FORMAT_B8G8R8A8_UNORM || p_SpecularTexture->GetFormat() == DXGI_FORMAT_R8G8B8A8_UNORM) {
 			mapsFlags |= MAP_FLAG_SPEC_COLOR;
-		}
-		else {
-			mapsFlags |= MAP_FLAG_SPEC_POWER;
 		}
 		if (p_SpecularTexture->AlphaLoaded()) {
 			mapsFlags |= MAP_FLAG_SPEC_ALPHA;
@@ -56,25 +54,10 @@ bool Material::ShowMaterialGUI(bool* p_open)
 	static constexpr ImVec4 red = {1.f,0.f,0.f,1.f};
 	static constexpr ImVec4 yellow = {1.f,1.f,0.f,1.f}; 
 
-	auto makeHashed = [](std::string str, const std::string_view& hash) -> std::string {
-		return str.append("##").append(hash);
-	};
-
-	if(mapsFlags & MAP_FLAG_DIFF)
-		changed |= ImGui::Checkbox(makeHashed("Use diffuse map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useDiffuseMap));
-	if(!matDesc.useDiffuseMap)
-		changed |= ImGui::ColorEdit3(makeHashed("Material albedo color", materialName).c_str(), &matDesc.Kd.x);
-	if(mapsFlags & MAP_FLAG_NORMAL)
-		changed |= ImGui::Checkbox(makeHashed("Use normal map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useNormalMap));
-	if(mapsFlags & MAP_FLAG_SPEC_POWER)
-		changed |= ImGui::Checkbox(makeHashed("Specular power map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useSpecOnlyRed));
-	if(mapsFlags & MAP_FLAG_SPEC_COLOR)
-		changed |= ImGui::Checkbox(makeHashed("Specular color map", materialName).c_str(), reinterpret_cast<bool*>(&matDesc.useSpecColored));
-	
 	ImGui::TextColored(mapsFlags & MAP_FLAG_DIFF ? yellow : red, "Diffuse map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_HEIGHT ? yellow : red, "Height map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_NORMAL ? yellow : red, "Normal map");
-	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_POWER ? yellow : red, "Specular power map");
+	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC ? yellow : red, "Specular map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_COLOR ? yellow : red, "Specular color map");
 	ImGui::TextColored(mapsFlags & MAP_FLAG_SPEC_ALPHA ? yellow : red, "Alpha used");
 	return changed;

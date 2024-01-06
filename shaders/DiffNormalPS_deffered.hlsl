@@ -28,36 +28,19 @@ struct PSOutput
 PSOutput ps_main(VS_OUT ps_input)
 {
     PSOutput output = (PSOutput) 0;
+    const float4 fragDiffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
     
     /* Diffuse map */
-    output.Albedo = float4(matDesc.Kd, 1.f);
-    if (matDesc.useDiffuseMap)
-    {
-        float4 diffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
-        if (any(matDesc.Kd))
-        {
-            output.Albedo.rgb = matDesc.Kd * diffuseSample.rgb;
-            output.Albedo.a = diffuseSample.a;
-        }
-        else
-        {
-            output.Albedo = diffuseSample;
-        }
-    }
+    output.Albedo = float4(ApplyDiffuseMap(matDesc.Kd, fragDiffuseSample.rgb), fragDiffuseSample.a);
     AlphaTest(output.Albedo.a);
     
     /* Normal map */
-    output.wNormal = float4(ps_input.wNormal, 0.f);
-    if (matDesc.useNormalMap)
-    {
-        // build the tranform (rotation) into world space
-        const float3x3 tanToWorld = float3x3(
-            normalize(ps_input.wTangent),
-            normalize(ps_input.wBitangent),
-            normalize(ps_input.wNormal)
-        );
-        output.wNormal = float4(ApplyNormalMap(NormalMap.Sample(sampleState, ps_input.textCoord).xyz, tanToWorld), 0.f);
-    }
+    const float3x3 tanToWorld = float3x3(
+        normalize(ps_input.wTangent),
+        normalize(ps_input.wBitangent),
+        normalize(ps_input.wNormal)
+    );
+    output.wNormal = float4(ApplyNormalMap(NormalMap.Sample(sampleState, ps_input.textCoord).xyz, tanToWorld), 0.f);
     
     output.Specular = float4(matDesc.Ks, matDesc.Ns / 1000.f);
     output.wPosition = ps_input.wPosition;

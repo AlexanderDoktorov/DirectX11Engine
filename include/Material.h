@@ -13,11 +13,10 @@ enum MAP_FLAG : uint32_t
 {
 	MAP_FLAG_DIFF		= 1 << 0,
 	MAP_FLAG_NORMAL		= 1 << 1,
-	MAP_FLAG_SPEC_POWER	= 1 << 2,
+	MAP_FLAG_SPEC		= 1 << 2,
 	MAP_FLAG_SPEC_COLOR	= 1 << 3,
 	MAP_FLAG_SPEC_ALPHA	= 1 << 4,
 	MAP_FLAG_HEIGHT		= 1 << 5,
-	MAP_FLAG_SPEC		= MAP_FLAG_SPEC_POWER | MAP_FLAG_SPEC_COLOR,
 };
 
 static inline MAP_FLAG& operator|=(MAP_FLAG& lhs, MAP_FLAG rhs) {
@@ -28,26 +27,18 @@ static inline MAP_FLAG& operator|=(MAP_FLAG& lhs, MAP_FLAG rhs) {
 
 struct MaterialDesc
 {
-	BOOL useNormalMap		= FALSE;
-	BOOL useDiffuseMap		= FALSE;
-	BOOL useHeightMap		= FALSE;
-	BOOL useSpecOnlyRed		= FALSE;
-	BOOL useSpecColored		= FALSE;
-	BOOL hasSpecularAlpha	= FALSE;
-	int32_t		 illum{3};
+	dx::XMFLOAT3 Kd{};
+	BOOL useSpecColored	= FALSE;
+	dx::XMFLOAT3 Ks{};
+	BOOL hasSpecularAlpha = FALSE;
+	dx::XMFLOAT3 Ka{};
 	float		 Ns{}; // shininess
-	alignas(16) dx::XMFLOAT3 Kd{}; // reflected color diffuse
-	alignas(16) dx::XMFLOAT3 Ks{}; // reflected color specular
-	alignas(16) dx::XMFLOAT3 Ka{}; // reflected color ambient
-	alignas(16) dx::XMFLOAT3 Ke{}; //	color emissive 
+	dx::XMFLOAT3 Ke{};
+	int32_t		 illum{3};
 
 	MaterialDesc() = default;
 	void FillMapsInfo(const MAP_FLAG& mapsFlags) noexcept
 	{
-		useNormalMap	 = mapsFlags & MAP_FLAG_NORMAL;
-		useDiffuseMap	 = mapsFlags & MAP_FLAG_DIFF;
-		useHeightMap	 = mapsFlags & MAP_FLAG_HEIGHT;
-		useSpecOnlyRed	 = mapsFlags & MAP_FLAG_SPEC_POWER;
 		useSpecColored	 = mapsFlags & MAP_FLAG_SPEC_COLOR;
 		hasSpecularAlpha = mapsFlags & MAP_FLAG_SPEC_ALPHA;
 	}

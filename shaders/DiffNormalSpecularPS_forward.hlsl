@@ -40,7 +40,7 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
     );
     const float3 fragWorldNormal    = ApplyNormalMap(NormalMap.Sample(sampleState, ps_input.textCoord).xyz, tanToWorld);
     const float3 fragWorldPosition  = ps_input.wPosition.xyz;
-    const float4 fragDiffuseSample = DiffuseMap.Sample(sampleState, ps_input.textCoord);
+    const float4 fragDiffuseSample  = DiffuseMap.Sample(sampleState, ps_input.textCoord);
     const float4 fragSpecularSample = SpecularMap.Sample(sampleState, ps_input.textCoord);
     
     // Alpha test
@@ -73,10 +73,9 @@ float4 ps_main(VS_OUT ps_input) : SV_TARGET0
         if(matDesc.useSpecColored) {
             specularMapped = ApplySpecularColored( specularMapped, fragSpecularSample, matDesc.hasSpecularAlpha );
         }
-        else if(matDesc.useSpecOnlyRed) {
+        else {
             specularMapped = ApplySpecularRed(specularMapped, fragSpecularSample);
         }
-         
         
         const float3 spec = Speculate(fragWorldNormal, fragWorldPosition, cameraWorldPosition, li.dirToL, specularMapped.a);
         

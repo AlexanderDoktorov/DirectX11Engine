@@ -138,5 +138,6 @@ private:
 		std::shared_ptr<Sampler> p_Sampler;
 		// Parent
 		Graphics* pGfx = nullptr;
+		bool isInitilized = false;
 	} defferedRenderer;
 };

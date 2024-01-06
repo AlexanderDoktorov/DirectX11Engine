@@ -2,18 +2,14 @@
 
 struct MaterialDesc
 {
-    bool useNormalMap;
-    bool useDiffuseMap;
-    bool useHeightMap;
-    bool useSpecOnlyRed;
+    float3 Kd;
     bool useSpecColored;
+    float3 Ks;
     bool hasSpecularAlpha;
+    float3 Ka;
+    float Ns;
+    float3 Ke;
     int illum;
-    float Ns; // shininess
-    float3 Kd; // reflected color diffuse
-    float3 Ks; // reflected color specular
-    float3 Ka; // reflected color ambient
-    float3 Ke; // color emissive 
 };
 
 cbuffer materialBuffer : register(SLOT_BUFFER_MATERIAL)
