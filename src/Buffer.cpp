@@ -85,14 +85,13 @@ namespace buffer
 		return bytes.size();
 	}
 
-
 	// ↓ PixelConstantBufferEx
-	PixelConstantBufferEx::PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot = 0U)
+	PixelConstantBufferEx::PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot)
 		:
 		Slotted(bindSlot)
 	{
 		D3D11_BUFFER_DESC CBDesc = {};
-		CBDesc.ByteWidth = buff.GetByteSize();
+		CBDesc.ByteWidth = static_cast<UINT>(buff.GetByteSize());
 		CBDesc.Usage = D3D11_USAGE_DYNAMIC;
 		CBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;

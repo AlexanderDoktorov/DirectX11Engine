@@ -68,7 +68,7 @@ namespace buffer
 	concept Defined = reverse_map<T>::is_defined && map<reverse_map<T>::t>::is_defined;
 
 	template <typename Tgt, typename Src>
-	concept NoNarrowConvertive = requires (Src s) { Tgt{s}; }
+	concept NoNarrowConvertive = requires (Src s) { Tgt{ s }; };
 
 	static constexpr const char* TypeStr(TYPE t) noexcept
 	{
@@ -144,7 +144,7 @@ namespace buffer
 
 	class FieldProxy
 	{
-		friend Buffer;
+		friend class Buffer;
 	public:
 		FieldProxy() = default;
 		FieldProxy(std::string_view semantic);
@@ -221,6 +221,6 @@ namespace buffer
 		PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot = 0U);
 		void Bind(Graphics& Gfx) noexcept override;
 	private:
-		Microsoft::WRL::ComPtr<class ID3D11Buffer> pBuffer;
+		Microsoft::WRL::ComPtr<struct ID3D11Buffer> pBuffer;
 	};
 }
