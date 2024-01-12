@@ -58,6 +58,9 @@
     <Filter Include="Файлы ресурсов\Common">
       <UniqueIdentifier>{a061bf80-3ecd-4942-b2ca-e12a35cf6ce5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Buffers">
+      <UniqueIdentifier>{84b2ce17-a00a-44be-a1ee-a68dfbe7a488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\backend\imgui_impl_dx11.cpp">
@@ -138,15 +141,6 @@
     <ClCompile Include="src\ISlot.cpp">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="src\VertexBuffer.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TransformBufferPS.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TransformBuffer.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="src\Blob.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
@@ -172,9 +166,6 @@
       <Filter>DOK</Filter>
     </ClCompile>
     <ClCompile Include="src\Vertex.cpp">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="src\IndexBuffer.cpp">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="src\InputLayout.cpp">
@@ -203,6 +194,27 @@
     </ClCompile>
     <ClCompile Include="src\TextureBase.cpp">
       <Filter>Файлы заголовков\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Testing.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseException.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IndexBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TransformBufferPS.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VertexBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Buffer.cpp">
+      <Filter>Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,40 +317,19 @@
     <ClInclude Include="include\Blob.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\ConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\Drawable.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\DrawableBase.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="include\IndexBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\InputLayout.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PixelConstantBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ResourseBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\Sampler.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\Topology.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TransformBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VertexBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VertexConstantBuffer.h">
       <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IAnimated.h">
@@ -392,17 +383,8 @@
     <ClInclude Include="include\Light.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\TransformBufferPS.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataBufferPS.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="include\IRotatable.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="include\StructuredBuffer.h">
-      <Filter>Файлы заголовков\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="include\IShaderResourse.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
@@ -455,9 +437,6 @@
     <ClInclude Include="include\IGetID.h">
       <Filter>Файлы заголовков\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="include\IBuffer.h">
-      <Filter>Файлы заголовков\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="include\DOK_assimp.h">
       <Filter>DOK</Filter>
     </ClInclude>
@@ -496,6 +475,45 @@
     </ClInclude>
     <ClInclude Include="include\ITexture2D.h">
       <Filter>Файлы заголовков\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Testing.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ConstantBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataBufferPS.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IndexBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PixelConstantBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourseBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StructuredBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransformBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransformBufferPS.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexConstantBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Buffer.h">
+      <Filter>Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

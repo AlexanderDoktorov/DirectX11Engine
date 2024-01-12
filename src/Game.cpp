@@ -19,10 +19,6 @@ Game::Game()
 	//gfx->AddLightSource(std::make_unique<Spotlight>(*gfx));
 
 	LoadModels();
-
-#pragma region TEST
-#pragma endregion TEST
-
 	LoadConfigurationFile("./game.config");
 }
 

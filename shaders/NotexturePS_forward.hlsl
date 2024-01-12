@@ -19,9 +19,9 @@ cbuffer lightBuffer : register(SLOT_BUFFER_LIGHT)
 
 struct VS_OUT
 {
-    float4 Position : SV_POSITION;
+    float4 Position  : SV_POSITION;
     float4 wPosition : POSITION0;
-    float3 wNormal : NORMAL0;
+    float3 wNormal   : NORMAL0;
 };
 
 float4 ps_main(VS_OUT ps_input) : SV_TARGET0

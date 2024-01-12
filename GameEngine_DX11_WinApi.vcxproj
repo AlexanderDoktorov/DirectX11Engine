@@ -254,7 +254,9 @@
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\baseException.cpp" />
     <ClCompile Include="src\Blob.cpp" />
+    <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\DirectXWindow.cpp" />
@@ -283,6 +285,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\Node.cpp" />
+    <ClCompile Include="src\Testing.cpp" />
     <ClCompile Include="src\TextureBase.cpp" />
     <ClCompile Include="src\WICTexture.cpp" />
     <ClCompile Include="src\PixelShader.cpp" />
@@ -305,6 +308,7 @@
     <ClInclude Include="include\BaseWindow.h" />
     <ClInclude Include="include\BindableSystem.h" />
     <ClInclude Include="include\Blob.h" />
+    <ClInclude Include="include\Buffer.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />
@@ -361,6 +365,7 @@
     <ClInclude Include="include\Node.h" />
     <ClInclude Include="include\Spotlight.h" />
     <ClInclude Include="include\Techique.h" />
+    <ClInclude Include="include\Testing.h" />
     <ClInclude Include="include\XSResourse.h" />
     <ClInclude Include="include\TextureBase.h" />
     <ClInclude Include="include\WICTexture.h" />

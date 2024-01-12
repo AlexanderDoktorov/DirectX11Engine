@@ -5,29 +5,11 @@
 class baseException
 {
 public:
-	baseException(int codeLine, const char* codeFileName) noexcept
-		: 
-		codeLine(codeLine),
-		codeFileName(codeFileName)
-	{
+	baseException(int codeLine, std::string_view codeFileName) noexcept;
 
-	}
-
-	int GetLine() const noexcept
-	{
-		return codeLine;
-	}
-
-	std::string GetFileName() const noexcept
-	{
-		return codeFileName;
-	}
-
-	virtual std::string what() const
-	{
-		using namespace std::string_literals;
-		return "[File] "s + codeFileName + " [Line] "s + std::to_string(codeLine);
-	}
+	int					GetLine()		const noexcept;
+			std::string GetFileName()	const noexcept;
+	virtual std::string what()			const;
 
 private:
 	int codeLine = -1;

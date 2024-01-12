@@ -8,6 +8,7 @@
 #endif _DEBUG
 
 #include "Logger.h"
+#include "Testing.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
 {
@@ -17,6 +18,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 	try
 	{
+		DoTest();
+
 		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED); CHECK_HR(hr);
 		Game game = Game();
 		auto val =  game.Start(nCmdShow);
