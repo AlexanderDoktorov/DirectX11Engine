@@ -13,7 +13,6 @@ protected:
 
 struct IBindable : virtual public GraphicsChild
 {
-public:
 	IBindable() = default;
 	virtual ~IBindable() = default;
 	virtual void Bind(Graphics& Gfx) noexcept = 0;
@@ -21,7 +20,6 @@ public:
 
 struct IUnbindable : virtual public GraphicsChild
 {
-public:
 	virtual ~IUnbindable() = default;
 	virtual void Unbind(Graphics& Gfx) noexcept = 0;
 };

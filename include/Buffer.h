@@ -1,20 +1,18 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <unordered_map>
 #include <DirectXMath.h>
-#include <ranges>
-#include <Windows.h>
 #include <stdexcept>
 #include <typeinfo>
 #include "baseException.h"
 #include <iostream>
+#include <wrl.h>
+#include "IBindable.h"
+#include "ISlot.h"
 
 namespace buffer
 {
-	namespace ranges = std::ranges;
 #define TYPES_APPLY_F(F) \
-	F(TYPE_UNDEFINED) \
 	F(TYPE_FLOAT) \
 	F(TYPE_FLOAT3) \
 	F(TYPE_FLOAT4) \
@@ -30,16 +28,6 @@ namespace buffer
 		TYPE_INT,
 		TYPE_BOOL
 	};
-
-	static constexpr const char* TypeStr(TYPE t) noexcept
-	{
-		switch (t)
-		{
-#define GENERATE_SWITCH(type) case type: return #type;
-		TYPES_APPLY_F(GENERATE_SWITCH)
-		}
-		return "UNKNOWN_TYPE";
-	}
 
 	struct defined {
 		static constexpr bool is_defined = true;
@@ -79,6 +67,44 @@ namespace buffer
 	template<class T>
 	concept Defined = reverse_map<T>::is_defined && map<reverse_map<T>::t>::is_defined;
 
+	template <typename Tgt, typename Src>
+	concept NoNarrowConvertive = requires (Src s) { Tgt{s}; }
+
+	static constexpr const char* TypeStr(TYPE t) noexcept
+	{
+		switch (t)
+		{
+#define NAME_F(type) case type: return #type;
+			TYPES_APPLY_F(NAME_F)
+#undef NAME_F
+		}
+		return "UNKNOWN_TYPE";
+	}
+
+	template<class T>
+	bool IsTypeAssignableTo(const TYPE& t) noexcept
+	{
+		switch (t)
+		{
+#define F(t) case t: return std::is_assignable_v<typename map<t>::type&,T>;
+			TYPES_APPLY_F(F)
+#undef F
+		}
+		return false;
+	}
+
+	template<class T>
+	bool IsTypeConvertableTo(const TYPE& t) noexcept
+	{
+		switch (t)
+		{
+#define F(t) case t: return std::is_convertible_v<typename map<t>::type,T>;
+			TYPES_APPLY_F(F)
+#undef F
+		}
+		return false;
+	}
+
 	class bufferException : public baseException
 	{
 	public:
@@ -90,7 +116,7 @@ namespace buffer
 
 	struct Field
 	{
-		std::string semantic = "Unknown";
+		std::string semantic = "Unknown semantic";
 		TYPE fieldType		 = TYPE_UNDEFINED; 
 		size_t byteOffset    = 0;
 	};
@@ -121,30 +147,59 @@ namespace buffer
 		friend Buffer;
 	public:
 		FieldProxy() = default;
+		FieldProxy(std::string_view semantic);
 		template<Defined T>
-		FieldProxy(T* data) 
+		FieldProxy(T* data, std::string_view semantic) 
 			:
 			data(data), 
-			dataType(reverse_map<T>::t)
+			dataType(reverse_map<T>::t),
+			semantic(semantic)
 		{}
-		template<Defined T>
+		template<class T>
 		operator T&() {
 			using namespace std::string_literals;
 			if (!data)
-				throw bufferException(__LINE__, __FILE__, "Trying to get non-existent value from buffer");
-			if(reverse_map<T>::t != dataType)
-				std::cerr << bufferException(__LINE__, __FILE__, "Unable to convert "s + TypeStr(dataType) + " into " + typeid(T).name()).what();
+				throw bufferException(__LINE__, __FILE__, "Semantic \""s + semantic.data() + "\" does not exist in buffer");
+			if(!IsTypeConvertableTo<T>(dataType))
+				throw bufferException(__LINE__, __FILE__, "Unable to convert "s + TypeStr(dataType) + " into " + typeid(T).name());
 			return *(reinterpret_cast<T*>(data));
 		}
-
 		template<Defined T>
 		operator const T&() const {
-			return (T&)const_cast<FieldProxy&>(*this);
+			return static_cast<T&>(const_cast<FieldProxy&>(*this));
+		}
+		template<class T>
+		FieldProxy& operator=(T&& value)
+		{
+			using namespace std::string_literals;
+			if (!data)
+				throw bufferException(__LINE__, __FILE__, "Semantic \""s + semantic.data() + "\" does not exist in buffer");
+			switch (dataType)
+			{
+#define F(t) case t: assignValue<t>(data, std::forward<T>(value)); break;
+			TYPES_APPLY_F(F)
+#undef F
+			}
+			return *this;
 		}
 		bool Valid() const noexcept;
+	protected:
+		template <TYPE t, class T> 
+			requires std::is_assignable_v<typename map<t>::type&, T> && NoNarrowConvertive<typename map<t>::type, T>
+		void assignValue(void* data, T&& value)
+		{
+			*reinterpret_cast<typename map<t>::type*>(data) = std::forward<T>(value);
+		}
+		template <TYPE t, class T>
+		void assignValue(void* data, T&& value)
+		{
+			using namespace std::string_literals;
+			throw bufferException(__LINE__, __FILE__, "Unable to assign "s + TypeStr(t) + " to a " + typeid(T).name());
+		}
 	private:
-		void* data	  = nullptr;
-		TYPE dataType = TYPE_UNDEFINED;
+		void* data			 = nullptr;
+		TYPE  dataType		 = TYPE_UNDEFINED;
+		std::string_view semantic = "Unknown semantic";
 	};
 
 	class Buffer
@@ -153,10 +208,19 @@ namespace buffer
 		Buffer(BufferLayout layout);
 		FieldProxy operator[](std::string_view semantic);
 		const FieldProxy operator[](std::string_view semantic) const;
+		const std::vector<std::byte>& GetBytes() const noexcept;
+		const size_t& GetByteSize() const noexcept;
 	private:
 		BufferLayout layout;
-		std::vector<std::byte> buff;
+		std::vector<std::byte> bytes;
 	};
 
-	
+	class PixelConstantBufferEx : public IBindable, public Slotted
+	{
+	public:
+		PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot = 0U);
+		void Bind(Graphics& Gfx) noexcept override;
+	private:
+		Microsoft::WRL::ComPtr<class ID3D11Buffer> pBuffer;
+	};
 }
