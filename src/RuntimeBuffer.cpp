@@ -1,9 +1,8 @@
-﻿#include "Buffer.h"
-#include <iostream>
+﻿#include "RuntimeBuffer.h"
 #include <Windows.h>
 #include "Graphics.h"
 
-namespace buffer
+namespace RuntimeBuffer
 {
 	// ↓ bufferException 
 	bufferException::bufferException(int line, std::string_view fileName, std::string_view msg)
@@ -42,6 +41,12 @@ namespace buffer
 	BufferLayout::FieldIterator BufferLayout::End() noexcept
 	{
 		return fields.end();
+	}
+
+	void BufferLayout::AlignAs16() noexcept
+	{
+		if (byteSize % 16 != 0)
+			byteSize += (16ull - byteSize % 16ull);
 	}
 
 	size_t BufferLayout::GetByteSize() const noexcept
@@ -108,15 +113,15 @@ namespace buffer
 		auto itField = layout.FindField(semantic);
 		switch (itField->dataType)
 		{
-		case buffer::TYPE_FLOAT:
+		case TYPE_FLOAT:
 			return *BufferIterator(&bytes.at(itField->byteOffset), itField);
-		case buffer::TYPE_FLOAT3:
+		case TYPE_FLOAT3:
 			return *BufferIterator(&bytes.at(itField->byteOffset), itField);
-		case buffer::TYPE_FLOAT4:
+		case TYPE_FLOAT4:
 			return *BufferIterator(&bytes.at(itField->byteOffset), itField);
-		case buffer::TYPE_INT:
+		case TYPE_INT:
 			return *BufferIterator(&bytes.at(itField->byteOffset), itField);
-		case buffer::TYPE_BOOL:
+		case TYPE_BOOL:
 			return *BufferIterator(&bytes.at(itField->byteOffset), itField);
 		}
 		return *BufferIterator(nullptr, itField);
@@ -168,18 +173,19 @@ namespace buffer
 		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pBuffer.GetAddressOf());
 	}
 	// ↓ CachingPixelConstantBufferEx
-	CachingPixelConstantBufferEx::CachingPixelConstantBufferEx(Graphics& Gfx, Buffer& buff, UINT bindSlot)
+	CachingPixelConstantBufferEx::CachingPixelConstantBufferEx(Graphics& Gfx, Buffer* ptrBuff, UINT bindSlot)
 		:
-		buffRef(buff)
+		ptrBuff(ptrBuff),
+		Slotted(bindSlot)
 	{
 		D3D11_BUFFER_DESC CBDesc = {};
-		CBDesc.ByteWidth = static_cast<UINT>(buff.GetByteSize());
+		CBDesc.ByteWidth = static_cast<UINT>(ptrBuff->GetByteSize());
 		CBDesc.Usage = D3D11_USAGE_DYNAMIC;
 		CBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA CBSubData = {};
-		CBSubData.pSysMem = buff.GetBytes().data();
+		CBSubData.pSysMem = ptrBuff->GetBytes().data();
 
 		HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &pBuffer); assert(SUCCEEDED(hr));
 	}
@@ -192,7 +198,7 @@ namespace buffer
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource = {};
 		HRESULT hr = GetContext(Gfx)->Map(pBuffer.Get(), 0U, D3D11_MAP_WRITE_DISCARD, 0U, &mappedSubresource); assert(SUCCEEDED(hr));
 
-		memcpy(mappedSubresource.pData, buffRef.GetBytes().data(), buffRef.GetByteSize());
+		memcpy(mappedSubresource.pData, ptrBuff->GetBytes().data(), ptrBuff->GetByteSize());
 
 		GetContext(Gfx)->Unmap(pBuffer.Get(), 0U);
 	}

@@ -8,12 +8,11 @@
 #include <iostream>
 #include <wrl.h>
 #include "noxnd.h"
-#include <ranges>
 #include "baseException.h"
 #include "IBindable.h"
 #include "ISlot.h"
 
-namespace buffer
+namespace RuntimeBuffer
 {
 	namespace ranges = std::ranges;
 	class FieldProxy;
@@ -133,10 +132,11 @@ namespace buffer
 		using FieldIterator = std::vector<Field>::iterator;
 		using FieldConstIterator = std::vector<Field>::const_iterator;
 	public:
+		BufferLayout() = default;
 		template<Defined T>
 		void AddField(std::string semantic) noxnd
 		{
-			auto it = ranges::find_if(fields, [&semantic](Field& f) {
+			auto it = std::find_if(fields.begin(), fields.end(), [&semantic](Field& f) {
 				return f.semantic == semantic;
 			});
 			if (it == fields.end()) {
@@ -154,6 +154,7 @@ namespace buffer
 		FieldIterator      FindField(const std::string& semantic);
 		FieldIterator      Begin() noexcept;
 		FieldIterator      End() noexcept;
+		void			   AlignAs16() noexcept;
 		size_t GetByteSize() const noexcept;
 	private:
 		bool   Crosses16Border(size_t fieldSize) const noexcept;
@@ -228,7 +229,9 @@ namespace buffer
 
 	class Buffer
 	{
+		friend class CachingPixelConstantBufferEx;
 	public:
+		Buffer() = default;
 		Buffer(BufferLayout layout);
 		FieldProxy operator[](const std::string& semantic);
 		const FieldProxy operator[](const std::string& semantic) const;
@@ -252,11 +255,13 @@ namespace buffer
 	class CachingPixelConstantBufferEx : public IBindable, public Slotted
 	{
 	public:
-		CachingPixelConstantBufferEx(Graphics& Gfx, Buffer& buff, UINT bindSlot = 0U);
+		CachingPixelConstantBufferEx() = default;
+		CachingPixelConstantBufferEx(Graphics& Gfx, Buffer* ptrBuff, UINT bindSlot = 0U);
 		void Bind(Graphics& Gfx) noexcept override;
 		void Update(Graphics& Gfx) noexcept;
+		operator bool() const noexcept { return ptrBuff != nullptr && pBuffer != nullptr; }
 	private:
-		Microsoft::WRL::ComPtr<struct ID3D11Buffer> pBuffer;
-		Buffer& buffRef;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
+		Buffer* ptrBuff = nullptr;
 	};
 }

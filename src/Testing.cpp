@@ -1,9 +1,9 @@
 #include "Testing.h"
-#include "Buffer.h"
+#include "RuntimeBuffer.h"
 
 void DoTest()
 {
-	buffer::BufferLayout layout{};
+	RuntimeBuffer::BufferLayout layout{};
 	layout.AddField<DirectX::XMFLOAT3>("diffuseColor");
 	layout.AddField<DirectX::XMFLOAT4>("someOption");
 	layout.AddField<DirectX::XMFLOAT3>("ambientColor");
@@ -11,7 +11,7 @@ void DoTest()
 	layout.AddField<DirectX::XMFLOAT3>("worldPosition");
 	layout.AddField<bool>("hasAnyMaps");
 
-	buffer::Buffer buff(layout);
+	RuntimeBuffer::Buffer buff(layout);
 	buff["diffuseColor"] = DirectX::XMFLOAT3{ 1.f,1.f,1.f };
 	buff["ambientColor"] = DirectX::XMFLOAT3{ 0.f,0.f,0.f };
 	buff["specularColor"] = DirectX::XMFLOAT3{ 0.1f,0.1f,0.1f };

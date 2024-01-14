@@ -256,7 +256,7 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\baseException.cpp" />
     <ClCompile Include="src\Blob.cpp" />
-    <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\RuntimeBuffer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\DirectXWindow.cpp" />
@@ -308,7 +308,7 @@
     <ClInclude Include="include\BaseWindow.h" />
     <ClInclude Include="include\BindableSystem.h" />
     <ClInclude Include="include\Blob.h" />
-    <ClInclude Include="include\Buffer.h" />
+    <ClInclude Include="include\RuntimeBuffer.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\CombinePixelShader.h" />
     <ClInclude Include="include\ComputeShader.h" />

@@ -7,9 +7,15 @@
 #include "PixelConstantBuffer.h"
 #include "Model.h"
 
+namespace RuntimeBuffer
+{
+	class CachingPixelConstantBufferEx;
+	class Buffer;
+}
+
 namespace dx = DirectX;
 
-enum LIGHT_TYPE : uint32_t
+enum LIGHT_TYPE : unsigned int
 {
 	LIGHT_TYPE_POINT_LIGHT = 0,
 	LIGHT_TYPE_SPOTLIGHT = 1,
@@ -47,7 +53,7 @@ public:
 public:
 	Light(Graphics& Gfx, LIGHT_TYPE typeID);
 
-	bool ShowLightGUI() noexcept;
+	bool ShowLightGUI();
 
 	LIGHT_TYPE  GetLightType() const noexcept { return data.typeId; }
 	const data_type& GetDesc()      const noexcept { return data; }
@@ -57,5 +63,7 @@ public:
 	virtual void Bind(Graphics& Gfx)					noexcept override;
 
 private:
+	static RuntimeBuffer::CachingPixelConstantBufferEx LightBuffer;
 	static std::shared_ptr<buffer_type> pLightBuffer;
+	static RuntimeBuffer::Buffer buffer;
 };

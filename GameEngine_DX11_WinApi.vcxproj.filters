@@ -213,7 +213,7 @@
     <ClCompile Include="src\VertexBuffer.cpp">
       <Filter>Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Buffer.cpp">
+    <ClCompile Include="src\RuntimeBuffer.cpp">
       <Filter>Buffers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -512,7 +512,7 @@
     <ClInclude Include="include\VertexConstantBuffer.h">
       <Filter>Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Buffer.h">
+    <ClInclude Include="include\RuntimeBuffer.h">
       <Filter>Buffers</Filter>
     </ClInclude>
   </ItemGroup>
