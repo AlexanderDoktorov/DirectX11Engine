@@ -1,17 +1,23 @@
-#pragma once
+﻿#pragma once
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include <DirectXMath.h>
 #include <stdexcept>
 #include <typeinfo>
-#include "baseException.h"
 #include <iostream>
 #include <wrl.h>
+#include "noxnd.h"
+#include <ranges>
+#include "baseException.h"
 #include "IBindable.h"
 #include "ISlot.h"
 
 namespace buffer
 {
+	namespace ranges = std::ranges;
+	class FieldProxy;
+
 #define TYPES_APPLY_F(F) \
 	F(TYPE_FLOAT) \
 	F(TYPE_FLOAT3) \
@@ -114,54 +120,74 @@ namespace buffer
 		std::string msg;
 	};
 
-	struct Field
-	{
-		std::string semantic = "Unknown semantic";
-		TYPE fieldType		 = TYPE_UNDEFINED; 
-		size_t byteOffset    = 0;
-	};
-
 	class BufferLayout
 	{
 		friend class Buffer;
 	public:
-		template<Defined T> 
-		void AddField(std::string_view semantic)
+		struct Field
 		{
-			Field field;
-			field.byteOffset = byteSize;
-			field.semantic	 = semantic;
-			field.fieldType  = reverse_map<T>::t;
-
-			fields.push_back(field);
-			byteSize += map<reverse_map<T>::t>::size;
+			TYPE   dataType		 = TYPE_UNDEFINED; 
+			size_t byteOffset	 = 0ull;
+			std::string semantic = "Unknown semantic";
+		};
+		using FieldIterator = std::vector<Field>::iterator;
+		using FieldConstIterator = std::vector<Field>::const_iterator;
+	public:
+		template<Defined T>
+		void AddField(std::string semantic) noxnd
+		{
+			auto it = ranges::find_if(fields, [&semantic](Field& f) {
+				return f.semantic == semantic;
+			});
+			if (it == fields.end()) {
+				constexpr const size_t fieldSize = map<reverse_map<T>::t>::size;
+				if (Crosses16Border(fieldSize) && (byteSize % 16 != 0) )
+					fields.emplace_back(reverse_map<T>::t, CalcBorderOffset(), std::move(semantic));
+				else
+					fields.emplace_back(reverse_map<T>::t, byteSize, std::move(semantic));
+				byteSize = fields.back().byteOffset + fieldSize;
+			}
+			else
+				assert(false && "Layout already has such field");
 		}
-		Field GetField(std::string_view semantic);
+		FieldConstIterator FindConstField(const std::string& semantic) const;
+		FieldIterator      FindField(const std::string& semantic);
+		FieldIterator      Begin() noexcept;
+		FieldIterator      End() noexcept;
+		size_t GetByteSize() const noexcept;
 	private:
+		bool   Crosses16Border(size_t fieldSize) const noexcept;
+		size_t CalcBorderOffset() const noexcept;
 		std::vector<Field> fields;
-		size_t byteSize = 0U;
+		size_t byteSize = 0ull;
 	};
 
-	class FieldProxy
+	// ↓ BufferIterator
+	class BufferIterator
 	{
-		friend class Buffer;
+		friend Buffer;
+		friend FieldProxy;
 	public:
-		FieldProxy() = default;
-		FieldProxy(std::string_view semantic);
-		template<Defined T>
-		FieldProxy(T* data, std::string_view semantic) 
-			:
-			data(data), 
-			dataType(reverse_map<T>::t),
-			semantic(semantic)
-		{}
+		BufferIterator(void* data, BufferLayout::FieldIterator itField);
+		BufferIterator& operator++() noexcept;
+		FieldProxy operator*();
+	private:
+		void* data	= nullptr;
+		BufferLayout::FieldIterator itField;
+	};
+
+	// ↓ FieldProxy
+	class FieldProxy
+	{		
+	public:
+		FieldProxy(BufferIterator& itBuff);
 		template<class T>
 		operator T&() {
 			using namespace std::string_literals;
 			if (!data)
-				throw bufferException(__LINE__, __FILE__, "Semantic \""s + semantic.data() + "\" does not exist in buffer");
-			if(!IsTypeConvertableTo<T>(dataType))
-				throw bufferException(__LINE__, __FILE__, "Unable to convert "s + TypeStr(dataType) + " into " + typeid(T).name());
+				throw bufferException(__LINE__, __FILE__, "Semantic \""s + field.semantic + "\" does not exist in buffer");
+			if(!IsTypeConvertableTo<T>(field.dataType))
+				throw bufferException(__LINE__, __FILE__, "Unable to convert "s + TypeStr(field.dataType) + " into " + typeid(T).name());
 			return *(reinterpret_cast<T*>(data));
 		}
 		template<Defined T>
@@ -173,16 +199,15 @@ namespace buffer
 		{
 			using namespace std::string_literals;
 			if (!data)
-				throw bufferException(__LINE__, __FILE__, "Semantic \""s + semantic.data() + "\" does not exist in buffer");
-			switch (dataType)
+				throw bufferException(__LINE__, __FILE__, "Semantic \""s + field.semantic + "\" does not exist in buffer");
+			switch (field.dataType)
 			{
 #define F(t) case t: assignValue<t>(data, std::forward<T>(value)); break;
-			TYPES_APPLY_F(F)
+				TYPES_APPLY_F(F)
 #undef F
 			}
 			return *this;
 		}
-		bool Valid() const noexcept;
 	protected:
 		template <TYPE t, class T> 
 			requires std::is_assignable_v<typename map<t>::type&, T> && NoNarrowConvertive<typename map<t>::type, T>
@@ -197,19 +222,20 @@ namespace buffer
 			throw bufferException(__LINE__, __FILE__, "Unable to assign "s + TypeStr(t) + " to a " + typeid(T).name());
 		}
 	private:
-		void* data			 = nullptr;
-		TYPE  dataType		 = TYPE_UNDEFINED;
-		std::string_view semantic = "Unknown semantic";
+		void* data = nullptr;
+		BufferLayout::Field field{};
 	};
 
 	class Buffer
 	{
 	public:
 		Buffer(BufferLayout layout);
-		FieldProxy operator[](std::string_view semantic);
-		const FieldProxy operator[](std::string_view semantic) const;
+		FieldProxy operator[](const std::string& semantic);
+		const FieldProxy operator[](const std::string& semantic) const;
 		const std::vector<std::byte>& GetBytes() const noexcept;
-		const size_t& GetByteSize() const noexcept;
+		size_t GetByteSize() const noexcept;
+		BufferIterator Begin() noexcept;
+		BufferIterator End() noexcept;
 	private:
 		BufferLayout layout;
 		std::vector<std::byte> bytes;
@@ -222,5 +248,15 @@ namespace buffer
 		void Bind(Graphics& Gfx) noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<struct ID3D11Buffer> pBuffer;
+	};
+	class CachingPixelConstantBufferEx : public IBindable, public Slotted
+	{
+	public:
+		CachingPixelConstantBufferEx(Graphics& Gfx, Buffer& buff, UINT bindSlot = 0U);
+		void Bind(Graphics& Gfx) noexcept override;
+		void Update(Graphics& Gfx) noexcept;
+	private:
+		Microsoft::WRL::ComPtr<struct ID3D11Buffer> pBuffer;
+		Buffer& buffRef;
 	};
 }
