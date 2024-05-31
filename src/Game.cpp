@@ -85,7 +85,7 @@ void Game::UpdateFrame()
 				cam.Translate({ 0.0f,-dt,0.0f });
 		}
 		if (std::optional<int> zDelta = window->ReadZDelta())
-			cam.Accelerate(static_cast<float>(zDelta.value()) / 50.f);
+			cam.Accelerate(zDelta.value() / 50.f);
 	}
 #ifndef _NOIMGUI
 	ShowItemsSubMenu();

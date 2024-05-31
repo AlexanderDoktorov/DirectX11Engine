@@ -154,7 +154,7 @@ namespace RuntimeBuffer
 		FieldIterator      FindField(const std::string& semantic);
 		FieldIterator      Begin() noexcept;
 		FieldIterator      End() noexcept;
-		void			   AlignAs16() noexcept;
+		BufferLayout&	   AlignAs16() noexcept;
 		size_t GetByteSize() const noexcept;
 	private:
 		bool   Crosses16Border(size_t fieldSize) const noexcept;
@@ -179,11 +179,32 @@ namespace RuntimeBuffer
 
 	// ↓ FieldProxy
 	class FieldProxy
-	{		
+	{
+		class Ptr
+		{
+		public:
+			Ptr(FieldProxy* ptrFieldProxy) :
+				ptrFieldProxy(ptrFieldProxy)
+			{}
+			// conversion for getting read-only pointer to supported SysType
+			template<class T>
+			operator const T*() const noxnd
+			{
+				return &static_cast<const T&>(*ptrFieldProxy);
+			}
+			template<class T>
+			operator T*() noxnd
+			{
+				const T& valCRef = static_cast<const T&>(*ptrFieldProxy);
+				return &const_cast<T&>(valCRef);
+			}
+		private:
+			FieldProxy* ptrFieldProxy = nullptr;
+		};
 	public:
 		FieldProxy(BufferIterator& itBuff);
-		template<class T>
-		operator T&() {
+		template<Defined T>
+		operator const T&() const {
 			using namespace std::string_literals;
 			if (!data)
 				throw bufferException(__LINE__, __FILE__, "Semantic \""s + field.semantic + "\" does not exist in buffer");
@@ -191,10 +212,11 @@ namespace RuntimeBuffer
 				throw bufferException(__LINE__, __FILE__, "Unable to convert "s + TypeStr(field.dataType) + " into " + typeid(T).name());
 			return *(reinterpret_cast<T*>(data));
 		}
-		template<Defined T>
-		operator const T&() const {
-			return static_cast<T&>(const_cast<FieldProxy&>(*this));
+		Ptr operator&()
+		{
+			return Ptr{ this };
 		}
+		
 		template<class T>
 		FieldProxy& operator=(T&& value)
 		{
@@ -229,13 +251,14 @@ namespace RuntimeBuffer
 
 	class Buffer
 	{
-		friend class CachingPixelConstantBufferEx;
+		friend class PixelConstantBufferEx;
 	public:
 		Buffer() = default;
 		Buffer(BufferLayout layout);
 		FieldProxy operator[](const std::string& semantic);
 		const FieldProxy operator[](const std::string& semantic) const;
 		const std::vector<std::byte>& GetBytes() const noexcept;
+		const BufferLayout& GetLayout() const noexcept;
 		size_t GetByteSize() const noexcept;
 		BufferIterator Begin() noexcept;
 		BufferIterator End() noexcept;
@@ -247,21 +270,12 @@ namespace RuntimeBuffer
 	class PixelConstantBufferEx : public IBindable, public Slotted
 	{
 	public:
-		PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot = 0U);
+		PixelConstantBufferEx() = default;
+		PixelConstantBufferEx(Graphics& Gfx, const BufferLayout& layout, Buffer* ptrBuff, UINT bindSlot = 0U);
 		void Bind(Graphics& Gfx) noexcept override;
+		void Update(Graphics& Gfx, const Buffer* buffer);
+		operator bool() const noexcept { return pBuffer != nullptr; }
 	private:
 		Microsoft::WRL::ComPtr<struct ID3D11Buffer> pBuffer;
-	};
-	class CachingPixelConstantBufferEx : public IBindable, public Slotted
-	{
-	public:
-		CachingPixelConstantBufferEx() = default;
-		CachingPixelConstantBufferEx(Graphics& Gfx, Buffer* ptrBuff, UINT bindSlot = 0U);
-		void Bind(Graphics& Gfx) noexcept override;
-		void Update(Graphics& Gfx) noexcept;
-		operator bool() const noexcept { return ptrBuff != nullptr && pBuffer != nullptr; }
-	private:
-		Microsoft::WRL::ComPtr<ID3D11Buffer> pBuffer;
-		Buffer* ptrBuff = nullptr;
 	};
 }

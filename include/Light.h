@@ -6,12 +6,7 @@
 #include "imgui.h"
 #include "PixelConstantBuffer.h"
 #include "Model.h"
-
-namespace RuntimeBuffer
-{
-	class CachingPixelConstantBufferEx;
-	class Buffer;
-}
+#include "RuntimeBuffer.h"
 
 namespace dx = DirectX;
 
@@ -48,22 +43,18 @@ protected:
 		LIGHT_TYPE typeId = LIGHT_TYPE_POINT_LIGHT;
 	} data{};
 public:
-	using data_type   = decltype(data);
-	using buffer_type = PixelConstantBuffer<data_type>;
-public:
 	Light(Graphics& Gfx, LIGHT_TYPE typeID);
 
 	bool ShowLightGUI();
 
 	LIGHT_TYPE  GetLightType() const noexcept { return data.typeId; }
-	const data_type& GetDesc()      const noexcept { return data; }
+	const Data& GetDesc() const noexcept { return data; }
 
 			void SetLightType(const LIGHT_TYPE& typeId) noexcept { data.typeId = typeId; }
-	virtual void Reset()								noexcept { data = data_type(); } // resets to default;
+	virtual void Reset()								noexcept { data = Data(); } // resets to default;
 	virtual void Bind(Graphics& Gfx)					noexcept override;
 
 private:
-	static RuntimeBuffer::CachingPixelConstantBufferEx LightBuffer;
-	static std::shared_ptr<buffer_type> pLightBuffer;
-	static RuntimeBuffer::Buffer buffer;
+	RuntimeBuffer::Buffer dataBuff;
+	static RuntimeBuffer::PixelConstantBufferEx constantBuffer;
 };

@@ -43,10 +43,11 @@ namespace RuntimeBuffer
 		return fields.end();
 	}
 
-	void BufferLayout::AlignAs16() noexcept
+	BufferLayout& BufferLayout::AlignAs16() noexcept
 	{
 		if (byteSize % 16 != 0)
 			byteSize += (16ull - byteSize % 16ull);
+		return *this;
 	}
 
 	size_t BufferLayout::GetByteSize() const noexcept
@@ -103,7 +104,7 @@ namespace RuntimeBuffer
 	// ↓ Buffer
 	Buffer::Buffer(BufferLayout layout)
 		:
-		layout(std::move(layout)),
+		layout(std::move(layout.AlignAs16())),
 		bytes(this->layout.byteSize)
 	{
 	}
@@ -147,58 +148,48 @@ namespace RuntimeBuffer
 		return bytes;
 	}
 
+	const BufferLayout& Buffer::GetLayout() const noexcept
+	{
+		return layout;
+	}
+
 	size_t Buffer::GetByteSize() const noexcept
 	{
 		return bytes.size();
 	}
 
 	// ↓ PixelConstantBufferEx
-	PixelConstantBufferEx::PixelConstantBufferEx(Graphics& Gfx, const Buffer& buff, UINT bindSlot)
+	PixelConstantBufferEx::PixelConstantBufferEx(Graphics& Gfx, const BufferLayout& layout, Buffer* ptrBuff, UINT bindSlot)
 		:
 		Slotted(bindSlot)
 	{
 		D3D11_BUFFER_DESC CBDesc = {};
-		CBDesc.ByteWidth = static_cast<UINT>(buff.GetByteSize());
+		CBDesc.ByteWidth = static_cast<UINT>(layout.GetByteSize());
 		CBDesc.Usage = D3D11_USAGE_DYNAMIC;
 		CBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-		D3D11_SUBRESOURCE_DATA CBSubData = {};
-		CBSubData.pSysMem = buff.GetBytes().data();
+		if (ptrBuff) {
+			D3D11_SUBRESOURCE_DATA CBSubData = {};
+			CBSubData.pSysMem = ptrBuff->GetBytes().data();
 
-		HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &pBuffer); assert(SUCCEEDED(hr));
+			HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &pBuffer); assert(SUCCEEDED(hr));
+		}
+		else
+		{
+			HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, nullptr, &pBuffer); assert(SUCCEEDED(hr));
+		}
 	}
 	void PixelConstantBufferEx::Bind(Graphics& Gfx) noexcept
 	{
 		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pBuffer.GetAddressOf());
 	}
-	// ↓ CachingPixelConstantBufferEx
-	CachingPixelConstantBufferEx::CachingPixelConstantBufferEx(Graphics& Gfx, Buffer* ptrBuff, UINT bindSlot)
-		:
-		ptrBuff(ptrBuff),
-		Slotted(bindSlot)
-	{
-		D3D11_BUFFER_DESC CBDesc = {};
-		CBDesc.ByteWidth = static_cast<UINT>(ptrBuff->GetByteSize());
-		CBDesc.Usage = D3D11_USAGE_DYNAMIC;
-		CBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		CBDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA CBSubData = {};
-		CBSubData.pSysMem = ptrBuff->GetBytes().data();
-
-		HRESULT hr = GetDevice(Gfx)->CreateBuffer(&CBDesc, &CBSubData, &pBuffer); assert(SUCCEEDED(hr));
-	}
-	void CachingPixelConstantBufferEx::Bind(Graphics& Gfx) noexcept
-	{
-		GetContext(Gfx)->PSSetConstantBuffers(GetBindSlot(), 1U, pBuffer.GetAddressOf());
-	}
-	void CachingPixelConstantBufferEx::Update(Graphics& Gfx) noexcept
+	void PixelConstantBufferEx::Update(Graphics& Gfx, const Buffer* buffer)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource = {};
 		HRESULT hr = GetContext(Gfx)->Map(pBuffer.Get(), 0U, D3D11_MAP_WRITE_DISCARD, 0U, &mappedSubresource); assert(SUCCEEDED(hr));
 
-		memcpy(mappedSubresource.pData, ptrBuff->GetBytes().data(), ptrBuff->GetByteSize());
+		memcpy(mappedSubresource.pData, buffer->GetBytes().data(), buffer->GetByteSize());
 
 		GetContext(Gfx)->Unmap(pBuffer.Get(), 0U);
 	}
